@@ -2,6 +2,7 @@ from math import exp, log,sqrt
 import numpy as np
 from scipy.misc import derivative
 import scipy.sparse.linalg
+from scipy.linalg import sqrtm
 
 constant = 1.
 interactions = [1.]
@@ -15,7 +16,7 @@ def get_simple_tensor_2 (model, temp = 1., field = 0, int = [0, 0, 0]):
 		int.append(0.0)
 
 	tensor_dict = {
-		"langmuir" : np.array([[0.0, field/4.0],[field/4.0, -int[0]+field/2.0]]),
+		"langmuir" : np.array([[0.0, field/6.0],[field/6.0, -int[0]+field/3.0]]),
 		"ising" : np.array([[(int[0]-field/2.0), (-int[0])],[(-int[0]), (int[0]+field/2.0)]]),
 		"hard-disk" : np.array([[0.0, field/2.0],[field/2.0, -1000000.0+field]]),
 		"BC_ising" : np.array([[int[1]+field/4.0, -int[1], int[1]+int[2]/4.0 + 3.0*field/8.0, -int[1]-int[2]/4.0+field/8.0,int[1]-int[2]/4.0+field/8.0,-int[1]+int[2]/4.0-field/8.0], \
@@ -39,18 +40,23 @@ def create_cd(dim,elem):
 		cd[((i,)*dim)] = 1.
 	return cd
 
-def TRG(model,max_count = 64, temp = 1., field = 0, int = [0], max_value = 1e-8, atol_lnZ = 1e-9, contractions_count = 300, lattice = "triangle"):
+def TRG(model,max_count = 64, temp = 1., field = 0, int = [0], max_value = 1e-8, atol_lnZ = 1e-9, contractions_count = 300, lattice = "square"):
 
-	"""tensor_0 = get_simple_tensor_2(model, temp,field, int = interactions)
+	tensor_0 = get_simple_tensor_2(model, temp,field, int = interactions)
 	n = tensor_0.shape[0]
 	cd = create_cd(3, n) #SVD of cd is cd
-	tensor = np.einsum("ab,ibk->iak",tensor_0,cd)
+	#tensor = np.einsum("ab,ibk->iak",tensor_0,cd)
 	if (lattice == "square"):
-		tensor = np.einsum("abc,bef,ejk,jcn->afkn",tensor,tensor,tensor,tensor)
+		cd = create_cd(4, n)
+		tensor_0 = sqrtm(tensor_0)
+		tensor = np.einsum("abcd,ia,bl,cn,od->ilno", cd, tensor_0, tensor_0, tensor_0, tensor_0)
+		#tensor = np.einsum("abcd,ia,bl->ilcd", cd, tensor_0, tensor_0)
+		#tensor = np.einsum("abc,bef,ejk,jcn->afkn",tensor,tensor,tensor,tensor)
+
 	elif (lattice == "triangle"):
 		tensor = np.einsum("abc,dfb,icf->adi",tensor,tensor,tensor)
-		tensor = np.einsum("abi,ijk->abjk", tensor,cd)"""
-	tensor = 0
+		tensor = np.einsum("abi,ijk->abjk", tensor,cd)
+	"""tensor = 0
 	if (model == "hard_triangle"):
 		inf = -1e8
 		field /= 6.0
@@ -194,7 +200,7 @@ def TRG(model,max_count = 64, temp = 1., field = 0, int = [0], max_value = 1e-8,
 	two = np.einsum("ab,iak->ibk",three,cd)
 	three = np.einsum("ab,ibk->iak",two2,cd)
 	tensor = np.einsum("abc,deb,ice->adi",one,two,three)
-	tensor = np.einsum("abi,ijk->abjk", tensor,cd)
+	tensor = np.einsum("abi,ijk->abjk", tensor,cd)"""
 
 
 	Z = np.empty((contractions_count+1))
@@ -222,7 +228,7 @@ def TRG(model,max_count = 64, temp = 1., field = 0, int = [0], max_value = 1e-8,
 		tensor = tensor/Z[i]
 		xxx = abs(np.trace(np.trace(tensor,axis1=0, axis2=2)))
 		if xxx == 0.0:
-			print("Warning! Tensor trace is zero!")
+			#print("Warning! Tensor trace is zero!")
 			break;
 		lnZ = log(abs(xxx))
 		lnZ /= (2.0**i)
@@ -322,14 +328,14 @@ def simple_hierarchical(model,size, temp = 1., field = 0, int = [0]):
 	cd4 = create_cd(4, tensor.shape[0])
 
 	#cd6 = create_cd(6, tensor.shape[0])
-	tensor = np.einsum("ab,ibk->iak",tensor,cd3)
+	#tensor = np.einsum("ab,ibk->iak",tensor,cd3)
 	#triangle
 	#tensor = np.einsum("abc,dfb,icf->adi",tensor,tensor,tensor)
 	#square
-	tensor = np.einsum("abc,bef,ejk,jcn->afkn",tensor,tensor,tensor,tensor)
+	#tensor = np.einsum("abc,bef,ejk,jcn->afkn",tensor,tensor,tensor,tensor)
 
 	for i in np.arange(1,(number_of_steps+1),1):
-		"""edges = (1 + size*2)**2
+		edges = (1 + size*2)**2
 		dop_tensor = create_cd(size+2,tensor.shape[0])
 		dop_tensor_2 = create_cd(size+2,tensor.shape[0])
 
@@ -361,10 +367,7 @@ def simple_hierarchical(model,size, temp = 1., field = 0, int = [0]):
 		if xxx == 0:
 			#print("xxx",i)
 			break
-		"""
-
-
-		#serpinski classic
+		"""#serpinski classic
 		if False:
 			edges = 3
 			tensor = np.einsum("abc,aef,ibf->eic",tensor,tensor,tensor)
@@ -435,17 +438,13 @@ def simple_hierarchical(model,size, temp = 1., field = 0, int = [0]):
 			tensor_one = np.einsum("abcdefadi->bcefi",tensor_one)
 			tensor = np.einsum("abcij,ijk->abck",tensor_one,cd3)
 
-
-
-
-
 		Z[i] = tensor.max()
 		tensor = tensor/Z[i]
 
 		xxx = np.einsum("abab",tensor)
 		if xxx == 0:
 			#print("xxx",i)
-			break
+			break"""
 
 		lnZ = np.log(xxx)
 		lnZ /= (edges**i)
@@ -467,17 +466,28 @@ def magnetization(method,model,size, temp = 1., field = 0, int = [0]):
 	return result
 
 def heat_capasity(method,model,size, temp = 1., field = 0, int = [0]):
-	result = derivative(lambda x: method(model,size,x,field,int), temp, n=2, dx=1e-4)
+	result = derivative(lambda x: method(model,size,x,field,int), temp, n=2, dx=1e-5)
 	return result
 
 def enthropy(method,model,size, temp = 1., field = 0, int = [0]):
 	result = derivative(lambda x: method(model,size,x,field,int), temp, n=1, dx=1e-5)
 	return result
 
-temperature = 1.
-for muu in np.arange(-10.0,10,0.1):
-	interactions = [0.0,0.0,0.0]
+"""temperature = 1.
+muu = 0.00001
+for temperature in np.arange(2.2,2.3,0.001):
+	interactions = [1.0,0.0,0.0]
 	method = TRG
-	size = 64
-	print(muu,coverage(method,'hard_triangle2',size, temperature, muu/10.0, interactions))#,heat_capasity(method,'BC_ising',size, T, muu, interactions))
-	#print(temperature,heat_capasity(method,'hard_triangle',size, temperature, muu, interactions))
+	size = 16
+	#print(muu,coverage(method,'hard_triangle2',size, temperature, muu/10.0, interactions))#,heat_capasity(method,'BC_ising',size, T, muu, interactions))
+	print(temperature,heat_capasity(method,'ising',size, temperature, muu, interactions))
+	#print(muu,coverage(method,'hard_triangle',size, temperature, muu/3.0, interactions))"""
+
+temperature = 2.0/log(1+sqrt(2))
+muu = 0.0
+interactions = [1.0,0.0,0.0]
+method = TRG
+size = 16
+for size in np.arange(10, 66, 5):
+#for temperature in np.arange(0.5,3,0.1):
+	print(size,method('ising',size, temperature, muu, interactions))
