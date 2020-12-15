@@ -40,8 +40,11 @@ def build_matrix (model, temp, m_par, neigbours = 4.0):
 	return matrixes
 
 def simulate(method = "trg", model = "langmuir", lattice = "square", temp = 1.0, m_par = [0.0, 0.0]):
+
 	tensors = build_matrix(model, temp, m_par)
+	#lattice = "hexagonal"
 	tensors = tn.build_tensor(tensors, lattice)
+	#lattice = "square"
 	scale = 0.0
 	old_scale = -1.0
 	if lattice == "triangle":
@@ -49,7 +52,7 @@ def simulate(method = "trg", model = "langmuir", lattice = "square", temp = 1.0,
 	else:
 		nodes = 2.0
 
-	for i in range(2):
+	for i in range(100):
 		if method == "trg":
 			(tensors, scale) = tn.trg_step(tensors, scale, chi_number, chi_min, lattice)
 		else:
@@ -63,9 +66,6 @@ def simulate(method = "trg", model = "langmuir", lattice = "square", temp = 1.0,
 	nodes *= 9.0**(i+1)
 
 
-	#tensors[0] = np.einsum("abcd, cfgh, ihkl, mdip -> mabfkgpl", tensors[0],tensors[0],tensors[0],tensors[0]).reshape(4,4,4,4)
-	#tensors[0] = np.einsum("abcd, cfgh, ihkl, mdip -> mabfkgpl", tensors[0],tensors[0],tensors[0],tensors[0]).reshape(16,16,16,16)
-	#norm = abs(np.trace(np.trace(tensors[0], axis1 = 0, axis2 = 2)))
 	"""norm = abs(np.einsum("abc, cba -> ", tensors[0], tensors[1]))
 	if norm != 0:
 		for i, ten in enumerate(tensors):
@@ -110,24 +110,25 @@ for size in np.arange(10, 66, 5):
 	print(size,method('ising',size, temperature, muu, interactions))"""
 
 method = "trg"
-model = "ising"
+model = "dimers"
 lattice = "hexagonal"
 temp_square = 2.0/log(1+sqrt(2))
 temp_hex = 4.0/log(3)
 temp = temp_hex
-mu = 0.0
-m_par = [mu, 1.0]
-for size in np.arange(2, 36, 1):
+temp = 2.0
+mu = 25.0
+m_par = [mu, 20.0]
+for size in np.arange(18, 100, 1):
 	chi_number = size
 	print(size, simulate(method, model, lattice, temp, m_par))
 
 
 """method = "trg"
-model = "langmuir"
+model = "dimers"
 lattice = "hexagonal"
 temp = 2
 mu = 0.0
-chi_number = 16
-for mu in np.arange(10.0,40.0,0.5):
-	m_par = [mu, 0.0]
+chi_number = 81
+for mu in np.arange(13.0, 40.0, 0.5):
+	m_par = [mu, 20.0]
 	print(mu,coverage(method, model, lattice, temp, m_par))"""
