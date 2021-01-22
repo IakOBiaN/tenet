@@ -4,6 +4,8 @@ from scipy.misc import derivative
 import scipy.sparse.linalg
 from scipy.linalg import sqrtm
 
+constant = 1.
+
 def identity(dimensions, elements):
 	id = np.zeros((elements, ) * dimensions)
 	for i in range(elements):
@@ -58,7 +60,7 @@ def build_tensor(matrixes, lattice = "square"):
 		tensor = np.einsum("abc, dfb, icf -> adi",tensor,tensor,tensor)
 		tensor = list((np.einsum("abi, ijk -> abjk", tensor, identity(3, leg_size)), ))
 	elif (lattice == "hexagonal"):
-		U_1, S_1, V_1 = scipy.linalg.svd(matrixes[0])
+		"""U_1, S_1, V_1 = scipy.linalg.svd(matrixes[0])
 		U_2, S_2, V_2 = scipy.linalg.svd(matrixes[1])
 		S_1 = np.sqrt(S_1)
 		U_1 = np.einsum("ai,i->ai", U_1, S_1)
@@ -72,10 +74,10 @@ def build_tensor(matrixes, lattice = "square"):
 		#V_2 = U_2
 		tensor1 = np.einsum("abc, ia, jb, cn -> ijn", identity(3, leg_size), V_1, V_2, U_1)
 		tensor2 = np.einsum("abc, ia, bj, cn -> ijn", identity(3, leg_size), V_1, U_2, U_1)
-		tensor = list((tensor1, tensor2))
+		tensor = list((tensor1, tensor2))"""
 
-		#tensor = np.einsum("abc, ia, bl, cn -> iln", identity(3, leg_size), matrixes[0], matrixes[0], matrixes[1])
-		#tensor = list((np.einsum("abc, bjk -> ajkc", tensor, identity(3, leg_size)), ))
+		tensor = np.einsum("abc, ia, bl, cn -> iln", identity(3, leg_size), matrixes[0], matrixes[0], matrixes[1])
+		tensor = list((np.einsum("abc, bjk -> ajkc", tensor, identity(3, leg_size)), ))
 	return tensor
 
 def build_triangles_tensor(model, temp, m_par):
@@ -216,13 +218,13 @@ def build_triangles_tensor(model, temp, m_par):
 	two2 = np.array([np.exp(line) for line in two])
 	three *= 1./(constant*temp)
 	three = np.array([np.exp(line) for line in three])
-	cd = create_cd(3, one.shape[0])
+	cd = identity(3, one.shape[0])
 	one = np.einsum("ab,iak->ibk",one,cd)
 	two = np.einsum("ab,iak->ibk",three,cd)
 	three = np.einsum("ab,ibk->iak",two2,cd)
 	tensor = np.einsum("abc,deb,ice->adi",one,two,three)
 	tensor = np.einsum("abi,ijk->abjk", tensor,cd)
-
+	tensor = list((tensor, ))
 	return tensor
 
 def trg_square(tensor, scale, chi_number = 64, chi_min = 1e-8):
