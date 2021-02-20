@@ -105,7 +105,7 @@ def build_triangles_tensor(model, temp, m_par):
 						[inf, inf, inf, inf, inf, inf, 2.0*field], \
 						[field, 2.0*field, 2.0*field, inf, 2.0*field, inf, inf], \
 						[field, 2.0*field, 2.0*field, inf, 2.0*field, 2.0*field, inf]])
-	elif model == "hard_trianles2":
+	elif model == "hard_triangles2":
 		field = m_par[0]/6.0
 		one = np.array([[0, inf, inf, inf, field, field, field, field, inf, inf, field, inf, field], \
 						[field, inf, inf, inf, 2.0*field, 2.0*field, 2.0*field, 2.0*field, inf, inf, 2.0*field, inf, 2.0*field], \

@@ -90,45 +90,18 @@ def enthropy(method,model,size, temp = 1., field = 0, int = [0]):
 	result = derivative(lambda x: simulate(model,size,x,field,int), temp, n=1, dx=1e-5)
 	return result
 
-"""temperature = 1.
-muu = 0.00001
-for temperature in np.arange(2.2,2.3,0.001):
-	interactions = [1.0,0.0,0.0]
-	method = TRG
-	size = 16
-	#print(muu,coverage(method,'hard_triangle2',size, temperature, muu/10.0, interactions))#,heat_capasity(method,'BC_ising',size, T, muu, interactions))
-	print(temperature,heat_capasity(method,'ising',size, temperature, muu, interactions))
-	#print(muu,coverage(method,'hard_triangle',size, temperature, muu/3.0, interactions))"""
-
-"""temperature = 2.0/log(1+sqrt(2))
-muu = 0.0
-interactions = [1.0,0.0,0.0]
-method = TRG
-size = 16
-for size in np.arange(10, 66, 5):
-#for temperature in np.arange(0.5,3,0.1):
-	print(size,method('ising',size, temperature, muu, interactions))"""
 
 method = "trg"
-model = "dimers"
-lattice = "hexagonal"
+model = "hard_triangles"
+lattice = "square"
 temp_square = 2.0/log(1+sqrt(2))
 temp_hex = 4.0/log(3)
 temp = temp_hex
-temp = 2.0
+temp = 1.0
 mu = 25.0
-m_par = [mu, 20.0]
-for size in np.arange(18, 100, 1):
-	chi_number = size
-	print(size, simulate(method, model, lattice, temp, m_par))
-
-
-"""method = "trg"
-model = "dimers"
-lattice = "hexagonal"
-temp = 2
-mu = 0.0
-chi_number = 81
-for mu in np.arange(13.0, 40.0, 0.5):
-	m_par = [mu, 20.0]
-	print(mu,coverage(method, model, lattice, temp, m_par))"""
+for size in range(32,34,1):
+	print("SIZE=", size)
+	for mu in np.arange(-10, 10, 0.5):
+		chi_number = 32
+		m_par = [mu/3.0, 0.0]
+		print(mu, coverage(method, model, lattice, temp, m_par))
