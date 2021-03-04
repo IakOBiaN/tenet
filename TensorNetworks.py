@@ -227,6 +227,10 @@ def build_triangles_tensor(model, temp, m_par):
 	tensor = list((tensor, ))
 	return tensor
 
+def hotrg_square(tensor, scale, chi_number = 64, chi_min = 1e-8):
+	
+	return tensor, scale
+
 def trg_square(tensor, scale, chi_number = 64, chi_min = 1e-8):
 
 	U_1,S_1,V_1 = split_by_svd(tensor[0], [0, 1], [2, 3], chi_min, chi_number)
@@ -274,18 +278,13 @@ def trg_hexagonal(tensors, scale, chi_number = 64, chi_min = 1e-8):
 def trg_step(tensor, scale, chi_number = 64, chi_min = 1e-8, lattice = "square"):
 
 	if (lattice == "square"):
-		norm = tensor[0].max()#abs(np.trace(np.trace(tensor[0], axis1 = 0, axis2 = 2)))
-		#print("norm=",norm)
+		norm = tensor[0].max()
 		if norm != 0:
 			for i, ten in enumerate(tensor):
 				tensor[i] = ten/norm
 			scale += np.log(norm)
-		#print(scale)
 		tensor, scale = trg_square(tensor, scale, chi_number, chi_min)
-		#print(tensor[0].shape)
 		tensor, scale = trg_square(tensor, scale, chi_number, chi_min)
-		#print(tensor[0].shape)
-		#exit()
 	elif (lattice == "hexagonal"):
 		norm = abs(np.einsum("abc, cba -> ", tensor[0], tensor[1]))
 		if norm != 0:

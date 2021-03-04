@@ -67,13 +67,6 @@ def simulate(method = "trg", model = "langmuir", lattice = "square", temp = 1.0,
 		print("Warning! More than 50 iterations")
 	nodes *= 4.0**(i+1)
 
-
-	"""norm = abs(np.einsum("abc, cba -> ", tensors[0], tensors[1]))
-	if norm != 0:
-		for i, ten in enumerate(tensors):
-			tensors[i] = ten/norm
-		scale += np.log(norm)"""
-
 	return scale/(nodes/(constant*temp))
 
 def coverage(method, model, lattice, temp = 1., m_par = [0.0, 0.0]):
