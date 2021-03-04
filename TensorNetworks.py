@@ -274,13 +274,18 @@ def trg_hexagonal(tensors, scale, chi_number = 64, chi_min = 1e-8):
 def trg_step(tensor, scale, chi_number = 64, chi_min = 1e-8, lattice = "square"):
 
 	if (lattice == "square"):
-		norm = abs(np.trace(np.trace(tensor[0], axis1 = 0, axis2 = 2)))
+		norm = tensor[0].max()#abs(np.trace(np.trace(tensor[0], axis1 = 0, axis2 = 2)))
+		#print("norm=",norm)
 		if norm != 0:
 			for i, ten in enumerate(tensor):
 				tensor[i] = ten/norm
 			scale += np.log(norm)
+		#print(scale)
 		tensor, scale = trg_square(tensor, scale, chi_number, chi_min)
+		#print(tensor[0].shape)
 		tensor, scale = trg_square(tensor, scale, chi_number, chi_min)
+		#print(tensor[0].shape)
+		#exit()
 	elif (lattice == "hexagonal"):
 		norm = abs(np.einsum("abc, cba -> ", tensor[0], tensor[1]))
 		if norm != 0:

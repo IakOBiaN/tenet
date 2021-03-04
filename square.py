@@ -41,29 +41,31 @@ def build_matrix (model, temp, m_par, neigbours = 4.0):
 
 def simulate(method = "trg", model = "langmuir", lattice = "square", temp = 1.0, m_par = [0.0, 0.0]):
 
-	tensors = build_matrix(model, temp, m_par)
+	#tensors = build_matrix(model, temp, m_par)
 	#lattice = "hexagonal"
-	tensors = tn.build_tensor(tensors, lattice)
+	#tensors = tn.build_tensor(tensors, lattice)
 	#lattice = "square"
+	tensors = tn.build_triangles_tensor(model, temp, m_par)
+
 	scale = 0.0
 	old_scale = -1.0
 	if lattice == "triangle":
 		nodes = 1.0
 	else:
-		nodes = 2.0
+		nodes = 1.0
 
 	for i in range(100):
 		if method == "trg":
 			(tensors, scale) = tn.trg_step(tensors, scale, chi_number, chi_min, lattice)
 		else:
 			assert False, "Error! There is no such method."
-		if abs(old_scale - scale/9.0) < method_tolerance:
+		if abs(old_scale - scale/4.0) < method_tolerance:
 			break
 		else:
 			old_scale = scale
 	if i > 50:
 		print("Warning! More than 50 iterations")
-	nodes *= 9.0**(i+1)
+	nodes *= 4.0**(i+1)
 
 
 	"""norm = abs(np.einsum("abc, cba -> ", tensors[0], tensors[1]))
@@ -92,16 +94,16 @@ def enthropy(method,model,size, temp = 1., field = 0, int = [0]):
 
 
 method = "trg"
-model = "hard_triangles"
+model = "hard_triangles2"
 lattice = "square"
 temp_square = 2.0/log(1+sqrt(2))
 temp_hex = 4.0/log(3)
 temp = temp_hex
 temp = 1.0
 mu = 25.0
-for size in range(32,34,1):
+for size in range(64,65,1):
 	print("SIZE=", size)
-	for mu in np.arange(-10, 10, 0.5):
-		chi_number = 32
-		m_par = [mu/3.0, 0.0]
+	for mu in np.arange(-10.0, 10.0, 0.5):
+		chi_number = 128
+		m_par = [mu/6.0, 0.0]
 		print(mu, coverage(method, model, lattice, temp, m_par))
