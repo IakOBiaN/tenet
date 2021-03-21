@@ -16,6 +16,11 @@ chi_min = 1e-8
 method_tolerance = 1e-8
 
 def build_matrix (model, temp, m_par, neigbours = 4.0):
+
+	if len(m_par) < 10:
+		m_par = m_par + [0.0]*(10-len(m_par))
+
+	#[any],[right, bottom],[right-up, right, right-bottom], [right-up, right, right-bottom, bottom]
 	matrix_dict = {
 		"langmuir" : (np.array([[0.0, m_par[0]/neigbours],[m_par[0]/neigbours, -m_par[1]+m_par[0]/(neigbours/2.0)]]) ,) * 2,
 		"ising" : (np.array([[(m_par[1]-m_par[0]/(neigbours/2.0)), (-m_par[1])],[(-m_par[1]), (m_par[1]+m_par[0]/(neigbours/2.0))]]), ) * 2,
@@ -29,7 +34,24 @@ def build_matrix (model, temp, m_par, neigbours = 4.0):
 						[(m_par[0]+m_par[1])/6.0, inf, inf, inf, inf], \
 						[(m_par[0]+m_par[1])/6.0, inf, inf, inf, inf], \
 						[inf, inf, inf, (m_par[0]+m_par[1])/3.0, inf], \
-						[m_par[0]/3.0, inf, inf, inf, inf]]))
+						[m_par[0]/3.0, inf, inf, inf, inf]])), \
+		#mu = m_par[0], m1 = m_par[1], m2 = m_par[2], m1 = m_par[3], m1 = m_par[4], m1 = m_par[5]
+		"HT1" : (np.array([[0, m_par[0], m_par[0], 2.0*m_par[0]+m_par[4]], \
+						[m_par[0], 2.0*m_par[0], 2.0*m_par[0], 3.0*m_par[0]+m_par[4]], \
+						[m_par[0], 2.0*m_par[0]+m_par[1], 2.0*m_par[0], 3.0*m_par[0]+m_par[4]+m_par[1]], \
+						[2.0*m_par[0]+m_par[4], 3.0*m_par[0]+m_par[4]+m_par[1], 3.0*m_par[0]+m_par[4], 4.0*m_par[0]+2.0*m_par[4]+m_par[1]]]), \
+					np.array([[0, m_par[0], m_par[0], 2.0*m_par[0]+m_par[4]], \
+						[m_par[0], 2.0*m_par[0]+m_par[2], 2.0*m_par[0], 3.0*m_par[0]+m_par[4]+m_par[2]], \
+						[m_par[0], 2.0*m_par[0]+m_par[4], 2.0*m_par[0]+m_par[2], 3.0*m_par[0]+2.0*m_par[4]+m_par[2]], \
+						[2.0*m_par[0]+m_par[4], 3.0*m_par[0]+2.0*m_par[4]+m_par[2], 3.0*m_par[0]+m_par[4]+m_par[2], 4.0*m_par[0]+3.0*m_par[4]+2.0*m_par[2]]]), \
+					np.array([[0, m_par[0], m_par[0], 2.0*m_par[0]+m_par[4]], \
+						[m_par[0], 2.0*m_par[0]+m_par[2], 2.0*m_par[0]+m_par[1], 3.0*m_par[0]+m_par[4]+m_par[1]+m_par[2]], \
+						[m_par[0], 2.0*m_par[0]+m_par[1], 2.0*m_par[0]+m_par[2], 3.0*m_par[0]+m_par[4]+m_par[1]+m_par[2]], \
+						[2.0*m_par[0]+m_par[4], 3.0*m_par[0]+m_par[4]+m_par[1]+m_par[2], 3.0*m_par[0]+m_par[4]+m_par[1]+m_par[2], 4.0*m_par[0]+2.0*m_par[4]+2.0*m_par[1]+2.0*m_par[2]]]), \
+					np.array([[0, m_par[0], m_par[0], 2.0*m_par[0]+m_par[4]], \
+						[m_par[0], 2.0*m_par[0]+m_par[2], 2.0*m_par[0]+m_par[4], 3.0*m_par[0]+2.0*m_par[4]+m_par[2]], \
+						[m_par[0], 2.0*m_par[0], 2.0*m_par[0]+m_par[2], 3.0*m_par[0]+m_par[4]+m_par[2]], \
+						[2.0*m_par[0]+m_par[4], 3.0*m_par[0]+m_par[4]+m_par[2], 3.0*m_par[0]+2.0*m_par[4]+m_par[2], 4.0*m_par[0]+3.0*m_par[4]+2.0*m_par[2]]]))
 	}
 
 	matrixes = list(matrix_dict.get(model))
@@ -39,7 +61,7 @@ def build_matrix (model, temp, m_par, neigbours = 4.0):
 		matrixes[i] = np.array([np.exp(line) for line in matrixes[i]])
 	return matrixes
 
-def simulate(method = "trg", model = "langmuir", lattice = "square", temp = 1.0, m_par = [0.0, 0.0]):
+def simulate(method = "trg", model = "langmuir", lattice = "square", temp = 1.0, m_par = [0.0]*10):
 
 	tensors = build_matrix(model, temp, m_par)
 	tensors = tn.build_tensor(tensors, lattice)
@@ -69,15 +91,15 @@ def simulate(method = "trg", model = "langmuir", lattice = "square", temp = 1.0,
 
 	return scale/(nodes/(constant*temp))
 
-def coverage(method, model, lattice, temp = 1., m_par = [0.0, 0.0]):
-	result = derivative(lambda x: simulate(method, model, lattice, temp, [x, m_par[1]]), m_par[0], n=1, dx=1e-3)
+def coverage(method, model, lattice, temp = 1., m_par = [0.0]*10):
+	result = derivative(lambda x: simulate(method, model, lattice, temp, [x]+m_par[1:]), m_par[0], n=1, dx=1e-3)
 	return result
 
 def magnetization(method,model,size, temp = 1., field = 0, int = [0]):
 	result = derivative(lambda x: simulate(model,size,temp,field,[x]), int[0], n=1, dx=1e-5)
 	return result
 
-def heat_capasity(method, model, lattice, temp = 1., m_par = [0.0, 0.0]):
+def heat_capasity(method, model, lattice, temp = 1., m_par = [0.0]*10):
 	result = derivative(lambda x: simulate(method, model, lattice, x, m_par), temp, n=2, dx=1e-3)
 	return result
 
@@ -87,16 +109,14 @@ def enthropy(method,model,size, temp = 1., field = 0, int = [0]):
 
 
 method = "trg"
-model = "hard_triangles2"
-lattice = "square"
+model = "HT1"
+lattice = "complex_to_sqr"
 temp_square = 2.0/log(1+sqrt(2))
 temp_hex = 4.0/log(3)
 temp = temp_hex
 temp = 1.0
-mu = 25.0
-for size in range(64,65,1):
-	print("SIZE=", size)
-	for mu in np.arange(-10.0, 10.0, 0.5):
-		chi_number = 128
-		m_par = [mu/6.0, 0.0]
-		print(mu, coverage(method, model, lattice, temp, m_par))
+mu = 1.0
+chi_number = 32
+for mu in np.arange(-10.0,10.01,1.0):
+	m_par = [mu/3.0, inf, inf, inf, inf, inf]
+	print(mu, coverage(method, model, lattice, temp, m_par))

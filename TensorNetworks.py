@@ -56,11 +56,11 @@ def build_tensor(matrixes, lattice = "square"):
 	tensor = np.einsum("ab,ibk->iak",matrixes[0], identity(3, leg_size))
 	if (lattice == "square"):
 		tensor = list((np.einsum("abc, bef, ejk, jcn -> afkn", tensor, tensor, tensor, tensor), ))
-	elif (lattice == "triangle"):
+	elif (lattice == "tr_to_sqr"):
 		tensor = np.einsum("abc, dfb, icf -> adi",tensor,tensor,tensor)
 		tensor = list((np.einsum("abi, ijk -> abjk", tensor, identity(3, leg_size)), ))
-	elif (lattice == "hexagonal"):
-		"""U_1, S_1, V_1 = scipy.linalg.svd(matrixes[0])
+	elif (lattice == "hex"):
+		U_1, S_1, V_1 = scipy.linalg.svd(matrixes[0])
 		U_2, S_2, V_2 = scipy.linalg.svd(matrixes[1])
 		S_1 = np.sqrt(S_1)
 		U_1 = np.einsum("ai,i->ai", U_1, S_1)
@@ -74,10 +74,17 @@ def build_tensor(matrixes, lattice = "square"):
 		#V_2 = U_2
 		tensor1 = np.einsum("abc, ia, jb, cn -> ijn", identity(3, leg_size), V_1, V_2, U_1)
 		tensor2 = np.einsum("abc, ia, bj, cn -> ijn", identity(3, leg_size), V_1, U_2, U_1)
-		tensor = list((tensor1, tensor2))"""
-
+		tensor = list((tensor1, tensor2))
+	elif (lattice == "hex_to_sqr"):
 		tensor = np.einsum("abc, ia, bl, cn -> iln", identity(3, leg_size), matrixes[0], matrixes[0], matrixes[1])
 		tensor = list((np.einsum("abc, bjk -> ajkc", tensor, identity(3, leg_size)), ))
+	elif (lattice == "complex_to_sqr"):
+		id3 = identity(3, leg_size)
+		ten_one = np.einsum("aix,ij,xy->ajy",id3, matrixes[0], matrixes[1])
+		ten_two = np.einsum("abc,ij,xy->ajy",id3, matrixes[2], matrixes[3])
+		tensor = np.einsum("kbcdef,ijk->ibjcdef",identity(6, leg_size), ten_one)
+		tensor = np.einsum("abckefg,ijk->abciejgf",tensor, ten_two).reshape(leg_size**2, leg_size**2, leg_size**2, leg_size**2)
+		tensor = list((tensor, ))
 	return tensor
 
 def build_triangles_tensor(model, temp, m_par):
@@ -301,7 +308,7 @@ def hotrg_step(tensor, scale, chi_number = 64, chi_min = 1e-8, lattice = "square
 
 def trg_step(tensor, scale, chi_number = 64, chi_min = 1e-8, lattice = "square"):
 
-	if (lattice == "square" or lattice == "triangle"):
+	if (lattice == "square" or lattice == "complex_to_sqr" or lattice == "hex_to_sqr" or lattice == "tr_to_sqr"):
 		norm = tensor[0].max()
 		if norm != 0:
 			for i, ten in enumerate(tensor):
@@ -309,7 +316,7 @@ def trg_step(tensor, scale, chi_number = 64, chi_min = 1e-8, lattice = "square")
 			scale += np.log(norm)
 		tensor, scale = trg_square(tensor, scale, chi_number, chi_min)
 		tensor, scale = trg_square(tensor, scale, chi_number, chi_min)
-	elif (lattice == "hexagonal"):
+	elif (lattice == "hex"):
 		norm = abs(np.einsum("abc, cba -> ", tensor[0], tensor[1]))
 		if norm != 0:
 			for i, ten in enumerate(tensor):
