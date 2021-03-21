@@ -228,7 +228,20 @@ def build_triangles_tensor(model, temp, m_par):
 	return tensor
 
 def hotrg_square(tensor, scale, chi_number = 64, chi_min = 1e-8):
-	
+	hotensor = tensor[0]
+	size = hotensor.shape
+	hotensor = np.einsum("abcd,cjkl->abjkdl", hotensor, hotensor).reshape(size[0],size[1]*size[1],size[2],size[3]*size[3])
+
+	if size[3]*size[3] > chi_number:
+		U,S,V = split_by_svd(hotensor, [0, 1, 2], [3], chi_min, chi_number)
+		S = np.sqrt(S)
+		U = np.einsum("abci,i->abci", U, S)
+		V = np.einsum("ib,i->ib",V, S)
+		hotensor = np.einsum("ajcd,ij->aicd", U, V)
+
+	tensor[0] = np.einsum("abcd->dabc", hotensor)
+
+	scale *= 2
 	return tensor, scale
 
 def trg_square(tensor, scale, chi_number = 64, chi_min = 1e-8):
@@ -275,9 +288,20 @@ def trg_hexagonal(tensors, scale, chi_number = 64, chi_min = 1e-8):
 	scale *= 3.0
 	return list((tensor1, tensor2)), scale
 
+def hotrg_step(tensor, scale, chi_number = 64, chi_min = 1e-8, lattice = "square"):
+	norm = tensor[0].max()
+	#print(np.log(norm))
+	if norm != 0:
+		for i, ten in enumerate(tensor):
+			tensor[i] = ten/norm
+		scale += np.log(norm)
+	tensor, scale = hotrg_square(tensor, scale, chi_number, chi_min)
+	tensor, scale = hotrg_square(tensor, scale, chi_number, chi_min)
+	return (tensor, scale)
+
 def trg_step(tensor, scale, chi_number = 64, chi_min = 1e-8, lattice = "square"):
 
-	if (lattice == "square"):
+	if (lattice == "square" or lattice == "triangle"):
 		norm = tensor[0].max()
 		if norm != 0:
 			for i, ten in enumerate(tensor):

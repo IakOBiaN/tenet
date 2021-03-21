@@ -41,22 +41,22 @@ def build_matrix (model, temp, m_par, neigbours = 4.0):
 
 def simulate(method = "trg", model = "langmuir", lattice = "square", temp = 1.0, m_par = [0.0, 0.0]):
 
-	#tensors = build_matrix(model, temp, m_par)
-	#lattice = "hexagonal"
-	#tensors = tn.build_tensor(tensors, lattice)
-	#lattice = "square"
-	tensors = tn.build_triangles_tensor(model, temp, m_par)
+	tensors = build_matrix(model, temp, m_par)
+	tensors = tn.build_tensor(tensors, lattice)
+	#tensors = tn.build_triangles_tensor(model, temp, m_par)
 
 	scale = 0.0
 	old_scale = -1.0
 	if lattice == "triangle":
 		nodes = 1.0
 	else:
-		nodes = 1.0
+		nodes = 2.0
 
 	for i in range(100):
 		if method == "trg":
 			(tensors, scale) = tn.trg_step(tensors, scale, chi_number, chi_min, lattice)
+		elif method == "hotrg":
+			(tensors, scale) = tn.hotrg_step(tensors, scale, chi_number, chi_min, lattice)
 		else:
 			assert False, "Error! There is no such method."
 		if abs(old_scale - scale/4.0) < method_tolerance:
@@ -77,8 +77,8 @@ def magnetization(method,model,size, temp = 1., field = 0, int = [0]):
 	result = derivative(lambda x: simulate(model,size,temp,field,[x]), int[0], n=1, dx=1e-5)
 	return result
 
-def heat_capasity(method,model,size, temp = 1., field = 0, int = [0]):
-	result = derivative(lambda x: simulate(model,size,x,field,int), temp, n=2, dx=1e-5)
+def heat_capasity(method, model, lattice, temp = 1., m_par = [0.0, 0.0]):
+	result = derivative(lambda x: simulate(method, model, lattice, x, m_par), temp, n=2, dx=1e-3)
 	return result
 
 def enthropy(method,model,size, temp = 1., field = 0, int = [0]):
