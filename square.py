@@ -109,14 +109,14 @@ def enthropy(method,model,size, temp = 1., field = 0, int = [0]):
 
 
 method = "trg"
-model = "HT1"
+model = "langmuir"
 lattice = "complex_to_sqr"
 temp_square = 2.0/log(1+sqrt(2))
 temp_hex = 4.0/log(3)
 temp = temp_hex
 temp = 1.0
 mu = 1.0
-chi_number = 32
-for mu in np.arange(-10.0,10.01,1.0):
-	m_par = [mu/3.0, inf, inf, inf, inf, inf]
+chi_number = 16
+for mu in np.arange(-20.0,50.01,1.0):
+	m_par = [mu, 5.0, inf, inf, inf, inf]
 	print(mu, coverage(method, model, lattice, temp, m_par))

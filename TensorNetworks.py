@@ -79,11 +79,13 @@ def build_tensor(matrixes, lattice = "square"):
 		tensor = np.einsum("abc, ia, bl, cn -> iln", identity(3, leg_size), matrixes[0], matrixes[0], matrixes[1])
 		tensor = list((np.einsum("abc, bjk -> ajkc", tensor, identity(3, leg_size)), ))
 	elif (lattice == "complex_to_sqr"):
+		if len(matrixes) < 4:
+			matrixes = matrixes + [matrixes[0]]*(4-len(matrixes))
 		id3 = identity(3, leg_size)
 		ten_one = np.einsum("aix,ij,xy->ajy",id3, matrixes[0], matrixes[1])
 		ten_two = np.einsum("abc,ij,xy->ajy",id3, matrixes[2], matrixes[3])
 		tensor = np.einsum("kbcdef,ijk->ibjcdef",identity(6, leg_size), ten_one)
-		tensor = np.einsum("abckefg,ijk->abciejgf",tensor, ten_two).reshape(leg_size**2, leg_size**2, leg_size**2, leg_size**2)
+		tensor = np.einsum("abckefg,ijk->abcijegf",tensor, ten_two).reshape(leg_size**2, leg_size**2, leg_size**2, leg_size**2)
 		tensor = list((tensor, ))
 	return tensor
 
