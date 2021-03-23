@@ -15,7 +15,7 @@ chi_number = 24
 chi_min = 1e-8
 method_tolerance = 1e-8
 
-def build_matrix (model, temp, m_par, neigbours = 4.0):
+def build_matrix (model, temp, m_par, neigbours = 8.0):
 
 	if len(m_par) < 10:
 		m_par = m_par + [0.0]*(10-len(m_par))
@@ -116,7 +116,7 @@ temp_hex = 4.0/log(3)
 temp = temp_hex
 temp = 1.0
 mu = 1.0
-chi_number = 16
-for mu in np.arange(-20.0,50.01,1.0):
+chi_number = 64
+for mu in np.arange(50.0,-20.01,-1.0):
 	m_par = [mu, 5.0, inf, inf, inf, inf]
-	print(mu, coverage(method, model, lattice, temp, m_par))
+	print(mu, 2.0*coverage(method, model, lattice, temp, m_par))
