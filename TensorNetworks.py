@@ -78,7 +78,7 @@ def build_tensor(matrixes, lattice = "square"):
 	elif (lattice == "hex_to_sqr"):
 		tensor = np.einsum("abc, ia, bl, cn -> iln", identity(3, leg_size), matrixes[0], matrixes[0], matrixes[1])
 		tensor = list((np.einsum("abc, bjk -> ajkc", tensor, identity(3, leg_size)), ))
-	elif (lattice == "complex_to_sqr"):
+	elif (lattice == "complex_to_sqr2"):
 		if len(matrixes) < 4:
 			matrixes = matrixes + [matrixes[0]]*(4-len(matrixes))
 		id3 = identity(3, leg_size)
@@ -87,15 +87,31 @@ def build_tensor(matrixes, lattice = "square"):
 		tensor = np.einsum("kbcdef,ijk->ibjcdef",identity(6, leg_size), ten_one)
 		tensor = np.einsum("abckefg,ijk->abciejgf",tensor, ten_two).reshape(leg_size**2, leg_size**2, leg_size**2, leg_size**2)
 		tensor = list((tensor, ))
-	"""elif (lattice == "complex_to_sqrxx"):
+	elif (lattice == "complex_to_sqr"):
 		if len(matrixes) < 4:
 			matrixes = matrixes + [matrixes[0]]*(4-len(matrixes))
 		id3 = identity(3, leg_size)
 		ten_one = np.einsum("aix,ij,xy->ajy",id3, matrixes[2], matrixes[3])
-		ten_two = np.einsum("abc,ij,xy->ajy",id3, matrixes[2], matrixes[3])
-		tensor = np.einsum("kbcdef,ijk->ibjcdef",identity(6, leg_size), ten_one)
-		tensor = np.einsum("abckefg,ijk->abcijegf",tensor, ten_two).reshape(leg_size**2, leg_size**2, leg_size**2, leg_size**2)
-		tensor = list((tensor, ))"""
+		ten_two = np.einsum("abi,ij->abj",id3, matrixes[1])
+		tensor = np.einsum("abj,ijk->abki",ten_one, ten_two)
+		tensor = np.einsum("aijd,ijk->akd",tensor, identity(3, leg_size))
+		ten_one = np.einsum("abi, ij->abj",identity(3, leg_size), matrixes[0])
+		tensor = np.einsum("akc, ijk->icja",ten_one, tensor)
+
+		U_1,S_1,V_1 = split_by_svd(tensor, [0, 1], [2, 3])
+		U_2 = identity(3, leg_size)
+		V_2 = identity(3, leg_size)
+
+		S_1 = np.sqrt(S_1)
+		U_1 = np.einsum("abi,i->abi", U_1, S_1)
+		V_1 = np.einsum("ibc,i->ibc",V_1, S_1)
+
+		ten_one = np.tensordot(V_2, V_1, ([1], [2]))
+		ten_two = np.tensordot(U_1, U_2, ([1], [1]))
+		tensor = np.tensordot(ten_one, ten_two, ([1, 3],[0, 2]))
+
+		tensor = np.swapaxes(tensor, 2, 3)
+		tensor = list((tensor, ))
 	return tensor
 
 def build_triangles_tensor(model, temp, m_par):
