@@ -51,7 +51,51 @@ def build_matrix (model, temp, m_par, neigbours = 8.0):
 					np.array([[0, m_par[0], m_par[0], 2.0*m_par[0]+m_par[4]], \
 						[m_par[0], 2.0*m_par[0]+m_par[2], 2.0*m_par[0]+m_par[4], 3.0*m_par[0]+2.0*m_par[4]+m_par[2]], \
 						[m_par[0], 2.0*m_par[0], 2.0*m_par[0]+m_par[2], 3.0*m_par[0]+m_par[4]+m_par[2]], \
-						[2.0*m_par[0]+m_par[4], 3.0*m_par[0]+m_par[4]+m_par[2], 3.0*m_par[0]+2.0*m_par[4]+m_par[2], 4.0*m_par[0]+3.0*m_par[4]+2.0*m_par[2]]]))
+						[2.0*m_par[0]+m_par[4], 3.0*m_par[0]+m_par[4]+m_par[2], 3.0*m_par[0]+2.0*m_par[4]+m_par[2], 4.0*m_par[0]+3.0*m_par[4]+2.0*m_par[2]]])), \
+		"HT2" : (np.array([[0, 2.0*m_par[0]/4.0, m_par[0]/4.0, 2.0*m_par[0]/4.0+m_par[4], 2.0*m_par[0]/4.0+m_par[5], m_par[0]/4.0, 2.0*m_par[0]/4.0+m_par[5], 2.0*m_par[0]/4.0+m_par[4], 2.0*m_par[0]/4.0, m_par[0]/4.0, m_par[0]/4.0], \
+						[2.0*m_par[0]/4.0, 4.0*m_par[0]/4.0+m_par[3], inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/4.0, 3.0*m_par[0]/4.0, 3.0*m_par[0]/4.0], \
+						[m_par[0]/4.0, 3.0*m_par[0]/4.0, 2.0*m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[4], 3.0*m_par[0]/4.0+m_par[5], 2.0*m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[5], 3.0*m_par[0]/4.0+m_par[4], 3.0*m_par[0]/4.0, 2.0*m_par[0]/4.0, 2.0*m_par[0]/4.0], \
+						[2.0*m_par[0]/4.0+m_par[4], 4.0*m_par[0]/4.0+m_par[4], inf, inf, inf, 3.0*m_par[0]/4.0+m_par[4], 4.0*m_par[0]/4.0+m_par[4]+m_par[5], 4.0*m_par[0]/4.0+2.0*m_par[4], inf, 3.0*m_par[0]/4.0+m_par[4], 3.0*m_par[0]/4.0+m_par[4]], \
+						[2.0*m_par[0]/4.0+m_par[5], 4.0*m_par[0]/4.0+m_par[5], 3.0*m_par[0]/4.0+m_par[5], 4.0*m_par[0]/4.0+m_par[5]+m_par[4], 4.0*m_par[0]/4.0+2.0*m_par[5], inf, inf, inf, inf, 3.0*m_par[0]/4.0+m_par[5], 3.0*m_par[0]/4.0+m_par[5]], \
+						[m_par[0]/4.0, 3.0*m_par[0]/4.0, 2.0*m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[4], 3.0*m_par[0]/4.0+m_par[5], 2.0*m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[5], 2.0*m_par[0]/4.0+m_par[4], 3.0*m_par[0]/4.0, 2.0*m_par[0]/4.0, 2.0*m_par[0]/4.0], \
+						[2.0*m_par[0]/4.0+m_par[5], 4.0*m_par[0]/4.0+m_par[5], inf, inf, inf, 3.0*m_par[0]/4.0+m_par[5], 4.0*m_par[0]/4.0+2.0*m_par[5], 4.0*m_par[0]/4.0+m_par[5]+m_par[4], inf, 3.0*m_par[0]/4.0+m_par[5], 3.0*m_par[0]/4.0+m_par[5]], \
+						[2.0*m_par[0]/4.0+m_par[4], 4.0*m_par[0]/4.0+m_par[4], 3.0*m_par[0]/4.0+m_par[4], 4.0*m_par[0]/4.0+2.0*m_par[4], 4.0*m_par[0]/4.0+m_par[4]+m_par[5], inf, inf, inf, inf, 3.0*m_par[0]/4.0+m_par[4], 3.0*m_par[0]/4.0+m_par[4]], \
+						[2.0*m_par[0]/4.0, 4.0*m_par[0]/4.0+m_par[1], 3.0*m_par[0]/4.0, 4.0*m_par[0]/4.0+m_par[4], 4.0*m_par[0]/4.0+m_par[5], 3.0*m_par[0]/4.0, 4.0*m_par[0]/4.0+m_par[5], 4.0*m_par[0]/4.0+m_par[4], 4.0*m_par[0]/4.0+m_par[3], 3.0*m_par[0]/4.0, 3.0*m_par[0]/4.0], \
+						[m_par[0]/4.0, 3.0*m_par[0]/4.0, inf, inf, inf, 2.0*m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[5], 3.0*m_par[0]/4.0+m_par[4], inf, 2.0*m_par[0]/4.0, 2.0*m_par[0]/4.0], \
+						[m_par[0]/4.0, 3.0*m_par[0]/4.0, 2.0*m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[4], 3.0*m_par[0]/4.0+m_par[5], inf, inf, inf, inf, 2.0*m_par[0]/4.0, 2.0*m_par[0]/4.0]]), \
+					np.array([[0, 2.0*m_par[0]/4.0, m_par[0]/4.0, 2.0*m_par[0]/4.0+m_par[4], 2.0*m_par[0]/4.0+m_par[5], inf, inf, inf, inf, m_par[0]/4.0, m_par[0]/4.0], \
+						[inf, inf, inf, inf, inf, 3.0*m_par[0]/4.0, 4.0*m_par[0]/4.0+m_par[5], 4.0*m_par[0]/4.0+m_par[4], inf, inf, inf], \
+						[m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[3], inf, inf, inf, inf, inf, inf, inf, 2.0*m_par[0]/4.0, 2.0*m_par[0]/4.0], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/4.0+m_par[4], inf, inf], \
+						[2.0*m_par[0]/4.0+m_par[5], 4.0*m_par[0]/4.0+m_par[5]+m_par[4]+m_par[3], inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/4.0+m_par[5], inf], \
+						[m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[2], 2.0*m_par[0]/4.0+m_par[3], 3.0*m_par[0]/4.0+m_par[4]+m_par[3], 3.0*m_par[0]/4.0+m_par[3]+m_par[5], inf, inf, inf, inf, 2.0*m_par[0]/4.0, 2.0*m_par[0]/4.0], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/4.0+m_par[5], inf, inf], \
+						[2.0*m_par[0]/4.0+m_par[4], 4.0*m_par[0]/4.0+2.0*m_par[4], 3.0*m_par[0]/4.0+m_par[4]+m_par[5], 4.0*m_par[0]/4.0+2.0*m_par[4]+m_par[5], 4.0*m_par[0]/4.0+m_par[4]+2.0*m_par[5], inf, inf, inf, inf, 3.0*m_par[0]/4.0+m_par[4]+m_par[3], inf], \
+						[2.0*m_par[0]/4.0, 4.0*m_par[0]/4.0+m_par[5], 3.0*m_par[0]/4.0+m_par[4], 4.0*m_par[0]/4.0+2.0*m_par[4], 4.0*m_par[0]/4.0+m_par[4]+m_par[5], inf, inf, inf, inf, 3.0*m_par[0]/4.0+m_par[2], 3.0*m_par[0]/4.0+m_par[3]], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/4.0, inf, inf], \
+						[m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[4], 2.0*m_par[0]/4.0+m_par[5], 3.0*m_par[0]/4.0+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf, 2.0*m_par[0]/4.0+m_par[3], inf]]), \
+					np.array([[0, 2.0*m_par[0]/4.0, m_par[0]/4.0, 2.0*m_par[0]/4.0+m_par[4], 2.0*m_par[0]/4.0+m_par[5], inf, inf, inf, 2.0*m_par[0]/4.0, m_par[0]/4.0, inf], \
+						[2.0*m_par[0]/4.0, inf, 3.0*m_par[0]/4.0+m_par[3], 4.0*m_par[0]/4.0+m_par[3]+m_par[4], inf, inf, inf, inf, 4.0*m_par[0]/4.0, 3.0*m_par[0]/4.0, inf], \
+						[inf, inf, inf, inf, inf, 2.0*m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[5], 3.0*m_par[0]/4.0+m_par[4], inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/4.0+2.0*m_par[4], inf, inf, inf], \
+						[inf, inf, inf, inf, inf, 3.0*m_par[0]/4.0+m_par[4], 4.0*m_par[0]/4.0+2.0*m_par[5]+m_par[2], inf, inf, inf, inf], \
+						[m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[3], 2.0*m_par[0]/4.0+m_par[2], 3.0*m_par[0]/4.0+m_par[2]+m_par[4], 3.0*m_par[0]/4.0+m_par[2]+m_par[5], inf, inf, inf, 3.0*m_par[0]/4.0, 2.0*m_par[0]/4.0+m_par[1], inf], \
+						[inf, inf, inf, inf, 4.0*m_par[0]/4.0+m_par[2]+2.0*m_par[5], inf, inf, inf, inf, inf, 3.0*m_par[0]/4.0+m_par[5]], \
+						[2.0*m_par[0]/4.0+m_par[4], 4.0*m_par[0]/4.0+m_par[3]+m_par[4], 3.0*m_par[0]/4.0+m_par[3]+m_par[4], 4.0*m_par[0]/4.0+2.0*m_par[4]+2.0*m_par[1]+2.0*m_par[2], inf, inf, inf, inf, 4.0*m_par[0]/4.0+m_par[4]+m_par[3], 3.0*m_par[0]/4.0+m_par[1]+m_par[2], inf], \
+						[2.0*m_par[0]/4.0, 4.0*m_par[0]/4.0, 3.0*m_par[0]/4.0, 4.0*m_par[0]/4.0+m_par[4]+m_par[3], inf, inf, inf, inf, inf, 3.0*m_par[0]/4.0+m_par[3], inf], \
+						[inf, inf, inf, inf, 3.0*m_par[0]/4.0+m_par[5], inf, inf, inf, inf, inf, 2.0*m_par[0]/4.0], \
+						[m_par[0]/4.0, 3.0*m_par[0]/4.0, 2.0*m_par[0]/4.0+m_par[1], 3.0*m_par[0]/4.0+m_par[1]+m_par[2], inf, inf, inf, inf, 3.0*m_par[0]/4.0+m_par[3], 2.0*m_par[0]/4.0+m_par[2], inf]]), \
+					np.array([[0, inf, m_par[0]/4.0, 2.0*m_par[0]/4.0+m_par[4], inf, m_par[0]/4.0, 2.0*m_par[0]/4.0+m_par[5], inf, 2.0*m_par[0]/4.0, m_par[0]/4.0, inf], \
+						[2.0*m_par[0]/4.0, inf, 3.0*m_par[0]/4.0+m_par[2], 4.0*m_par[0]/4.0+2.0*m_par[4]+m_par[2], inf, 3.0*m_par[0]/4.0+m_par[3], 4.0*m_par[0]/4.0+m_par[4]+m_par[5]+m_par[3], inf, 4.0*m_par[0]/4.0+m_par[5], 3.0*m_par[0]/4.0+m_par[4], inf], \
+						[inf, 3.0*m_par[0]/4.0, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, 4.0*m_par[0]/4.0+m_par[4], inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, 4.0*m_par[0]/4.0+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[m_par[0]/4.0, inf, 2.0*m_par[0]/4.0+m_par[3], 3.0*m_par[0]/4.0+m_par[4]+m_par[3]+m_par[5], inf, inf, inf, inf, 3.0*m_par[0]/4.0+m_par[4], 2.0*m_par[0]/4.0+m_par[5], inf], \
+						[2.0*m_par[0]/4.0, inf, 3.0*m_par[0]/4.0+m_par[3]+m_par[5], inf, inf, inf, inf, inf, 4.0*m_par[0]/4.0+m_par[4]+m_par[3]+m_par[5], inf, inf], \
+						[2.0*m_par[0]/4.0+m_par[4], inf, 3.0*m_par[0]/4.0+m_par[4]+m_par[3], 4.0*m_par[0]/4.0+2.0*m_par[3]+2.0*m_par[4], inf, inf, inf, inf, 4.0*m_par[0]/4.0+2.0*m_par[4]+m_par[2], 3.0*m_par[0]/4.0+m_par[4]+m_par[5]+m_par[3], inf], \
+						[inf, inf, inf, inf, 4.0*m_par[0]/4.0+m_par[5], inf, inf, 4.0*m_par[0]/4.0, inf, inf, 3.0*m_par[0]/4.0], \
+						[m_par[0]/4.0, inf, 2.0*m_par[0]/4.0, inf, inf, 2.0*m_par[0]/4.0, inf, inf, 3.0*m_par[0]/4.0+m_par[3], inf, inf], \
+						[m_par[0]/4.0, inf, 2.0*m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[3]+m_par[4], inf, 2.0*m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[3]+m_par[5], inf, 3.0*m_par[0]/4.0+m_par[2], 2.0*m_par[0]/4.0+m_par[3], inf]]))
 	}
 
 	matrixes = list(matrix_dict.get(model))
@@ -88,10 +132,12 @@ def simulate(method = "trg", model = "langmuir", lattice = "square", temp = 1.0,
 	if i > 50:
 		print("Warning! More than 50 iterations")
 	nodes *= 4.0**(i+1)
+	norm = np.einsum("abab->",tensors[0])
+	if norm < 0:
+		norm = -norm
+	return (scale+log(norm))/(nodes/(constant*temp))
 
-	return scale/(nodes/(constant*temp))
-
-def coverage(method, model, lattice, temp = 1., m_par = [0.0]*10):
+def coverage_old(method, model, lattice, temp = 1., m_par = [0.0]*10):
 	result = derivative(lambda x: simulate(method, model, lattice, temp, [x]+m_par[1:]), m_par[0], n=1, dx=1e-3)
 	return result
 
@@ -103,13 +149,49 @@ def heat_capasity(method, model, lattice, temp = 1., m_par = [0.0]*10):
 	result = derivative(lambda x: simulate(method, model, lattice, x, m_par), temp, n=2, dx=1e-3)
 	return result
 
-def enthropy(method,model,size, temp = 1., field = 0, int = [0]):
+def enthropy_old(method,model,size, temp = 1., field = 0, int = [0]):
 	result = derivative(lambda x: simulate(model,size,x,field,int), temp, n=1, dx=1e-5)
 	return result
 
+def coverage(method, model, lattice, temp = 1., m_par = [0.0]*10):
+	BTP = []
+	mu_step = 1e-3
+	for mu_TRG in [m_par[0] - mu_step, m_par[0] + mu_step]:
+		lnZ = simulate(method, model, lattice, temp, [mu_TRG] + m_par[1:])
+		BTP.append(lnZ)
+
+	result = -(BTP[0]-BTP[1])/(mu_step*2.0)
+	return result
+
+def entropy(method, model, lattice, temp = 1., m_par = [0.0]*10):
+	BTP = []
+	temp_step = 1e-3
+	for temp_TRG in [temp - temp_step, temp + temp_step]:
+		lnZ = simulate(method, model, lattice, temp_TRG, m_par)
+		BTP.append(lnZ)
+
+	result = -(BTP[0]-BTP[1])/(temp_step*2.0)
+	return result
+
+def full(method, model, lattice, temp = 1., m_par = [0.0]*10):
+	BTP_mu = []
+	BTP_temp = []
+	step = 1e-3
+	for mu_TRG in [m_par[0] - step, m_par[0] + step]:
+		lnZ = simulate(method, model, lattice, temp, [mu_TRG] + m_par[1:])
+		BTP_mu.append(lnZ)
+	for temp_TRG in [temp - step, temp, temp + step]:
+		lnZ = simulate(method, model, lattice, temp_TRG, m_par)
+		BTP_temp.append(lnZ)
+
+	cov = -(BTP_mu[0]-BTP_mu[1])/(step*2.0)
+	ent = -(BTP_temp[0]-BTP_temp[2])/(step*2.0)
+	sus = (BTP_mu[0]-2.0*BTP_temp[1]+BTP_mu[1])/(step**2.0)
+	cap = (BTP_temp[0]-2.0*BTP_temp[1]+BTP_temp[2])/(step**2.0)
+	return cov, ent, sus, cap
 
 method = "trg"
-model = "langmuir"
+model = "HT1"
 lattice = "complex_to_sqr"
 temp_square = 2.0/log(1+sqrt(2))
 temp_hex = 4.0/log(3)
@@ -117,6 +199,6 @@ temp = temp_hex
 temp = 1.0
 mu = 1.0
 chi_number = 64
-for mu in np.arange(50.0,-20.01,-1.0):
-	m_par = [mu, 5.0, inf, inf, inf, inf]
-	print(mu, 2.0*coverage(method, model, lattice, temp, m_par))
+for mu in np.arange(-10.0,10.01,0.5):
+	m_par = [mu/8.0, 0.0, inf, inf, inf, inf]
+	print(-mu, 1.0/2.0*coverage(method, model, lattice, temp, m_par))
