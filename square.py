@@ -95,7 +95,95 @@ def build_matrix (model, temp, m_par, neigbours = 8.0):
 						[2.0*m_par[0]/4.0+m_par[4], inf, 3.0*m_par[0]/4.0+m_par[4]+m_par[3], 4.0*m_par[0]/4.0+2.0*m_par[3]+2.0*m_par[4], inf, inf, inf, inf, 4.0*m_par[0]/4.0+2.0*m_par[4]+m_par[2], 3.0*m_par[0]/4.0+m_par[4]+m_par[5]+m_par[3], inf], \
 						[inf, inf, inf, inf, 4.0*m_par[0]/4.0+m_par[5], inf, inf, 4.0*m_par[0]/4.0, inf, inf, 3.0*m_par[0]/4.0], \
 						[m_par[0]/4.0, inf, 2.0*m_par[0]/4.0, inf, inf, 2.0*m_par[0]/4.0, inf, inf, 3.0*m_par[0]/4.0+m_par[3], inf, inf], \
-						[m_par[0]/4.0, inf, 2.0*m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[3]+m_par[4], inf, 2.0*m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[3]+m_par[5], inf, 3.0*m_par[0]/4.0+m_par[2], 2.0*m_par[0]/4.0+m_par[3], inf]]))
+						[m_par[0]/4.0, inf, 2.0*m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[3]+m_par[4], inf, 2.0*m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[3]+m_par[5], inf, 3.0*m_par[0]/4.0+m_par[2], 2.0*m_par[0]/4.0+m_par[3], inf]])) , \
+		"HT3" : (np.array([[0, m_par[0]/9, m_par[0]/9, m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, m_par[0]/9, 2.0*m_par[0]/9+m_par[5], 2.0*m_par[0]/9+m_par[5], 2.0*m_par[0]/9+m_par[4], 2.0*m_par[0]/9, inf, inf, inf, inf, m_par[0]/9, 2.0*m_par[0]/9+m_par[4], 2.0*m_par[0]/9+m_par[5], 2.0*m_par[0]/9+m_par[5], 2.0*m_par[0]/9, inf, 2.0*m_par[0]/9], \
+						[m_par[0]/9, inf, inf, 3.0*m_par[0]/9+m_par[3], 3.0*m_par[0]/9+m_par[5], 3.0*m_par[0]/9+m_par[4], 3.0*m_par[0]/9+m_par[5], inf, inf, 3.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9, inf], \
+						[m_par[0]/9, 2.0*m_par[0]/9+m_par[3], inf, inf, 3.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[4], inf, inf, inf, inf, 2.0*m_par[0]/9+m_par[5], 3.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9, 4.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+m_par[4], 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf], \
+						[2.0*m_par[0]/9, 3.0*m_par[0]/9, 3.0*m_par[0]/9, 3.0*m_par[0]/9, 4.0*m_par[0]/9+m_par[3], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, 4.0*m_par[0]/9+m_par[4]], \
+						[m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, 3.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[3], inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[2], inf, inf, inf, inf, 2.0*m_par[0]/9+m_par[3], 3.0*m_par[0]/9+m_par[3]+m_par[4], 3.0*m_par[0]/9+m_par[3]+m_par[5], 3.0*m_par[0]/9+m_par[3]+m_par[5], 3.0*m_par[0]/9, inf, 3.0*m_par[0]/9], \
+						[2.0*m_par[0]/9+m_par[5], inf, inf, 3.0*m_par[0]/9+m_par[5]+m_par[3], 4.0*m_par[0]/9+2.0*m_par[5], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[5], inf], \
+						[2.0*m_par[0]/9+m_par[4], 3.0*m_par[0]/9+m_par[4]+m_par[3], inf, inf, 4.0*m_par[0]/9+m_par[4]+m_par[5], inf, inf, inf, inf, inf, 4.0*m_par[0]/9+2.0*m_par[4]+m_par[2], inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[4]+m_par[5]+m_par[3], 4.0*m_par[0]/9+2.0*m_par[4]+m_par[5]+2.0*m_par[3], inf, inf, inf, inf, inf], \
+						[2.0*m_par[0]/9, 3.0*m_par[0]/9, 3.0*m_par[0]/9, 3.0*m_par[0]/9, 4.0*m_par[0]/9+m_par[3], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[4], inf, 4.0*m_par[0]/9+m_par[5]], \
+						[m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, 3.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[3], inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[3], inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9, inf, 3.0*m_par[0]/9], \
+						[2.0*m_par[0]/9+m_par[5], inf, inf, 3.0*m_par[0]/9+m_par[3]+m_par[5], 4.0*m_par[0]/9+2.0*m_par[5], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[4], inf], \
+						[2.0*m_par[0]/9+m_par[5], 3.0*m_par[0]/9+m_par[3]+m_par[5], inf, inf, 4.0*m_par[0]/9+2.0*m_par[5], inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, 3.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[2], 2.0*m_par[0]/9+m_par[3], 3.0*m_par[0]/9+m_par[3]+m_par[5], 3.0*m_par[0]/9+m_par[3]+m_par[5], 3.0*m_par[0]/9+m_par[4]+m_par[3], 3.0*m_par[0]/9+m_par[3], inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9, inf, 3.0*m_par[0]/9], \
+						[2.0*m_par[0]/9+m_par[4], inf, inf, 3.0*m_par[0]/9+m_par[3]+m_par[4], 4.0*m_par[0]/9+m_par[4]+m_par[5], 4.0*m_par[0]/9+2.0*m_par[4]+m_par[3], 3.0*m_par[0]/9+m_par[4]+m_par[5], inf, inf, 4.0*m_par[0]/9+2.0*m_par[4]+2.0*m_par[3], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf], \
+						[2.0*m_par[0]/9+m_par[5], 3.0*m_par[0]/9+m_par[3]+m_par[5], inf, inf, 4.0*m_par[0]/9+2.0*m_par[5], inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[3], 3.0*m_par[0]/9+m_par[3], 3.0*m_par[0]/9+m_par[2], 4.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+m_par[5], 3.0*m_par[0]/9+m_par[4], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], 4.0*m_par[0]/9+2.0*m_par[4]+m_par[2], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[2.0*m_par[0]/9, 3.0*m_par[0]/9, 3.0*m_par[0]/9, 3.0*m_par[0]/9, 4.0*m_par[0]/9+m_par[1], 4.0*m_par[0]/9+m_par[5], 3.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+2.0*m_par[5], 4.0*m_par[0]/9+2.0*m_par[5], 4.0*m_par[0]/9+m_par[5]+m_par[4], 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+m_par[5]+m_par[4], 4.0*m_par[0]/9+2.0*m_par[5], 4.0*m_par[0]/9+2.0*m_par[5], 4.0*m_par[0]/9+m_par[3], inf, 4.0*m_par[0]/9+m_par[3]], \
+						[2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[2], 3.0*m_par[0]/9+m_par[3], 3.0*m_par[0]/9+m_par[3], 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[4], 4.0*m_par[0]/9+2.0*m_par[4]+m_par[2], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf]]), \
+					np.array([[0, m_par[0]/9, m_par[0]/9, m_par[0]/9, 2.0*m_par[0]/9, inf, inf, inf, inf, inf, 2.0*m_par[0]/9, inf, inf, inf, inf, m_par[0]/9, 2.0*m_par[0]/9+m_par[4], 2.0*m_par[0]/9+m_par[5], 2.0*m_par[0]/9+m_par[5], inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9], \
+						[m_par[0]/9, 2.0*m_par[0]/9+m_par[3], inf, inf, 3.0*m_par[0]/9+m_par[4], inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, 2.0*m_par[0]/9+m_par[5], 3.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, 4.0*m_par[0]/9, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9, 4.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+m_par[4], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[2], inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[3], inf, inf, inf, inf, 2.0*m_par[0]/9+m_par[3], 3.0*m_par[0]/9+m_par[3]+m_par[4], 3.0*m_par[0]/9+m_par[3]+m_par[5], 3.0*m_par[0]/9+m_par[3]+m_par[5], inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5]], \
+						[2.0*m_par[0]/9+m_par[4], 3.0*m_par[0]/9+m_par[4], inf, inf, 4.0*m_par[0]/9+2.0*m_par[4]+m_par[2], inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], 4.0*m_par[0]/9+2.0*m_par[4]+2.0*m_par[5]+2.0*m_par[3], inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9, 4.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+m_par[4], 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf], \
+						[m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[3], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[4]], \
+						[2.0*m_par[0]/9+m_par[5], 3.0*m_par[0]/9+m_par[3]+m_par[5], inf, inf, 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[3], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[4], inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5]], \
+						[2.0*m_par[0]/9+m_par[5], 3.0*m_par[0]/9+m_par[3]+m_par[5], inf, inf, 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9, inf], \
+						[2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[2], 3.0*m_par[0]/9+m_par[3], 3.0*m_par[0]/9+m_par[3], 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[4], 4.0*m_par[0]/9+2.0*m_par[4]+m_par[2], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf], \
+						[2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[3], inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[4], inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf]]), \
+					np.array([[0, m_par[0]/9, inf, inf, 2.0*m_par[0]/9, inf, inf, inf, inf, inf, 2.0*m_par[0]/9, inf, inf, inf, inf, m_par[0]/9, 2.0*m_par[0]/9+m_par[4], inf, inf, 2.0*m_par[0]/9, 2.0*m_par[0]/9, inf], \
+						[inf, inf, 2.0*m_par[0]/9, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[5], inf, inf, inf, inf], \
+						[inf, inf, inf, 2.0*m_par[0]/9, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[5], inf, inf, inf], \
+						[m_par[0]/9, 2.0*m_par[0]/9+m_par[2], inf, inf, 3.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, 2.0*m_par[0]/9+m_par[1], 3.0*m_par[0]/9+m_par[1]+m_par[2]+m_par[4], inf, inf, 3.0*m_par[0]/9+m_par[3], 3.0*m_par[0]/9+m_par[3], inf], \
+						[2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[3], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, 4.0*m_par[0]/9+m_par[4], 4.0*m_par[0]/9+m_par[5], inf], \
+						[2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[3], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, 4.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+m_par[4], inf], \
+						[m_par[0]/9, 2.0*m_par[0]/9+m_par[1], inf, inf, 3.0*m_par[0]/9+m_par[3], inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[3], inf, inf, inf, inf, 2.0*m_par[0]/9+m_par[2], 3.0*m_par[0]/9+m_par[1]+m_par[2]+m_par[4], inf, inf, 3.0*m_par[0]/9+m_par[5], 3.0*m_par[0]/9+m_par[5], inf], \
+						[inf, inf, 3.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+2.0*m_par[5]+m_par[2], inf, inf, inf, inf], \
+						[inf, inf, inf, 3.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[2]+2.0*m_par[5], inf, inf, inf], \
+						[2.0*m_par[0]/9+m_par[4], 3.0*m_par[0]/9+m_par[1]+m_par[2], inf, inf, 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[1]+m_par[2]+m_par[4], 4.0*m_par[0]/9+2.0*m_par[1]+2.0*m_par[2]+2.0*m_par[4], inf, inf, 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf], \
+						[inf, inf, inf, inf, inf, 4.0*m_par[0]/9, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, 2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[4], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+m_par[2]+2.0*m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[4], inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+2.0*m_par[2]+2.0*m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9], \
+						[2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[3], inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[4], inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf], \
+						[2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[3], inf, inf, 4.0*m_par[0]/9+m_par[4], inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf]]), \
+					np.array([[0, m_par[0]/9, inf, inf, inf, inf, m_par[0]/9, 2.0*m_par[0]/9+m_par[5], inf, inf, inf, m_par[0]/9, 2.0*m_par[0]/9+m_par[5], inf, inf, m_par[0]/9, 2.0*m_par[0]/9+m_par[4], inf, inf, 2.0*m_par[0]/9, 2.0*m_par[0]/9, inf], \
+						[m_par[0]/9, inf, inf, inf, inf, inf, 2.0*m_par[0]/9, inf, inf, inf, inf, 2.0*m_par[0]/9, inf, inf, inf, 2.0*m_par[0]/9, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[3], inf], \
+						[m_par[0]/9, inf, inf, inf, inf, inf, 2.0*m_par[0]/9, inf, inf, inf, inf, 2.0*m_par[0]/9, inf, inf, inf, 2.0*m_par[0]/9, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[3], inf], \
+						[m_par[0]/9, 2.0*m_par[0]/9+m_par[3], inf, inf, inf, inf, 2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[3]+m_par[5], inf, inf, inf, 2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[3]+m_par[5], inf, inf, 2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[3]+m_par[4], inf, inf, 3.0*m_par[0]/9+m_par[3], 3.0*m_par[0]/9+m_par[2], inf], \
+						[2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[4], inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[3], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, 3.0*m_par[0]/9+m_par[3], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, 3.0*m_par[0]/9+m_par[2], 4.0*m_par[0]/9+2.0*m_par[4]+m_par[2], inf, inf, 4.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+m_par[5], inf], \
+						[2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[3], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, 4.0*m_par[0]/9+m_par[4], 4.0*m_par[0]/9+m_par[5], inf], \
+						[m_par[0]/9, 2.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 2.0*m_par[0]/9+m_par[3], 3.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, 3.0*m_par[0]/9+m_par[5], 3.0*m_par[0]/9+m_par[4], inf], \
+						[2.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[3]+m_par[5], inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf], \
+						[2.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[3]+m_par[5], inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf], \
+						[2.0*m_par[0]/9+m_par[4], 3.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[4]+m_par[3], 4.0*m_par[0]/9+2.0*m_par[3]+2.0*m_par[4]+m_par[5], inf, inf, 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], 4.0*m_par[0]/9+m_par[2]+2.0*m_par[4], inf], \
+						[inf, inf, inf, inf, 4.0*m_par[0]/9, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, 3.0*m_par[0]/9, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[4], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[4], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, 3.0*m_par[0]/9, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[4], inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9], \
+						[inf, inf, inf, 3.0*m_par[0]/9, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[4], inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf]]))
 	}
 
 	matrixes = list(matrix_dict.get(model))
@@ -118,6 +206,7 @@ def simulate(method = "trg", model = "langmuir", lattice = "square", temp = 1.0,
 	else:
 		nodes = 2.0
 
+	i = 0
 	for i in range(100):
 		if method == "trg":
 			(tensors, scale) = tn.trg_step(tensors, scale, chi_number, chi_min, lattice)
@@ -191,14 +280,18 @@ def full(method, model, lattice, temp = 1., m_par = [0.0]*10):
 	return cov, ent, sus, cap
 
 method = "trg"
-model = "HT1"
+model = "HT3"
 lattice = "complex_to_sqr"
 temp_square = 2.0/log(1+sqrt(2))
 temp_hex = 4.0/log(3)
 temp = temp_hex
 temp = 1.0
 mu = 1.0
-chi_number = 64
+chi_number = 32
 for mu in np.arange(-10.0,10.01,0.5):
-	m_par = [mu/8.0, 0.0, inf, inf, inf, inf]
-	print(-mu, 1.0/2.0*coverage(method, model, lattice, temp, m_par))
+	m_par = [mu/8.0, inf, inf, inf, inf, inf]
+	coef = 1.0/2.0
+	print(-mu, coef*coverage(method, model, lattice, temp, m_par))
+	#result = full(method, model, lattice, temp, m_par)
+	#print(-mu, coef*result[0], coef*result[1] , coef*result[2] , coef*result[3])
+	#print(-mu, coef*result[2])
