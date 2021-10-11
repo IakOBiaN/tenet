@@ -59,6 +59,19 @@ def build_tensor(matrixes, lattice = "square"):
 	elif (lattice == "tr_to_sqr"):
 		tensor = np.einsum("abc, dfb, icf -> adi",tensor,tensor,tensor)
 		tensor = list((np.einsum("abi, ijk -> abjk", tensor, identity(3, leg_size)), ))
+	elif (lattice == "tr_to_sqr_susmost"):
+		id4 = identity(4, leg_size)
+		id3 = identity(3, leg_size)
+		tensor = np.einsum("abcd, efgh, ijk, mno, bi, kf, dn, oh, cg -> ajem", id4, id4, id3, id3, matrixes[0] ** 0.5, matrixes[0] ** 0.5, matrixes[0] ** 0.5, matrixes[0] ** 0.5, matrixes[0])
+		U, S, V = split_by_svd(tensor, [0, 1], [2, 3])
+		S = np.sqrt(S)
+		U = np.einsum("abi,i->abi", U, S)
+		V = np.einsum("ibc,i->ibc",V, S)
+		tensor_1 = np.tensordot(id3, V, ([1], [2]))
+		tensor_2 = np.tensordot(U, id3, ([1], [1]))
+		tensor = np.tensordot(tensor_1, tensor_2, ([1, 3],[0, 2]))
+		tensor = np.swapaxes(tensor, 2, 3)
+		tensor = list((tensor, ))
 	elif (lattice == "hex"):
 		U_1, S_1, V_1 = scipy.linalg.svd(matrixes[0])
 		U_2, S_2, V_2 = scipy.linalg.svd(matrixes[1])
@@ -249,16 +262,42 @@ def build_triangles_tensor(model, temp, m_par):
 	one *= 1./(constant*temp)
 	one = np.array([np.exp(line) for line in one])
 	two *= 1./(constant*temp)
-	two2 = np.array([np.exp(line) for line in two])
+	two = np.array([np.exp(line) for line in two])
+	two2 = two
 	three *= 1./(constant*temp)
 	three = np.array([np.exp(line) for line in three])
 	cd = identity(3, one.shape[0])
-	one = np.einsum("ab,iak->ibk",one,cd)
+
+	id4 = identity(4, one.shape[0])
+	id3 = identity(3, one.shape[0])
+	#dop = three
+	#three = two
+	#two = dop
+	one = one ** 0.5
+	two = two ** 0.5
+	tensor = np.einsum("abcd, bi, nd, cg -> aign", id4, two, one, three)
+	tensor = np.einsum("ijkl, ajc, xc -> iaxkl", tensor, id3, one)
+	tensor = np.einsum("ijklm, ablk, xb -> ijaxm", tensor, id4, two)
+	tensor = np.einsum("ijklm, aml -> ijka", tensor, id3)
+
+	#tensor = np.einsum("abcd, efgh, ijk, mno, bi, fk, nd, oh, cg -> ajem", tensor, id4, id3, id3, two, one, one, two, three)
+
+	U, S, V = split_by_svd(tensor, [0, 1], [2, 3])
+	S = np.sqrt(S)
+	U = np.einsum("abi,i->abi", U, S)
+	V = np.einsum("ibc,i->ibc",V, S)
+	tensor_1 = np.tensordot(id3, V, ([1], [2]))
+	tensor_2 = np.tensordot(U, id3, ([1], [1]))
+	tensor = np.tensordot(tensor_1, tensor_2, ([1, 3],[0, 2]))
+	tensor = np.swapaxes(tensor, 2, 3)
+	tensor = list((tensor, ))
+
+	"""one = np.einsum("ab,iak->ibk",one,cd)
 	two = np.einsum("ab,iak->ibk",three,cd)
 	three = np.einsum("ab,ibk->iak",two2,cd)
 	tensor = np.einsum("abc,deb,ice->adi",one,two,three)
 	tensor = np.einsum("abi,ijk->abjk", tensor,cd)
-	tensor = list((tensor, ))
+	tensor = list((tensor, ))"""
 	return tensor
 
 def hotrg_square(tensor, scale, chi_number = 64, chi_min = 1e-8):
@@ -335,15 +374,7 @@ def hotrg_step(tensor, scale, chi_number = 64, chi_min = 1e-8, lattice = "square
 
 def trg_step(tensor, scale, chi_number = 64, chi_min = 1e-8, lattice = "square"):
 
-	if (lattice == "square" or lattice == "complex_to_sqr" or lattice == "hex_to_sqr" or lattice == "tr_to_sqr"):
-		norm = tensor[0].max()
-		if norm != 0:
-			for i, ten in enumerate(tensor):
-				tensor[i] = ten/norm
-			scale += np.log(norm)
-		tensor, scale = trg_square(tensor, scale, chi_number, chi_min)
-		tensor, scale = trg_square(tensor, scale, chi_number, chi_min)
-	elif (lattice == "hex"):
+	if (lattice == "hex"):
 		norm = abs(np.einsum("abc, cba -> ", tensor[0], tensor[1]))
 		if norm != 0:
 			for i, ten in enumerate(tensor):
@@ -351,4 +382,13 @@ def trg_step(tensor, scale, chi_number = 64, chi_min = 1e-8, lattice = "square")
 			scale += np.log(norm)
 		tensor, scale = trg_hexagonal(tensor, scale, chi_number, chi_min)
 		tensor, scale = trg_hexagonal(tensor, scale, chi_number, chi_min)
+	else:
+		norm = tensor[0].max()
+		if norm != 0:
+			for i, ten in enumerate(tensor):
+				tensor[i] = ten/norm
+			scale += np.log(norm)
+		tensor, scale = trg_square(tensor, scale, chi_number, chi_min)
+		tensor, scale = trg_square(tensor, scale, chi_number, chi_min)
+
 	return (tensor, scale)

@@ -22,9 +22,9 @@ def build_matrix (model, temp, m_par, neigbours = 8.0):
 
 	#[any],[right, bottom],[right-up, right, right-bottom], [right-up, right, right-bottom, bottom]
 	matrix_dict = {
-		"langmuir" : (np.array([[0.0, m_par[0]/neigbours],[m_par[0]/neigbours, -m_par[1]+m_par[0]/(neigbours/2.0)]]) ,) * 2,
-		"ising" : (np.array([[(m_par[1]-m_par[0]/(neigbours/2.0)), (-m_par[1])],[(-m_par[1]), (m_par[1]+m_par[0]/(neigbours/2.0))]]), ) * 2,
-		"hard-disk" : (np.array([[0.0, m_par[0]/(neigbours/2.0)],[m_par[0]/(neigbours/2.0), -1000000.0+m_par[0]]]), ) * 2,
+		"langmuir" : (np.array([[0.0, m_par[0]/neigbours],[m_par[0]/neigbours, -m_par[1]+m_par[0]/(neigbours/2.0)]]) ,) * 3,
+		"ising" : (np.array([[(m_par[1]-m_par[0]/(neigbours/2.0)), (-m_par[1])],[(-m_par[1]), (m_par[1]+m_par[0]/(neigbours/2.0))]]), ) * 3,
+		"hard-disk" : (np.array([[0.0, m_par[0]/(neigbours/2.0)],[m_par[0]/(neigbours/2.0), -1000000.0+m_par[0]]]), ) * 3,
 		"dimers" : (np.array([[0, inf, (m_par[0]+m_par[1])/6.0, (m_par[0]+m_par[1])/6.0, m_par[0]/3.0], \
 						[(m_par[0]+m_par[1])/6.0, inf, inf, inf, inf], \
 						[inf, (m_par[0]+m_par[1])/3.0, inf, inf, inf], \
@@ -207,7 +207,7 @@ def simulate(method = "trg", model = "langmuir", lattice = "square", temp = 1.0,
 		nodes = 2.0
 
 	i = 0
-	for i in range(100):
+	for i in range(300):
 		if method == "trg":
 			(tensors, scale) = tn.trg_step(tensors, scale, chi_number, chi_min, lattice)
 		elif method == "hotrg":
@@ -218,8 +218,8 @@ def simulate(method = "trg", model = "langmuir", lattice = "square", temp = 1.0,
 			break
 		else:
 			old_scale = scale
-	if i > 50:
-		print("Warning! More than 50 iterations")
+	if i > 250:
+		print("Warning! More than 250 iterations")
 	nodes *= 4.0**(i+1)
 	norm = np.einsum("abab->",tensors[0])
 	if norm < 0:
@@ -280,18 +280,22 @@ def full(method, model, lattice, temp = 1., m_par = [0.0]*10):
 	return cov, ent, sus, cap
 
 method = "trg"
-model = "HT3"
-lattice = "complex_to_sqr"
+model = "hard_triangles"
+lattice = "tr_to_sqr"
 temp_square = 2.0/log(1+sqrt(2))
-temp_hex = 4.0/log(3)
-temp = temp_hex
+#temp_hex = 4.0/log(3)
+#temp = temp_hex
+#temp = 4.0/log(3) + 1e-7
 temp = 1.0
 mu = 1.0
-chi_number = 32
-for mu in np.arange(-10.0,10.01,0.5):
-	m_par = [mu/8.0, inf, inf, inf, inf, inf]
-	coef = 1.0/2.0
-	print(-mu, coef*coverage(method, model, lattice, temp, m_par))
+chi_number = 24
+#for temp in np.arange(2.0, 4.41, 0.05):
+for mu in np.arange(8.0, -8.01, -0.5):
+	m_par = [mu/6.0, inf, 0.0, 0.0, 0.0, 0.0]
+	#m_par = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+	#coef = 1.0/8.00
+	#print(-mu, coef*coverage(method, model, lattice, temp, m_par))
+	print(mu, 2.0*simulate(method, model, lattice, temp, m_par))
 	#result = full(method, model, lattice, temp, m_par)
 	#print(-mu, coef*result[0], coef*result[1] , coef*result[2] , coef*result[3])
 	#print(-mu, coef*result[2])
