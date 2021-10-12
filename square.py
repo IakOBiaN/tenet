@@ -280,7 +280,7 @@ def full(method, model, lattice, temp = 1., m_par = [0.0]*10):
 	return cov, ent, sus, cap
 
 method = "trg"
-model = "hard_triangles"
+model = "ising"
 lattice = "tr_to_sqr"
 temp_square = 2.0/log(1+sqrt(2))
 #temp_hex = 4.0/log(3)
@@ -291,11 +291,11 @@ mu = 1.0
 chi_number = 24
 #for temp in np.arange(2.0, 4.41, 0.05):
 for mu in np.arange(8.0, -8.01, -0.5):
-	m_par = [mu/6.0, inf, 0.0, 0.0, 0.0, 0.0]
+	m_par = [mu/6.0, 1.0, 0.0, 0.0, 0.0, 0.0]
 	#m_par = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
 	#coef = 1.0/8.00
 	#print(-mu, coef*coverage(method, model, lattice, temp, m_par))
-	print(mu, 2.0*simulate(method, model, lattice, temp, m_par))
+	print(mu, simulate(method, model, lattice, temp, m_par))
 	#result = full(method, model, lattice, temp, m_par)
 	#print(-mu, coef*result[0], coef*result[1] , coef*result[2] , coef*result[3])
 	#print(-mu, coef*result[2])
