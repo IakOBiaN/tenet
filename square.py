@@ -16,7 +16,7 @@ method_tolerance = 1e-8
 
 def simulate(method = "trg", model = "langmuir", lattice = "square", temp = 1.0, m_par = [0.0]*10):
 
-	tensors = bt.build_matrix(model, temp, m_par)
+	tensors = bt.build_matrix(model, temp, m_par, 6.0)
 	tensors = tn.build_tensor(tensors, lattice)
 	#tensors = tn.build_triangles_tensor(model, temp, m_par)
 
@@ -101,7 +101,7 @@ def full(method, model, lattice, temp = 1., m_par = [0.0]*10):
 	return cov, ent, sus, cap
 
 method = "trg"
-model = "ising"
+model = "4NN_triangular"
 lattice = "tr_to_sqr"
 temp_square = 2.0/log(1+sqrt(2))
 #temp_hex = 4.0/log(3)
@@ -109,17 +109,17 @@ temp_square = 2.0/log(1+sqrt(2))
 #temp = 4.0/log(3) + 1e-7
 temp = 1.0
 mu = 1.0
-chi_number = 24
-temp = 4.0/log(3) + 5e-8
-m_par = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
-for chi_number in np.arange(4, 48, 1):
-	print(chi_number, 2.0*simulate(method, model, lattice, temp, m_par))
+chi_number = 48
+
+#m_par = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+#for chi_number in np.arange(4, 48, 1):
+#	print(chi_number, 2.0*simulate(method, model, lattice, temp, m_par))
 #for temp in np.arange(2.0, 4.41, 0.05):
-#for mu in np.arange(8.0, -8.01, -0.5):
-	#m_par = [mu/6.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+for mu in np.arange(10.0, -10.01, -0.5):
+	m_par = [mu, 0.0, 0.0, 0.0, 0.0, 0.0]
 	#m_par = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
 	#coef = 1.0/8.00
-	#print(-mu, coef*coverage(method, model, lattice, temp, m_par))
+	print(mu, 2.0*coverage(method, model, lattice, temp, m_par))
 	#print(mu, simulate(method, model, lattice, temp, m_par))
 	#result = full(method, model, lattice, temp, m_par)
 	#print(-mu, coef*result[0], coef*result[1] , coef*result[2] , coef*result[3])
