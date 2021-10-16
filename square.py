@@ -45,7 +45,7 @@ def simulate(method = "trg", model = "langmuir", lattice = "square", temp = 1.0,
 	norm = np.einsum("abab->",tensors[0])
 	if norm < 0:
 		norm = -norm
-	return (scale+log(norm))/(nodes/(constant*temp))
+	return -2.0*(scale+log(norm))/(nodes/(constant*temp))
 
 def coverage_old(method, model, lattice, temp = 1., m_par = [0.0]*10):
 	result = derivative(lambda x: simulate(method, model, lattice, temp, [x]+m_par[1:]), m_par[0], n=1, dx=1e-3)
@@ -70,7 +70,7 @@ def coverage(method, model, lattice, temp = 1., m_par = [0.0]*10):
 		lnZ = simulate(method, model, lattice, temp, [mu_TRG] + m_par[1:])
 		BTP.append(lnZ)
 
-	result = -(BTP[0]-BTP[1])/(mu_step*2.0)
+	result = (BTP[0]-BTP[1])/(mu_step*2.0)
 	return result
 
 def entropy(method, model, lattice, temp = 1., m_par = [0.0]*10):
@@ -101,26 +101,28 @@ def full(method, model, lattice, temp = 1., m_par = [0.0]*10):
 	return cov, ent, sus, cap
 
 method = "trg"
-model = "4NN_triangular"
-lattice = "tr_to_sqr"
+model = "kNN_triangular"
+lattice = "tr_to_sqr_susmost"
 temp_square = 2.0/log(1+sqrt(2))
 #temp_hex = 4.0/log(3)
 #temp = temp_hex
 #temp = 4.0/log(3) + 1e-7
 temp = 1.0
 mu = 1.0
-chi_number = 48
+chi_number = 13
 
 #m_par = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
 #for chi_number in np.arange(4, 48, 1):
 #	print(chi_number, 2.0*simulate(method, model, lattice, temp, m_par))
 #for temp in np.arange(2.0, 4.41, 0.05):
-for mu in np.arange(10.0, -10.01, -0.5):
-	m_par = [mu, 0.0, 0.0, 0.0, 0.0, 0.0]
-	#m_par = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
-	#coef = 1.0/8.00
-	print(mu, 2.0*coverage(method, model, lattice, temp, m_par))
-	#print(mu, simulate(method, model, lattice, temp, m_par))
-	#result = full(method, model, lattice, temp, m_par)
-	#print(-mu, coef*result[0], coef*result[1] , coef*result[2] , coef*result[3])
-	#print(-mu, coef*result[2])
+for chi_number in range(14, 81):
+	print("xhi=", chi_number)
+	for mu in np.arange(6.0, -6.01, -0.1):
+		m_par = [mu, 0.0, 0.0, 0.0, 0.0, 0.0]
+		#m_par = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+		#coef = 1.0/8.00
+		print(simulate(method, model, lattice, temp, m_par))
+		#print(mu, simulate(method, model, lattice, temp, m_par))
+		#result = full(method, model, lattice, temp, m_par)
+		#print(-mu, coef*result[0], coef*result[1] , coef*result[2] , coef*result[3])
+		#print(-mu, coef*result[2])

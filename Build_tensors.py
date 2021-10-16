@@ -13,7 +13,6 @@ def build_matrix (model, temp, m_par, neigbours = 8.0):
 		m_par = m_par + [0.0]*(10-len(m_par))
 
 
-	var_0NN = 0
 	var_1NN_0 = 0
 	var_1NN_mu = m_par[0]/neigbours
 	var_2NN_0 = 0
@@ -22,7 +21,6 @@ def build_matrix (model, temp, m_par, neigbours = 8.0):
 	var_4NN = 0
 	NN_model = "3NN"
 	if NN_model == "1NN":
-		var_0NN = inf
 		var_1NN_0 = 0
 		var_1NN_mu = m_par[0]/neigbours
 		var_2NN_0 = 0
@@ -30,7 +28,6 @@ def build_matrix (model, temp, m_par, neigbours = 8.0):
 		var_3NN = 0
 		var_4NN = 0
 	elif NN_model == "2NN":
-		var_0NN = inf
 		var_1NN_0 = inf
 		var_1NN_mu = inf
 		var_2NN_0 = 0
@@ -38,7 +35,6 @@ def build_matrix (model, temp, m_par, neigbours = 8.0):
 		var_3NN = 0
 		var_4NN = 0
 	elif NN_model == "3NN":
-		var_0NN = inf
 		var_1NN_0 = inf
 		var_1NN_mu = inf
 		var_2NN_0 = inf
@@ -46,7 +42,6 @@ def build_matrix (model, temp, m_par, neigbours = 8.0):
 		var_3NN = 0
 		var_4NN = 0
 	elif NN_model == "4NN":
-		var_0NN = inf
 		var_1NN_0 = inf
 		var_1NN_mu = inf
 		var_2NN_0 = inf
@@ -54,7 +49,6 @@ def build_matrix (model, temp, m_par, neigbours = 8.0):
 		var_3NN = inf
 		var_4NN = 0
 	elif NN_model == "5NN":
-		var_0NN = inf
 		var_1NN_0 = inf
 		var_1NN_mu = inf
 		var_2NN_0 = inf
@@ -78,7 +72,7 @@ def build_matrix (model, temp, m_par, neigbours = 8.0):
 						[inf, inf, inf, (m_par[0]+m_par[1])/3.0, inf], \
 						[m_par[0]/3.0, inf, inf, inf, inf]])), \
 		#mu = m_par[0], m1 = m_par[1], m2 = m_par[2], m1 = m_par[3], m1 = m_par[4], m1 = m_par[5]
-		"4NN_triangular" : (np.array([[0, inf, 0, inf, inf, inf, 0, 0], \
+		"kNN_triangular" : (np.array([[0, inf, 0, inf, inf, inf, 0, 0], \
 						[inf, inf, var_1NN_mu, inf, m_par[0]/neigbours, inf, var_1NN_mu, var_2NN_mu], \
 						[inf, inf, inf, 0, inf, var_1NN_0, var_2NN_0, var_1NN_0], \
 						[0, var_1NN_mu, var_2NN_0, inf, inf, var_2NN_0, var_3NN, var_3NN], \
@@ -87,18 +81,18 @@ def build_matrix (model, temp, m_par, neigbours = 8.0):
 						[inf, inf, var_2NN_0, var_1NN_0, inf, 0, inf, var_1NN_0], \
 						[inf, m_par[0]/neigbours, inf, inf, inf, inf, inf, inf]]), \
 					np.array([[0, inf, 0, 0, inf, inf, inf, 0], \
-						[inf, inf, var_2NN_0, inf, inf, m_par[0]/neigbours, var_1NN_0, var_1NN_0], \
+						[inf, inf, var_2NN_mu, var_1NN_mu, inf, m_par[0]/neigbours, inf, var_1NN_mu], \
 						[inf, m_par[0]/neigbours, inf, inf, inf, inf, inf, inf], \
 						[inf, inf, var_1NN_0, inf, 0, inf, var_1NN_0, var_2NN_0], \
-						[0, var_1NN_mu, var_3NN, var_2NN_0, inf, var_1NN_0, var_2NN_0, var_3NN], \
+						[0, var_1NN_mu, var_3NN, var_2NN_0, inf, inf, var_2NN_0, var_3NN], \
 						[0, var_2NN_mu, var_4NN, var_3NN, var_1NN_0, inf, var_1NN_0, var_3NN], \
 						[0, var_1NN_mu, var_3NN, var_3NN, var_2NN_0, inf, inf, var_2NN_0], \
 						[inf, inf, var_1NN_0, var_2NN_0, var_1NN_0, inf, 0, inf]]), \
 					np.array([[0, inf, 0, 0, 0, inf, inf, inf], \
-						[inf, inf, var_1NN_0, var_2NN_0, var_1NN_0, inf, m_par[0]/neigbours, inf], \
+						[inf, inf, var_1NN_mu, var_2NN_mu, var_1NN_mu, inf, m_par[0]/neigbours, inf], \
 						[inf, inf, inf, var_1NN_0, var_2NN_0, var_1NN_0, inf, 0], \
 						[inf, m_par[0]/neigbours, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, var_2NN_0, var_1NN_0, var_1NN_0, 0, inf, var_1NN_0], \
+						[inf, inf, var_2NN_0, var_1NN_0, inf, 0, inf, var_1NN_0], \
 						[0, var_1NN_mu, var_3NN, var_3NN, var_2NN_0, inf, inf, var_2NN_0], \
 						[0, var_2NN_mu, var_3NN, var_4NN, var_3NN, var_1NN_0, inf, var_1NN_0], \
 						[0, var_1NN_mu, var_2NN_0, var_3NN, var_3NN, var_2NN_0, inf, inf]])), \
