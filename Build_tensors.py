@@ -20,7 +20,7 @@ def build_matrix (model, temp, m_par, neigbours = 8.0):
 	var_2NN_mu = m_par[0]/neigbours
 	var_3NN = 0
 	var_4NN = 0
-	NN_model = "3NN"
+	NN_model = "4NN"
 	if NN_model == "1NN":
 		var_0NN = inf
 		var_1NN_0 = 0
