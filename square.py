@@ -45,7 +45,7 @@ def simulate(method = "trg", model = "langmuir", lattice = "square", temp = 1.0,
 	norm = np.einsum("abab->",tensors[0])
 	if norm < 0:
 		norm = -norm
-	return (scale+log(norm))/(nodes/(constant*temp))
+	return -2.0*(scale+log(norm))/(nodes/(constant*temp))
 
 def coverage_old(method, model, lattice, temp = 1., m_par = [0.0]*10):
 	result = derivative(lambda x: simulate(method, model, lattice, temp, [x]+m_par[1:]), m_par[0], n=1, dx=1e-3)
@@ -70,7 +70,7 @@ def coverage(method, model, lattice, temp = 1., m_par = [0.0]*10):
 		lnZ = simulate(method, model, lattice, temp, [mu_TRG] + m_par[1:])
 		BTP.append(lnZ)
 
-	result = -(BTP[0]-BTP[1])/(mu_step*2.0)
+	result = (BTP[0]-BTP[1])/(mu_step*2.0)
 	return result
 
 def entropy(method, model, lattice, temp = 1., m_par = [0.0]*10):
@@ -101,8 +101,8 @@ def full(method, model, lattice, temp = 1., m_par = [0.0]*10, temp_size = 300):
 	return cov, ent, sus, cap
 
 method = "trg"
-model = "4NN_triangular"
-lattice = "tr_to_sqr"
+model = "kNN_triangular"
+lattice = "tr_to_sqr_susmost"
 temp_square = 2.0/log(1+sqrt(2))
 #temp_hex = 4.0/log(3)
 #temp = temp_hex
