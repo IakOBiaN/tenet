@@ -143,18 +143,82 @@ def full(model, lattice, chi_number = 32, temp = 120., m_par = [0.0] * 10, step 
 	cap = (BTP_temp[0] - 2.0 * BTP_temp[1] + BTP_temp[2]) / (step ** 2.0)
 	return cov, ent, sus, cap
 
-def main():
-	model = "1NN"
-	lattice = "triangular"
-	temp = 120.0
-	mu = 0.0
-	inter = -2.0
-	chi_number = 10
-	step = 0.01
-	for mu in np.arange(-5.0, 8.01, 0.1):
-		m_par = [mu, inter]
+def main(model, lattice, chi_number, mu_diap = (-10, 10, 0.1), energy = 0.0, step = 0.01):
+	graph = list()
+	for mu in np.arange(mu_diap[0], mu_diap[1], mu_diap[2]):
+		m_par = [mu, energy]
 		result = full(model, lattice, chi_number, temp, m_par, step)
-		print(mu, result[0])
+		graph.append(((mu, ) + result))
+		print(round(abs(mu - mu_diap[0]) / abs(mu_diap[1] - mu_diap[0]) * 100.0, 1), "%")
+	graph = np.array(graph)
+	pt.figure()
+	pt.subplot(221)
+	pt.title("Изотерма")
+	pt.xlabel("Химический потенциал")
+	pt.ylabel("Степень покрытия")
+	pt.plot(graph[:, 0], graph[:, 1])
+
+	pt.subplot(222)
+	pt.title("Энтропия")
+	pt.xlabel("Химический потенциал")
+	pt.ylabel("Энтропия")
+	pt.plot(graph[:, 0], graph[:, 2])
+
+	pt.subplot(223)
+	pt.title("Восприимчивость")
+	pt.xlabel("Химический потенциал")
+	pt.ylabel("Восприимчивость")
+	pt.plot(graph[:, 0], graph[:, 3])
+
+	pt.subplot(224)
+	pt.title("Теплоёмкость")
+	pt.xlabel("Химический потенциал")
+	pt.ylabel("Теплоёмкость")
+	pt.plot(graph[:, 0], graph[:, 4])
+	pt.tight_layout()
+	pt.show()
+	print("Результаты расчётов:")
+	print("Хим.потенциал", "Покрытие", "Энтропия", "Восприимчивость", "Теплоёмкость")
+	for line in graph:
+		print(" ".join(map(str, line)))
+
 
 if __name__ == "__main__":
-    main()
+	choice = input("Выберите модель: 1 - 0NN, 2 - 1NN, 3 - Модель Ленгмюра со стандартными параметрами \n")
+	model = ""
+	if choice == "1":
+		model = "0NN"
+	elif choice == "2":
+		model = "1NN"
+	elif choice == "3":
+		model = "Langmuir"
+	else:
+		print("Ошибка! Вводите 1 или 2 для выбора")
+		exit()
+	lattice = "square"
+	temp = 120.
+	mu_diap = (-7., 7., 0.5)
+	energy = 0.
+	chi_number = 16
+	if model != "Langmuir":
+		choice = input("Выберите решётку: 1 - квадратная, 2 - треугольная, 3 - гексагональная \n")
+		if choice == "1":
+			lattice = "square"
+		elif choice == "2":
+			lattice = "triangular"
+		elif choice == "3":
+			lattice = "hexagonal"
+		else:
+			print("Ошибка! Вводите 1, 2 или 3 для выбора")
+			exit()
+		temp = float(input("Введите температуру одной цифрой. Вещественные числа вводятся через точку. \n"))
+		mu_start = float(input("Введите диапазон для химического потенциала. Отдельно вводятся три цифры: начало, конец, шаг. \n Введите начало диапазона \n"))
+		mu_end = float(input("Введите конец диапазона \n"))
+		mu_step = float(input("Введите шаг по химическому потенциалу \n"))
+		mu_diap = (mu_start, mu_end, mu_step)
+		if model == "0NN":
+			energy = float(input("Введите энергию взаимодействия между частицами. \n"))
+		chi_number = int(input("Введите число сингулярных значений, которые остаются на каждой итерации (рекомендация от 4 до 100). \n"))
+	else:
+		model = "0NN"
+	main(model, lattice, chi_number, mu_diap, energy)
