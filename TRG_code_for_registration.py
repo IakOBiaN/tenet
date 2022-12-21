@@ -139,8 +139,8 @@ def full(model, lattice, chi_number = 32, temp = 120., m_par = [0.0] * 10, step 
 
 	cov = - (BTP_mu[0] - BTP_mu[1]) / (step * 2.0)
 	ent = - (BTP_temp[0] - BTP_temp[2]) / (step * 2.0)
-	sus = (BTP_mu[0] - 2.0 * BTP_temp[1] + BTP_mu[1]) / (step ** 2.0)
-	cap = (BTP_temp[0] - 2.0 * BTP_temp[1] + BTP_temp[2]) / (step ** 2.0)
+	sus = constant * temp * (BTP_mu[0] - 2.0 * BTP_temp[1] + BTP_mu[1]) / (step ** 2.0)
+	cap = temp * (BTP_temp[0] - 2.0 * BTP_temp[1] + BTP_temp[2]) / (step ** 2.0)
 	return cov, ent, sus, cap
 
 def main(model, lattice, chi_number, mu_diap = (-10, 10, 0.1), energy = 0.0, step = 0.01):
@@ -178,13 +178,13 @@ def main(model, lattice, chi_number, mu_diap = (-10, 10, 0.1), energy = 0.0, ste
 	pt.tight_layout()
 	pt.show()
 	print("Результаты расчётов:")
-	print("Хим.потенциал", "Покрытие", "Энтропия", "Восприимчивость", "Теплоёмкость")
+	print("Хим.потенциал,кДж/моль", "Покрытие", "Энтропия, кДж/(моль*K)", "Восприимчивость", "Теплоёмкость, кДж/(моль*K)")
 	for line in graph:
 		print(" ".join(map(str, line)))
 
 
 if __name__ == "__main__":
-	choice = input("Выберите модель:\n1 - модель мономолекулярной адсорбции,\n2 - модель с отталкиваниями между ближайшими соседями,\n3 - Модель Ленгмюра со стандартными параметрами \n")
+	choice = input("Выберите модель:\n1 - модель моноцентровой адсорбции с взаимодействиями,\n2 - модель с отталкиваниями между ближайшими соседями,\n3 - Модель Ленгмюра со стандартными параметрами \n")
 	model = ""
 	if choice == "1":
 		model = "0NN"
