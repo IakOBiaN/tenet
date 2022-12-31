@@ -45,7 +45,7 @@ def simulate(method = "trg", model = "langmuir", lattice = "square", temp = 1.0,
 	norm = np.einsum("abab->",tensors[0])
 	if norm < 0:
 		norm = -norm
-	return -2.0*(scale+log(norm))/(nodes/(constant*temp))
+	return (scale+log(norm))/(nodes/(constant*temp))
 
 def coverage_old(method, model, lattice, temp = 1., m_par = [0.0]*10):
 	result = derivative(lambda x: simulate(method, model, lattice, temp, [x]+m_par[1:]), m_par[0], n=1, dx=1e-3)
@@ -63,14 +63,14 @@ def enthropy_old(method,model,size, temp = 1., field = 0, int = [0]):
 	result = derivative(lambda x: simulate(model,size,x,field,int), temp, n=1, dx=1e-5)
 	return result
 
-def coverage(method, model, lattice, temp = 1., m_par = [0.0]*10):
+def coverage(method, model, lattice, temp = 1., m_par = [0.0]*10, temp_size = 300):
 	BTP = []
 	mu_step = 1e-3
 	for mu_TRG in [m_par[0] - mu_step, m_par[0] + mu_step]:
 		lnZ = simulate(method, model, lattice, temp, [mu_TRG] + m_par[1:])
 		BTP.append(lnZ)
 
-	result = (BTP[0]-BTP[1])/(mu_step*2.0)
+	result = -(BTP[0]-BTP[1])/(mu_step*2.0)
 	return result
 
 def entropy(method, model, lattice, temp = 1., m_par = [0.0]*10):
@@ -86,7 +86,7 @@ def entropy(method, model, lattice, temp = 1., m_par = [0.0]*10):
 def full(method, model, lattice, temp = 1., m_par = [0.0]*10, temp_size = 300):
 	BTP_mu = []
 	BTP_temp = []
-	step = 1e-3
+	step = 0.1
 	for mu_TRG in [m_par[0] - step, m_par[0] + step]:
 		lnZ = simulate(method, model, lattice, temp, [mu_TRG] + m_par[1:], temp_size)
 		BTP_mu.append(lnZ)
@@ -101,8 +101,8 @@ def full(method, model, lattice, temp = 1., m_par = [0.0]*10, temp_size = 300):
 	return cov, ent, sus, cap
 
 method = "trg"
-model = "kNN_triangular"
-lattice = "tr_to_sqr_susmost"
+model = "4NN_triangular"
+lattice = "tr_to_sqr"
 temp_square = 2.0/log(1+sqrt(2))
 #temp_hex = 4.0/log(3)
 #temp = temp_hex
@@ -110,19 +110,20 @@ temp_square = 2.0/log(1+sqrt(2))
 temp = 1.0
 mu = 1.0
 chi_number = 100
-system_size = 3
-for system_size in np.arange(2, 50, 1):
-	print("system_size=", system_size)
+system_size = 300
+#for system_size in np.arange(2, 50, 1):
+#	print("system_size=", system_size)
 	#m_par = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
-	#for chi_number in np.arange(4, 48, 1):
+for chi_number in np.arange(24, 2000, 1):
+	#print("xhi=", chi_number)
 	#	print(chi_number, 2.0*simulate(method, model, lattice, temp, m_par))
 	#for temp in np.arange(2.0, 4.41, 0.05):
-	for mu in np.arange(-10.0, 10.01, 0.5):
+	for mu in np.arange(1.0, -6.01, -100.1):
 		m_par = [mu, 0.0, 0.0, 0.0, 0.0, 0.0]
 		#m_par = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
 		coef = 2.0/1.00
-		#print(mu, full(method, model, lattice, temp, m_par))
-		#print(mu, simulate(method, model, lattice, temp, m_par))
 		result = full(method, model, lattice, temp, m_par, system_size)
-		print(mu, coef*result[0], coef*result[1] , coef*result[2] , coef*result[3])
-		#print(-mu, coef*result[2])
+		#print(mu, coef*result[0], coef*result[1], coef*result[2], coef*result[3], chi_number)
+		print(chi_number, simulate(method, model, lattice, temp, m_par, chi_number))
+        #result = coverage(method, model, lattice, temp, m_par, system_size)
+		#print(mu, coef*result, chi_number)

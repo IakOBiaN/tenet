@@ -3,6 +3,7 @@ import numpy as np
 from scipy.misc import derivative
 import scipy.sparse.linalg
 from scipy.linalg import sqrtm
+import gc
 
 constant = 1.
 
@@ -48,7 +49,7 @@ def split_by_svd(tensor, legs_one, legs_two, chi_min = 0.0, chi_number = None):
 	U = U[:, sort]
 	S = S[sort]
 	V = V[sort, :]
-
+	gc.collect()
 	return U.reshape(shape_one+ [cut]), S, V.reshape([cut] + shape_two)
 
 def build_tensor(matrixes, lattice = "square"):
@@ -134,6 +135,7 @@ def build_tensor(matrixes, lattice = "square"):
 
 		tensor = np.swapaxes(tensor, 2, 3)
 		tensor = list((tensor, ))
+	gc.collect()
 	return tensor
 
 def hotrg_square(tensor, scale, chi_number = 64, chi_min = 1e-8):
@@ -151,6 +153,7 @@ def hotrg_square(tensor, scale, chi_number = 64, chi_min = 1e-8):
 	tensor[0] = np.einsum("abcd->dabc", hotensor)
 
 	scale *= 2
+	gc.collect()
 	return tensor, scale
 
 def trg_square(tensor, scale, chi_number = 64, chi_min = 1e-8):
@@ -170,6 +173,7 @@ def trg_square(tensor, scale, chi_number = 64, chi_min = 1e-8):
 	tensor[0] = np.swapaxes(tensor[0], 2, 3)
 
 	scale *= 2
+	gc.collect()
 	return tensor, scale
 
 def trg_hexagonal(tensors, scale, chi_number = 64, chi_min = 1e-8):
@@ -226,5 +230,5 @@ def trg_step(tensor, scale, chi_number = 64, chi_min = 1e-8, lattice = "square")
 			scale += np.log(norm)
 		tensor, scale = trg_square(tensor, scale, chi_number, chi_min)
 		tensor, scale = trg_square(tensor, scale, chi_number, chi_min)
-
+	gc.collect()
 	return (tensor, scale)
