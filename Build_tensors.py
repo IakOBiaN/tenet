@@ -1,4 +1,4 @@
-from math import exp, log,sqrt
+from math import exp, log,sqrt, pi, cos, radians
 import numpy as np
 from scipy.misc import derivative
 import scipy.sparse.linalg
@@ -268,7 +268,62 @@ def build_matrix (model, temp, m_par, neigbours = 8.0):
 						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9], \
 						[inf, inf, inf, 3.0 * m_par[0] / 9, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[4], inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[5], inf, inf, inf]])]
 	elif model == "qstate":
-		matrixes = [1, 2, 3]
+		mu = m_par[0]
+		c = m_par[1]
+		n = m_par[2]
+		epsilon = m_par[3]
+		delta = m_par[4]
+		matrixes = []
+		#right-up
+		anglesi = [(i - radians(60)) for i in np.arange(0, 2.0 * pi, 2.0 * pi / n)]
+		anglesj = [(i - pi - radians(60)) for i in np.arange(0, 2.0 * pi, 2.0 * pi / n)]
+		matrix = [[0, ] + [mu, ] * n]
+		for alpha_i in anglesi:
+			line = [mu, ]
+			for alpha_j in anglesj:
+				uij = 0
+				for k in range(c):
+					for l in range (c):
+						if (cos(alpha_i - 2 * pi * k / c) > 0) and (cos(alpha_j - 2 * pi * l / c) > 0):
+							uij += epsilon * cos(alpha_i - 2 * pi * k / c) ** 2 * cos(alpha_j - 2 * pi * l / c) ** 2
+				uij += delta
+				line.append(uij)
+			matrix.append(line)
+		matrixes.append(np.array(matrix))
+		#right
+		anglesi = [i for i in np.arange(0, 2.0 * pi, 2.0 * pi / n)]
+		anglesj = [(i - pi) for i in np.arange(0, 2.0 * pi, 2.0 * pi / n)]
+		matrix = [[0, ] + [mu, ] * n]
+		for alpha_i in anglesi:
+			line = [mu, ]
+			for alpha_j in anglesj:
+				uij = 0
+				for k in range(c):
+					for l in range (c):
+						if (cos(alpha_i - 2 * pi * k / c) > 0) and (cos(alpha_j - 2 * pi * l / c) > 0):
+							uij += epsilon * cos(alpha_i - 2 * pi * k / c) ** 2 * cos(alpha_j - 2 * pi * l / c) ** 2
+				uij += delta
+				line.append(uij)
+			matrix.append(line)
+		matrixes.append(np.array(matrix))
+		#right-bottom
+		anglesi = [(i + radians(60)) for i in np.arange(0, 2.0 * pi, 2.0 * pi / n)]
+		anglesj = [(i - pi + radians(60)) for i in np.arange(0, 2.0 * pi, 2.0 * pi / n)]
+		matrix = [[0, ] + [mu, ] * n]
+		for alpha_i in anglesi:
+			line = [mu, ]
+			for alpha_j in anglesj:
+				uij = 0
+				for k in range(c):
+					for l in range (c):
+						if (cos(alpha_i - 2 * pi * k / c) > 0) and (cos(alpha_j - 2 * pi * l / c) > 0):
+							uij += epsilon * cos(alpha_i - 2 * pi * k / c) ** 2 * cos(alpha_j - 2 * pi * l / c) ** 2
+				uij += delta
+				line.append(uij)
+			matrix.append(line)
+		matrixes.append(np.array(matrix))
+		#print(matrixes)
+		#exit()
 
 	for i in range(len(matrixes)):
 		matrixes[i] = matrixes[i]/(constant*temp)

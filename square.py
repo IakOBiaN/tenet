@@ -101,12 +101,17 @@ def full(method, model, lattice, chi_number, T = 1., m_par = [0.0]*10):
     return coverage, entropy, susceptibility, heat_capacity
 
 method = "trg"
-model = "2NN"
+model = "qstate"
 lattice = "tr_to_sqr"
-T = 1.0
-chi_number = 16
-for mu in np.arange(-6.0, 6.01, 0.5):
-	m_par = [mu, 0.0, 0.0, 0.0, 0.0, 0.0]
-	coef = 2.0/1.00
+#model params
+c = 2
+n = 3
+epsilon = -1
+delta = 1.0
+T = 0.1
+chi_number = 24
+for mu in np.arange(-1.00, 5.01, 0.5):
+	m_par = [mu, c, n, epsilon, delta, 0.0]
+	coef = 1.0/1.00
 	result = full(method, model, lattice, chi_number, T, m_par)
 	print(mu, coef*result[0], coef*result[1] , coef*result[2] , coef*result[3])
