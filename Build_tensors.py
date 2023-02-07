@@ -276,7 +276,7 @@ def build_matrix (model, temp, m_par, neigbours = 8.0):
 		matrixes = []
 		#right-up
 		anglesi = [(i - radians(60)) for i in np.arange(0, 2.0 * pi, 2.0 * pi / n)]
-		anglesj = [(i - pi - radians(60)) for i in np.arange(0, 2.0 * pi, 2.0 * pi / n)]
+		anglesj = [(i + pi - radians(60)) for i in np.arange(0, 2.0 * pi, 2.0 * pi / n)]
 		matrix = [[0, ] + [mu, ] * n]
 		for alpha_i in anglesi:
 			line = [mu, ]
@@ -308,7 +308,7 @@ def build_matrix (model, temp, m_par, neigbours = 8.0):
 		matrixes.append(np.array(matrix))
 		#right-bottom
 		anglesi = [(i + radians(60)) for i in np.arange(0, 2.0 * pi, 2.0 * pi / n)]
-		anglesj = [(i - pi + radians(60)) for i in np.arange(0, 2.0 * pi, 2.0 * pi / n)]
+		anglesj = [(i + pi + radians(60)) for i in np.arange(0, 2.0 * pi, 2.0 * pi / n)]
 		matrix = [[0, ] + [mu, ] * n]
 		for alpha_i in anglesi:
 			line = [mu, ]

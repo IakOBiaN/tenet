@@ -7,11 +7,6 @@ import TensorNetworks as tn
 import Build_tensors as bt
 
 constant = 1.
-interactions = [1.]
-temperature = 1.
-l_vector = []
-chi_number = 24
-chi_min = 1e-8
 method_tolerance = 1e-8
 
 def simulate(method = "trg", model = "langmuir", lattice = "square", T = 1.0, m_par = [0.0]*10, chi_number = 300):
