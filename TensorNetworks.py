@@ -203,7 +203,6 @@ def trg_hexagonal(tensors, scale, chi_number = 64, chi_min = 1e-8):
 
 def hotrg_step(tensor, scale, chi_number = 64, chi_min = 1e-8, lattice = "square"):
 	norm = tensor[0].max()
-	#print(np.log(norm))
 	if norm != 0:
 		for i, ten in enumerate(tensor):
 			tensor[i] = ten/norm

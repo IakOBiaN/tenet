@@ -12,62 +12,35 @@ def build_matrix (model, temp, m_par, neigbours = 8.0):
 	if len(m_par) < 10:
 		m_par = m_par + [0.0]*(10-len(m_par))
 
+	models_dict = {
+		"langmuir" : True,
+		"ising" : True,
+		"hard-disk" : True,
+		"dimers" : True,
+		"1NN" : True,
+		"2NN" : True,
+		"3NN" : True,
+		"4NN" : True,
+		"5NN" : True,
+		"HT1" : True,
+		"HT2" : True,
+		"HT3" : True,
+		"qstate" : True
+	}
 
-	var_0NN = 0
-	var_1NN_0 = 0
-	var_1NN_mu = m_par[0]/neigbours
-	var_2NN_0 = 0
-	var_2NN_mu = m_par[0]/neigbours
-	var_3NN = 0
-	var_4NN = 0
-	NN_model = "4NN"
-	if NN_model == "1NN":
-		var_0NN = inf
-		var_1NN_0 = 0
-		var_1NN_mu = m_par[0]/neigbours
-		var_2NN_0 = 0
-		var_2NN_mu = m_par[0]/neigbours
-		var_3NN = 0
-		var_4NN = 0
-	elif NN_model == "2NN":
-		var_0NN = inf
-		var_1NN_0 = inf
-		var_1NN_mu = inf
-		var_2NN_0 = 0
-		var_2NN_mu = m_par[0]/neigbours
-		var_3NN = 0
-		var_4NN = 0
-	elif NN_model == "3NN":
-		var_0NN = inf
-		var_1NN_0 = inf
-		var_1NN_mu = inf
-		var_2NN_0 = inf
-		var_2NN_mu = inf
-		var_3NN = 0
-		var_4NN = 0
-	elif NN_model == "4NN":
-		var_0NN = inf
-		var_1NN_0 = inf
-		var_1NN_mu = inf
-		var_2NN_0 = inf
-		var_2NN_mu = inf
-		var_3NN = inf
-		var_4NN = 0
-	elif NN_model == "5NN":
-		var_0NN = inf
-		var_1NN_0 = inf
-		var_1NN_mu = inf
-		var_2NN_0 = inf
-		var_2NN_mu = inf
-		var_3NN = inf
-		var_4NN = inf
+	exist = models_dict.get(model)
+	assert (exist is not None), "Error! This model is not in the database"
 
 	#[any],[right, bottom],[right-up, right, right-bottom], [right-up, right, right-bottom, bottom]
-	matrix_dict = {
-		"langmuir" : (np.array([[0.0, m_par[0]/neigbours],[m_par[0]/neigbours, -m_par[1]+m_par[0]/(neigbours/2.0)]]) ,) * 3,
-		"ising" : (np.array([[(m_par[1]-m_par[0]/(neigbours/2.0)), (-m_par[1])],[(-m_par[1]), (m_par[1]+m_par[0]/(neigbours/2.0))]]), ) * 3,
-		"hard-disk" : (np.array([[0.0, m_par[0]/(neigbours/1.0)],[m_par[0]/(neigbours/1.0), -1000000.0+m_par[0]]]), ) * 3,
-		"dimers" : (np.array([[0, inf, (m_par[0]+m_par[1])/6.0, (m_par[0]+m_par[1])/6.0, m_par[0]/3.0], \
+	matrixes = []
+	if model == "langmuir":
+		matrixes = [np.array([[0.0, m_par[0]/neigbours],[m_par[0]/neigbours, -m_par[1]+m_par[0]/(neigbours/2.0)]]) ,] * 3
+	elif model == "ising":
+		matrixes = [np.array([[(m_par[1]-m_par[0]/(neigbours/2.0)), (-m_par[1])],[(-m_par[1]), (m_par[1]+m_par[0]/(neigbours/2.0))]]), ] * 3
+	elif model == "hard-disk":
+		matrixes = [np.array([[0.0, m_par[0]/(neigbours/1.0)],[m_par[0]/(neigbours/1.0), -1000000.0+m_par[0]]]), ] * 3
+	elif model == "dimers":
+		matrixes = [np.array([[0, inf, (m_par[0]+m_par[1])/6.0, (m_par[0]+m_par[1])/6.0, m_par[0]/3.0], \
 						[(m_par[0]+m_par[1])/6.0, inf, inf, inf, inf], \
 						[inf, (m_par[0]+m_par[1])/3.0, inf, inf, inf], \
 						[(m_par[0]+m_par[1])/6.0, inf, inf, inf, inf], \
@@ -76,184 +49,227 @@ def build_matrix (model, temp, m_par, neigbours = 8.0):
 						[(m_par[0]+m_par[1])/6.0, inf, inf, inf, inf], \
 						[(m_par[0]+m_par[1])/6.0, inf, inf, inf, inf], \
 						[inf, inf, inf, (m_par[0]+m_par[1])/3.0, inf], \
-						[m_par[0]/3.0, inf, inf, inf, inf]])), \
-		#mu = m_par[0], m1 = m_par[1], m2 = m_par[2], m1 = m_par[3], m1 = m_par[4], m1 = m_par[5]
-		"4NN_triangular" : (np.array([[0, inf, 0, inf, inf, inf, 0, 0], \
-						[inf, inf, var_1NN_mu, inf, m_par[0]/neigbours, inf, var_1NN_mu, var_2NN_mu], \
+						[m_par[0]/3.0, inf, inf, inf, inf]])]
+	elif model == "1NN" or model == "2NN" or model == "3NN" or model == "4NN" or model == "5NN":
+		var_1NN_0 = 0
+		var_1NN_mu = m_par[0] / neigbours
+		var_2NN_0 = 0
+		var_2NN_mu = m_par[0] / neigbours
+		var_3NN = 0
+		var_4NN = 0
+		if model == "1NN":
+			var_1NN_0 = 0
+			var_1NN_mu = m_par[0] / neigbours
+			var_2NN_0 = 0
+			var_2NN_mu = m_par[0] / neigbours
+			var_3NN = 0
+			var_4NN = 0
+		elif model == "2NN":
+			var_1NN_0 = inf
+			var_1NN_mu = inf
+			var_2NN_0 = 0
+			var_2NN_mu = m_par[0] / neigbours
+			var_3NN = 0
+			var_4NN = 0
+		elif model == "3NN":
+			var_1NN_0 = inf
+			var_1NN_mu = inf
+			var_2NN_0 = inf
+			var_2NN_mu = inf
+			var_3NN = 0
+			var_4NN = 0
+		elif model == "4NN":
+			var_1NN_0 = inf
+			var_1NN_mu = inf
+			var_2NN_0 = inf
+			var_2NN_mu = inf
+			var_3NN = inf
+			var_4NN = 0
+		elif model == "5NN":
+			var_1NN_0 = inf
+			var_1NN_mu = inf
+			var_2NN_0 = inf
+			var_2NN_mu = inf
+			var_3NN = inf
+			var_4NN = inf
+		matrixes = [np.array([[0, inf, 0, inf, inf, inf, 0, 0], \
+						[inf, inf, var_1NN_mu, inf, m_par[0] / neigbours, inf, var_1NN_mu, var_2NN_mu], \
 						[inf, inf, inf, 0, inf, var_1NN_0, var_2NN_0, var_1NN_0], \
 						[0, var_1NN_mu, var_2NN_0, inf, inf, var_2NN_0, var_3NN, var_3NN], \
 						[0, var_2NN_mu, var_3NN, var_1NN_0, inf, var_1NN_0, var_3NN, var_4NN], \
 						[0, var_1NN_mu, var_3NN, var_2NN_0, inf, inf, var_2NN_0, var_3NN], \
 						[inf, inf, var_2NN_0, var_1NN_0, inf, 0, inf, var_1NN_0], \
-						[inf, m_par[0]/neigbours, inf, inf, inf, inf, inf, inf]]), \
+						[inf, m_par[0] / neigbours, inf, inf, inf, inf, inf, inf]]), \
 					np.array([[0, inf, 0, 0, inf, inf, inf, 0], \
-						[inf, inf, var_2NN_0, inf, inf, m_par[0]/neigbours, var_1NN_0, var_1NN_0], \
-						[inf, m_par[0]/neigbours, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, var_2NN_mu, var_1NN_mu, inf, m_par[0] / neigbours, inf, var_1NN_mu], \
+						[inf, m_par[0] / neigbours, inf, inf, inf, inf, inf, inf], \
 						[inf, inf, var_1NN_0, inf, 0, inf, var_1NN_0, var_2NN_0], \
 						[0, var_1NN_mu, var_3NN, var_2NN_0, inf, var_1NN_0, var_2NN_0, var_3NN], \
 						[0, var_2NN_mu, var_4NN, var_3NN, var_1NN_0, inf, var_1NN_0, var_3NN], \
 						[0, var_1NN_mu, var_3NN, var_3NN, var_2NN_0, inf, inf, var_2NN_0], \
 						[inf, inf, var_1NN_0, var_2NN_0, var_1NN_0, inf, 0, inf]]), \
 					np.array([[0, inf, 0, 0, 0, inf, inf, inf], \
-						[inf, inf, var_1NN_0, var_2NN_0, var_1NN_0, inf, m_par[0]/neigbours, inf], \
+						[inf, inf, var_1NN_mu, var_2NN_mu, var_1NN_mu, inf, m_par[0] / neigbours, inf], \
 						[inf, inf, inf, var_1NN_0, var_2NN_0, var_1NN_0, inf, 0], \
-						[inf, m_par[0]/neigbours, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, var_2NN_0, var_1NN_0, var_1NN_0, 0, inf, var_1NN_0], \
+						[inf, m_par[0] / neigbours, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, var_2NN_0, var_1NN_0, inf, 0, inf, var_1NN_0], \
 						[0, var_1NN_mu, var_3NN, var_3NN, var_2NN_0, inf, inf, var_2NN_0], \
 						[0, var_2NN_mu, var_3NN, var_4NN, var_3NN, var_1NN_0, inf, var_1NN_0], \
-						[0, var_1NN_mu, var_2NN_0, var_3NN, var_3NN, var_2NN_0, inf, inf]])), \
-		"HT1" : (np.array([[0, m_par[0], m_par[0], 2.0*m_par[0]+m_par[4]], \
-						[m_par[0], 2.0*m_par[0], 2.0*m_par[0], 3.0*m_par[0]+m_par[4]], \
-						[m_par[0], 2.0*m_par[0]+m_par[1], 2.0*m_par[0], 3.0*m_par[0]+m_par[4]+m_par[1]], \
-						[2.0*m_par[0]+m_par[4], 3.0*m_par[0]+m_par[4]+m_par[1], 3.0*m_par[0]+m_par[4], 4.0*m_par[0]+2.0*m_par[4]+m_par[1]]]), \
-					np.array([[0, m_par[0], m_par[0], 2.0*m_par[0]+m_par[4]], \
-						[m_par[0], 2.0*m_par[0]+m_par[2], 2.0*m_par[0], 3.0*m_par[0]+m_par[4]+m_par[2]], \
-						[m_par[0], 2.0*m_par[0]+m_par[4], 2.0*m_par[0]+m_par[2], 3.0*m_par[0]+2.0*m_par[4]+m_par[2]], \
-						[2.0*m_par[0]+m_par[4], 3.0*m_par[0]+2.0*m_par[4]+m_par[2], 3.0*m_par[0]+m_par[4]+m_par[2], 4.0*m_par[0]+3.0*m_par[4]+2.0*m_par[2]]]), \
-					np.array([[0, m_par[0], m_par[0], 2.0*m_par[0]+m_par[4]], \
-						[m_par[0], 2.0*m_par[0]+m_par[2], 2.0*m_par[0]+m_par[1], 3.0*m_par[0]+m_par[4]+m_par[1]+m_par[2]], \
-						[m_par[0], 2.0*m_par[0]+m_par[1], 2.0*m_par[0]+m_par[2], 3.0*m_par[0]+m_par[4]+m_par[1]+m_par[2]], \
-						[2.0*m_par[0]+m_par[4], 3.0*m_par[0]+m_par[4]+m_par[1]+m_par[2], 3.0*m_par[0]+m_par[4]+m_par[1]+m_par[2], 4.0*m_par[0]+2.0*m_par[4]+2.0*m_par[1]+2.0*m_par[2]]]), \
-					np.array([[0, m_par[0], m_par[0], 2.0*m_par[0]+m_par[4]], \
-						[m_par[0], 2.0*m_par[0]+m_par[2], 2.0*m_par[0]+m_par[4], 3.0*m_par[0]+2.0*m_par[4]+m_par[2]], \
-						[m_par[0], 2.0*m_par[0], 2.0*m_par[0]+m_par[2], 3.0*m_par[0]+m_par[4]+m_par[2]], \
-						[2.0*m_par[0]+m_par[4], 3.0*m_par[0]+m_par[4]+m_par[2], 3.0*m_par[0]+2.0*m_par[4]+m_par[2], 4.0*m_par[0]+3.0*m_par[4]+2.0*m_par[2]]])), \
-		"HT2" : (np.array([[0, 2.0*m_par[0]/4.0, m_par[0]/4.0, 2.0*m_par[0]/4.0+m_par[4], 2.0*m_par[0]/4.0+m_par[5], m_par[0]/4.0, 2.0*m_par[0]/4.0+m_par[5], 2.0*m_par[0]/4.0+m_par[4], 2.0*m_par[0]/4.0, m_par[0]/4.0, m_par[0]/4.0], \
-						[2.0*m_par[0]/4.0, 4.0*m_par[0]/4.0+m_par[3], inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/4.0, 3.0*m_par[0]/4.0, 3.0*m_par[0]/4.0], \
-						[m_par[0]/4.0, 3.0*m_par[0]/4.0, 2.0*m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[4], 3.0*m_par[0]/4.0+m_par[5], 2.0*m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[5], 3.0*m_par[0]/4.0+m_par[4], 3.0*m_par[0]/4.0, 2.0*m_par[0]/4.0, 2.0*m_par[0]/4.0], \
-						[2.0*m_par[0]/4.0+m_par[4], 4.0*m_par[0]/4.0+m_par[4], inf, inf, inf, 3.0*m_par[0]/4.0+m_par[4], 4.0*m_par[0]/4.0+m_par[4]+m_par[5], 4.0*m_par[0]/4.0+2.0*m_par[4], inf, 3.0*m_par[0]/4.0+m_par[4], 3.0*m_par[0]/4.0+m_par[4]], \
-						[2.0*m_par[0]/4.0+m_par[5], 4.0*m_par[0]/4.0+m_par[5], 3.0*m_par[0]/4.0+m_par[5], 4.0*m_par[0]/4.0+m_par[5]+m_par[4], 4.0*m_par[0]/4.0+2.0*m_par[5], inf, inf, inf, inf, 3.0*m_par[0]/4.0+m_par[5], 3.0*m_par[0]/4.0+m_par[5]], \
-						[m_par[0]/4.0, 3.0*m_par[0]/4.0, 2.0*m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[4], 3.0*m_par[0]/4.0+m_par[5], 2.0*m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[5], 2.0*m_par[0]/4.0+m_par[4], 3.0*m_par[0]/4.0, 2.0*m_par[0]/4.0, 2.0*m_par[0]/4.0], \
-						[2.0*m_par[0]/4.0+m_par[5], 4.0*m_par[0]/4.0+m_par[5], inf, inf, inf, 3.0*m_par[0]/4.0+m_par[5], 4.0*m_par[0]/4.0+2.0*m_par[5], 4.0*m_par[0]/4.0+m_par[5]+m_par[4], inf, 3.0*m_par[0]/4.0+m_par[5], 3.0*m_par[0]/4.0+m_par[5]], \
-						[2.0*m_par[0]/4.0+m_par[4], 4.0*m_par[0]/4.0+m_par[4], 3.0*m_par[0]/4.0+m_par[4], 4.0*m_par[0]/4.0+2.0*m_par[4], 4.0*m_par[0]/4.0+m_par[4]+m_par[5], inf, inf, inf, inf, 3.0*m_par[0]/4.0+m_par[4], 3.0*m_par[0]/4.0+m_par[4]], \
-						[2.0*m_par[0]/4.0, 4.0*m_par[0]/4.0+m_par[1], 3.0*m_par[0]/4.0, 4.0*m_par[0]/4.0+m_par[4], 4.0*m_par[0]/4.0+m_par[5], 3.0*m_par[0]/4.0, 4.0*m_par[0]/4.0+m_par[5], 4.0*m_par[0]/4.0+m_par[4], 4.0*m_par[0]/4.0+m_par[3], 3.0*m_par[0]/4.0, 3.0*m_par[0]/4.0], \
-						[m_par[0]/4.0, 3.0*m_par[0]/4.0, inf, inf, inf, 2.0*m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[5], 3.0*m_par[0]/4.0+m_par[4], inf, 2.0*m_par[0]/4.0, 2.0*m_par[0]/4.0], \
-						[m_par[0]/4.0, 3.0*m_par[0]/4.0, 2.0*m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[4], 3.0*m_par[0]/4.0+m_par[5], inf, inf, inf, inf, 2.0*m_par[0]/4.0, 2.0*m_par[0]/4.0]]), \
-					np.array([[0, 2.0*m_par[0]/4.0, m_par[0]/4.0, 2.0*m_par[0]/4.0+m_par[4], 2.0*m_par[0]/4.0+m_par[5], inf, inf, inf, inf, m_par[0]/4.0, m_par[0]/4.0], \
-						[inf, inf, inf, inf, inf, 3.0*m_par[0]/4.0, 4.0*m_par[0]/4.0+m_par[5], 4.0*m_par[0]/4.0+m_par[4], inf, inf, inf], \
-						[m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[3], inf, inf, inf, inf, inf, inf, inf, 2.0*m_par[0]/4.0, 2.0*m_par[0]/4.0], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/4.0+m_par[4], inf, inf], \
-						[2.0*m_par[0]/4.0+m_par[5], 4.0*m_par[0]/4.0+m_par[5]+m_par[4]+m_par[3], inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/4.0+m_par[5], inf], \
-						[m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[2], 2.0*m_par[0]/4.0+m_par[3], 3.0*m_par[0]/4.0+m_par[4]+m_par[3], 3.0*m_par[0]/4.0+m_par[3]+m_par[5], inf, inf, inf, inf, 2.0*m_par[0]/4.0, 2.0*m_par[0]/4.0], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/4.0+m_par[5], inf, inf], \
-						[2.0*m_par[0]/4.0+m_par[4], 4.0*m_par[0]/4.0+2.0*m_par[4], 3.0*m_par[0]/4.0+m_par[4]+m_par[5], 4.0*m_par[0]/4.0+2.0*m_par[4]+m_par[5], 4.0*m_par[0]/4.0+m_par[4]+2.0*m_par[5], inf, inf, inf, inf, 3.0*m_par[0]/4.0+m_par[4]+m_par[3], inf], \
-						[2.0*m_par[0]/4.0, 4.0*m_par[0]/4.0+m_par[5], 3.0*m_par[0]/4.0+m_par[4], 4.0*m_par[0]/4.0+2.0*m_par[4], 4.0*m_par[0]/4.0+m_par[4]+m_par[5], inf, inf, inf, inf, 3.0*m_par[0]/4.0+m_par[2], 3.0*m_par[0]/4.0+m_par[3]], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/4.0, inf, inf], \
-						[m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[4], 2.0*m_par[0]/4.0+m_par[5], 3.0*m_par[0]/4.0+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf, 2.0*m_par[0]/4.0+m_par[3], inf]]), \
-					np.array([[0, 2.0*m_par[0]/4.0, m_par[0]/4.0, 2.0*m_par[0]/4.0+m_par[4], 2.0*m_par[0]/4.0+m_par[5], inf, inf, inf, 2.0*m_par[0]/4.0, m_par[0]/4.0, inf], \
-						[2.0*m_par[0]/4.0, inf, 3.0*m_par[0]/4.0+m_par[3], 4.0*m_par[0]/4.0+m_par[3]+m_par[4], inf, inf, inf, inf, 4.0*m_par[0]/4.0, 3.0*m_par[0]/4.0, inf], \
-						[inf, inf, inf, inf, inf, 2.0*m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[5], 3.0*m_par[0]/4.0+m_par[4], inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/4.0+2.0*m_par[4], inf, inf, inf], \
-						[inf, inf, inf, inf, inf, 3.0*m_par[0]/4.0+m_par[4], 4.0*m_par[0]/4.0+2.0*m_par[5]+m_par[2], inf, inf, inf, inf], \
-						[m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[3], 2.0*m_par[0]/4.0+m_par[2], 3.0*m_par[0]/4.0+m_par[2]+m_par[4], 3.0*m_par[0]/4.0+m_par[2]+m_par[5], inf, inf, inf, 3.0*m_par[0]/4.0, 2.0*m_par[0]/4.0+m_par[1], inf], \
-						[inf, inf, inf, inf, 4.0*m_par[0]/4.0+m_par[2]+2.0*m_par[5], inf, inf, inf, inf, inf, 3.0*m_par[0]/4.0+m_par[5]], \
-						[2.0*m_par[0]/4.0+m_par[4], 4.0*m_par[0]/4.0+m_par[3]+m_par[4], 3.0*m_par[0]/4.0+m_par[3]+m_par[4], 4.0*m_par[0]/4.0+2.0*m_par[4]+2.0*m_par[1]+2.0*m_par[2], inf, inf, inf, inf, 4.0*m_par[0]/4.0+m_par[4]+m_par[3], 3.0*m_par[0]/4.0+m_par[1]+m_par[2], inf], \
-						[2.0*m_par[0]/4.0, 4.0*m_par[0]/4.0, 3.0*m_par[0]/4.0, 4.0*m_par[0]/4.0+m_par[4]+m_par[3], inf, inf, inf, inf, inf, 3.0*m_par[0]/4.0+m_par[3], inf], \
-						[inf, inf, inf, inf, 3.0*m_par[0]/4.0+m_par[5], inf, inf, inf, inf, inf, 2.0*m_par[0]/4.0], \
-						[m_par[0]/4.0, 3.0*m_par[0]/4.0, 2.0*m_par[0]/4.0+m_par[1], 3.0*m_par[0]/4.0+m_par[1]+m_par[2], inf, inf, inf, inf, 3.0*m_par[0]/4.0+m_par[3], 2.0*m_par[0]/4.0+m_par[2], inf]]), \
-					np.array([[0, inf, m_par[0]/4.0, 2.0*m_par[0]/4.0+m_par[4], inf, m_par[0]/4.0, 2.0*m_par[0]/4.0+m_par[5], inf, 2.0*m_par[0]/4.0, m_par[0]/4.0, inf], \
-						[2.0*m_par[0]/4.0, inf, 3.0*m_par[0]/4.0+m_par[2], 4.0*m_par[0]/4.0+2.0*m_par[4]+m_par[2], inf, 3.0*m_par[0]/4.0+m_par[3], 4.0*m_par[0]/4.0+m_par[4]+m_par[5]+m_par[3], inf, 4.0*m_par[0]/4.0+m_par[5], 3.0*m_par[0]/4.0+m_par[4], inf], \
-						[inf, 3.0*m_par[0]/4.0, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, 4.0*m_par[0]/4.0+m_par[4], inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, 4.0*m_par[0]/4.0+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[m_par[0]/4.0, inf, 2.0*m_par[0]/4.0+m_par[3], 3.0*m_par[0]/4.0+m_par[4]+m_par[3]+m_par[5], inf, inf, inf, inf, 3.0*m_par[0]/4.0+m_par[4], 2.0*m_par[0]/4.0+m_par[5], inf], \
-						[2.0*m_par[0]/4.0, inf, 3.0*m_par[0]/4.0+m_par[3]+m_par[5], inf, inf, inf, inf, inf, 4.0*m_par[0]/4.0+m_par[4]+m_par[3]+m_par[5], inf, inf], \
-						[2.0*m_par[0]/4.0+m_par[4], inf, 3.0*m_par[0]/4.0+m_par[4]+m_par[3], 4.0*m_par[0]/4.0+2.0*m_par[3]+2.0*m_par[4], inf, inf, inf, inf, 4.0*m_par[0]/4.0+2.0*m_par[4]+m_par[2], 3.0*m_par[0]/4.0+m_par[4]+m_par[5]+m_par[3], inf], \
-						[inf, inf, inf, inf, 4.0*m_par[0]/4.0+m_par[5], inf, inf, 4.0*m_par[0]/4.0, inf, inf, 3.0*m_par[0]/4.0], \
-						[m_par[0]/4.0, inf, 2.0*m_par[0]/4.0, inf, inf, 2.0*m_par[0]/4.0, inf, inf, 3.0*m_par[0]/4.0+m_par[3], inf, inf], \
-						[m_par[0]/4.0, inf, 2.0*m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[3]+m_par[4], inf, 2.0*m_par[0]/4.0, 3.0*m_par[0]/4.0+m_par[3]+m_par[5], inf, 3.0*m_par[0]/4.0+m_par[2], 2.0*m_par[0]/4.0+m_par[3], inf]])) , \
-		"HT3" : (np.array([[0, m_par[0]/9, m_par[0]/9, m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, m_par[0]/9, 2.0*m_par[0]/9+m_par[5], 2.0*m_par[0]/9+m_par[5], 2.0*m_par[0]/9+m_par[4], 2.0*m_par[0]/9, inf, inf, inf, inf, m_par[0]/9, 2.0*m_par[0]/9+m_par[4], 2.0*m_par[0]/9+m_par[5], 2.0*m_par[0]/9+m_par[5], 2.0*m_par[0]/9, inf, 2.0*m_par[0]/9], \
-						[m_par[0]/9, inf, inf, 3.0*m_par[0]/9+m_par[3], 3.0*m_par[0]/9+m_par[5], 3.0*m_par[0]/9+m_par[4], 3.0*m_par[0]/9+m_par[5], inf, inf, 3.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9, inf], \
-						[m_par[0]/9, 2.0*m_par[0]/9+m_par[3], inf, inf, 3.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[4], inf, inf, inf, inf, 2.0*m_par[0]/9+m_par[5], 3.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9, 4.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+m_par[4], 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf], \
-						[2.0*m_par[0]/9, 3.0*m_par[0]/9, 3.0*m_par[0]/9, 3.0*m_par[0]/9, 4.0*m_par[0]/9+m_par[3], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, 4.0*m_par[0]/9+m_par[4]], \
-						[m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, 3.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[3], inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[2], inf, inf, inf, inf, 2.0*m_par[0]/9+m_par[3], 3.0*m_par[0]/9+m_par[3]+m_par[4], 3.0*m_par[0]/9+m_par[3]+m_par[5], 3.0*m_par[0]/9+m_par[3]+m_par[5], 3.0*m_par[0]/9, inf, 3.0*m_par[0]/9], \
-						[2.0*m_par[0]/9+m_par[5], inf, inf, 3.0*m_par[0]/9+m_par[5]+m_par[3], 4.0*m_par[0]/9+2.0*m_par[5], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[5], inf], \
-						[2.0*m_par[0]/9+m_par[4], 3.0*m_par[0]/9+m_par[4]+m_par[3], inf, inf, 4.0*m_par[0]/9+m_par[4]+m_par[5], inf, inf, inf, inf, inf, 4.0*m_par[0]/9+2.0*m_par[4]+m_par[2], inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[4]+m_par[5]+m_par[3], 4.0*m_par[0]/9+2.0*m_par[4]+m_par[5]+2.0*m_par[3], inf, inf, inf, inf, inf], \
-						[2.0*m_par[0]/9, 3.0*m_par[0]/9, 3.0*m_par[0]/9, 3.0*m_par[0]/9, 4.0*m_par[0]/9+m_par[3], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[4], inf, 4.0*m_par[0]/9+m_par[5]], \
-						[m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, 3.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[3], inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[3], inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9, inf, 3.0*m_par[0]/9], \
-						[2.0*m_par[0]/9+m_par[5], inf, inf, 3.0*m_par[0]/9+m_par[3]+m_par[5], 4.0*m_par[0]/9+2.0*m_par[5], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[4], inf], \
-						[2.0*m_par[0]/9+m_par[5], 3.0*m_par[0]/9+m_par[3]+m_par[5], inf, inf, 4.0*m_par[0]/9+2.0*m_par[5], inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, 3.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[2], 2.0*m_par[0]/9+m_par[3], 3.0*m_par[0]/9+m_par[3]+m_par[5], 3.0*m_par[0]/9+m_par[3]+m_par[5], 3.0*m_par[0]/9+m_par[4]+m_par[3], 3.0*m_par[0]/9+m_par[3], inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9, inf, 3.0*m_par[0]/9], \
-						[2.0*m_par[0]/9+m_par[4], inf, inf, 3.0*m_par[0]/9+m_par[3]+m_par[4], 4.0*m_par[0]/9+m_par[4]+m_par[5], 4.0*m_par[0]/9+2.0*m_par[4]+m_par[3], 3.0*m_par[0]/9+m_par[4]+m_par[5], inf, inf, 4.0*m_par[0]/9+2.0*m_par[4]+2.0*m_par[3], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf], \
-						[2.0*m_par[0]/9+m_par[5], 3.0*m_par[0]/9+m_par[3]+m_par[5], inf, inf, 4.0*m_par[0]/9+2.0*m_par[5], inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[3], 3.0*m_par[0]/9+m_par[3], 3.0*m_par[0]/9+m_par[2], 4.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+m_par[5], 3.0*m_par[0]/9+m_par[4], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], 4.0*m_par[0]/9+2.0*m_par[4]+m_par[2], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[2.0*m_par[0]/9, 3.0*m_par[0]/9, 3.0*m_par[0]/9, 3.0*m_par[0]/9, 4.0*m_par[0]/9+m_par[1], 4.0*m_par[0]/9+m_par[5], 3.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+2.0*m_par[5], 4.0*m_par[0]/9+2.0*m_par[5], 4.0*m_par[0]/9+m_par[5]+m_par[4], 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+m_par[5]+m_par[4], 4.0*m_par[0]/9+2.0*m_par[5], 4.0*m_par[0]/9+2.0*m_par[5], 4.0*m_par[0]/9+m_par[3], inf, 4.0*m_par[0]/9+m_par[3]], \
-						[2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[2], 3.0*m_par[0]/9+m_par[3], 3.0*m_par[0]/9+m_par[3], 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[4], 4.0*m_par[0]/9+2.0*m_par[4]+m_par[2], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf]]), \
-					np.array([[0, m_par[0]/9, m_par[0]/9, m_par[0]/9, 2.0*m_par[0]/9, inf, inf, inf, inf, inf, 2.0*m_par[0]/9, inf, inf, inf, inf, m_par[0]/9, 2.0*m_par[0]/9+m_par[4], 2.0*m_par[0]/9+m_par[5], 2.0*m_par[0]/9+m_par[5], inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9], \
-						[m_par[0]/9, 2.0*m_par[0]/9+m_par[3], inf, inf, 3.0*m_par[0]/9+m_par[4], inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, 2.0*m_par[0]/9+m_par[5], 3.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, 4.0*m_par[0]/9, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9, 4.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+m_par[4], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[2], inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[3], inf, inf, inf, inf, 2.0*m_par[0]/9+m_par[3], 3.0*m_par[0]/9+m_par[3]+m_par[4], 3.0*m_par[0]/9+m_par[3]+m_par[5], 3.0*m_par[0]/9+m_par[3]+m_par[5], inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5]], \
-						[2.0*m_par[0]/9+m_par[4], 3.0*m_par[0]/9+m_par[4], inf, inf, 4.0*m_par[0]/9+2.0*m_par[4]+m_par[2], inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], 4.0*m_par[0]/9+2.0*m_par[4]+2.0*m_par[5]+2.0*m_par[3], inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9, 4.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+m_par[4], 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf], \
-						[m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[3], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[4]], \
-						[2.0*m_par[0]/9+m_par[5], 3.0*m_par[0]/9+m_par[3]+m_par[5], inf, inf, 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, 2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[3], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[4], inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5]], \
-						[2.0*m_par[0]/9+m_par[5], 3.0*m_par[0]/9+m_par[3]+m_par[5], inf, inf, 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9, inf], \
-						[2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[2], 3.0*m_par[0]/9+m_par[3], 3.0*m_par[0]/9+m_par[3], 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[4], 4.0*m_par[0]/9+2.0*m_par[4]+m_par[2], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf], \
-						[2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[3], inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[4], inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf]]), \
-					np.array([[0, m_par[0]/9, inf, inf, 2.0*m_par[0]/9, inf, inf, inf, inf, inf, 2.0*m_par[0]/9, inf, inf, inf, inf, m_par[0]/9, 2.0*m_par[0]/9+m_par[4], inf, inf, 2.0*m_par[0]/9, 2.0*m_par[0]/9, inf], \
-						[inf, inf, 2.0*m_par[0]/9, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[5], inf, inf, inf, inf], \
-						[inf, inf, inf, 2.0*m_par[0]/9, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[5], inf, inf, inf], \
-						[m_par[0]/9, 2.0*m_par[0]/9+m_par[2], inf, inf, 3.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, 2.0*m_par[0]/9+m_par[1], 3.0*m_par[0]/9+m_par[1]+m_par[2]+m_par[4], inf, inf, 3.0*m_par[0]/9+m_par[3], 3.0*m_par[0]/9+m_par[3], inf], \
-						[2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[3], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, 4.0*m_par[0]/9+m_par[4], 4.0*m_par[0]/9+m_par[5], inf], \
-						[2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[3], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, 4.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+m_par[4], inf], \
-						[m_par[0]/9, 2.0*m_par[0]/9+m_par[1], inf, inf, 3.0*m_par[0]/9+m_par[3], inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[3], inf, inf, inf, inf, 2.0*m_par[0]/9+m_par[2], 3.0*m_par[0]/9+m_par[1]+m_par[2]+m_par[4], inf, inf, 3.0*m_par[0]/9+m_par[5], 3.0*m_par[0]/9+m_par[5], inf], \
-						[inf, inf, 3.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+2.0*m_par[5]+m_par[2], inf, inf, inf, inf], \
-						[inf, inf, inf, 3.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[2]+2.0*m_par[5], inf, inf, inf], \
-						[2.0*m_par[0]/9+m_par[4], 3.0*m_par[0]/9+m_par[1]+m_par[2], inf, inf, 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[1]+m_par[2]+m_par[4], 4.0*m_par[0]/9+2.0*m_par[1]+2.0*m_par[2]+2.0*m_par[4], inf, inf, 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf], \
-						[inf, inf, inf, inf, inf, 4.0*m_par[0]/9, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, 2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[4], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+m_par[2]+2.0*m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[4], inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+2.0*m_par[2]+2.0*m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9], \
-						[2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[3], inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[4], inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf], \
-						[2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[3], inf, inf, 4.0*m_par[0]/9+m_par[4], inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf]]), \
-					np.array([[0, m_par[0]/9, inf, inf, inf, inf, m_par[0]/9, 2.0*m_par[0]/9+m_par[5], inf, inf, inf, m_par[0]/9, 2.0*m_par[0]/9+m_par[5], inf, inf, m_par[0]/9, 2.0*m_par[0]/9+m_par[4], inf, inf, 2.0*m_par[0]/9, 2.0*m_par[0]/9, inf], \
-						[m_par[0]/9, inf, inf, inf, inf, inf, 2.0*m_par[0]/9, inf, inf, inf, inf, 2.0*m_par[0]/9, inf, inf, inf, 2.0*m_par[0]/9, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[3], inf], \
-						[m_par[0]/9, inf, inf, inf, inf, inf, 2.0*m_par[0]/9, inf, inf, inf, inf, 2.0*m_par[0]/9, inf, inf, inf, 2.0*m_par[0]/9, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[3], inf], \
-						[m_par[0]/9, 2.0*m_par[0]/9+m_par[3], inf, inf, inf, inf, 2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[3]+m_par[5], inf, inf, inf, 2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[3]+m_par[5], inf, inf, 2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[3]+m_par[4], inf, inf, 3.0*m_par[0]/9+m_par[3], 3.0*m_par[0]/9+m_par[2], inf], \
-						[2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[4], inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[3], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, 3.0*m_par[0]/9+m_par[3], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, 3.0*m_par[0]/9+m_par[2], 4.0*m_par[0]/9+2.0*m_par[4]+m_par[2], inf, inf, 4.0*m_par[0]/9+m_par[5], 4.0*m_par[0]/9+m_par[5], inf], \
-						[2.0*m_par[0]/9, 3.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[3], 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, 4.0*m_par[0]/9+m_par[4], 4.0*m_par[0]/9+m_par[5], inf], \
-						[m_par[0]/9, 2.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 2.0*m_par[0]/9+m_par[3], 3.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, 3.0*m_par[0]/9+m_par[5], 3.0*m_par[0]/9+m_par[4], inf], \
-						[2.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[3]+m_par[5], inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf], \
-						[2.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[3]+m_par[5], inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf], \
-						[2.0*m_par[0]/9+m_par[4], 3.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9+m_par[4]+m_par[3], 4.0*m_par[0]/9+2.0*m_par[3]+2.0*m_par[4]+m_par[5], inf, inf, 4.0*m_par[0]/9+m_par[3]+m_par[4]+m_par[5], 4.0*m_par[0]/9+m_par[2]+2.0*m_par[4], inf], \
-						[inf, inf, inf, inf, 4.0*m_par[0]/9, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, 3.0*m_par[0]/9, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[4], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0*m_par[0]/9, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[4], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
-						[inf, inf, 3.0*m_par[0]/9, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[4], inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, inf], \
-						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0*m_par[0]/9], \
-						[inf, inf, inf, 3.0*m_par[0]/9, inf, inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[4], inf, inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf, 4.0*m_par[0]/9+m_par[5], inf, inf, inf]]))
-	}
+						[0, var_1NN_mu, var_2NN_0, var_3NN, var_3NN, var_2NN_0, inf, inf]])]
+	elif model == "HT1":
+		matrixes = [np.array([[0, m_par[0], m_par[0], 2.0 * m_par[0] + m_par[4]], \
+						[m_par[0], 2.0 * m_par[0], 2.0 * m_par[0], 3.0 * m_par[0] + m_par[4]], \
+						[m_par[0], 2.0 * m_par[0] + m_par[1], 2.0 * m_par[0], 3.0 * m_par[0] + m_par[4] + m_par[1]], \
+						[2.0 * m_par[0] + m_par[4], 3.0 * m_par[0] + m_par[4] + m_par[1], 3.0 * m_par[0] + m_par[4], 4.0 * m_par[0] + 2.0 * m_par[4] + m_par[1]]]), \
+					np.array([[0, m_par[0], m_par[0], 2.0 * m_par[0] + m_par[4]], \
+						[m_par[0], 2.0 * m_par[0] + m_par[2], 2.0 * m_par[0], 3.0 * m_par[0] + m_par[4] + m_par[2]], \
+						[m_par[0], 2.0 * m_par[0] + m_par[4], 2.0 * m_par[0] + m_par[2], 3.0 * m_par[0] + 2.0 * m_par[4] + m_par[2]], \
+						[2.0 * m_par[0] + m_par[4], 3.0 * m_par[0] + 2.0 * m_par[4] + m_par[2], 3.0 * m_par[0] + m_par[4] + m_par[2], 4.0 * m_par[0] + 3.0 * m_par[4] + 2.0 * m_par[2]]]), \
+					np.array([[0, m_par[0], m_par[0], 2.0 * m_par[0] + m_par[4]], \
+						[m_par[0], 2.0 * m_par[0] + m_par[2], 2.0 * m_par[0] + m_par[1], 3.0 * m_par[0] + m_par[4] + m_par[1] + m_par[2]], \
+						[m_par[0], 2.0*m_par[0] + m_par[1], 2.0 * m_par[0] + m_par[2], 3.0 * m_par[0] + m_par[4] + m_par[1] + m_par[2]], \
+						[2.0 * m_par[0] + m_par[4], 3.0 * m_par[0] + m_par[4] + m_par[1] + m_par[2], 3.0 * m_par[0] + m_par[4] + m_par[1] + m_par[2], 4.0 * m_par[0] + 2.0 * m_par[4] + 2.0 * m_par[1] + 2.0 * m_par[2]]]), \
+					np.array([[0, m_par[0], m_par[0], 2.0 * m_par[0] + m_par[4]], \
+						[m_par[0], 2.0 * m_par[0] + m_par[2], 2.0 * m_par[0] + m_par[4], 3.0 * m_par[0] + 2.0 * m_par[4] + m_par[2]], \
+						[m_par[0], 2.0 * m_par[0], 2.0 * m_par[0] + m_par[2], 3.0 * m_par[0] + m_par[4] + m_par[2]], \
+						[2.0 * m_par[0] + m_par[4], 3.0 * m_par[0] + m_par[4] + m_par[2], 3.0 * m_par[0] + 2.0 * m_par[4] + m_par[2], 4.0 * m_par[0] + 3.0 * m_par[4] + 2.0 * m_par[2]]])]
+	elif model == "HT2":
+		matrixes = [np.array([[0, 2.0 * m_par[0] / 4.0, m_par[0] / 4.0, 2.0 * m_par[0] / 4.0 + m_par[4], 2.0 * m_par[0] / 4.0 + m_par[5], m_par[0] / 4.0, 2.0 * m_par[0] / 4.0 + m_par[5], 2.0 * m_par[0] / 4.0 + m_par[4], 2.0 * m_par[0] / 4.0, m_par[0] / 4.0, m_par[0] / 4.0], \
+						[2.0 * m_par[0] / 4.0, 4.0 * m_par[0] / 4.0 + m_par[3], inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 4.0, 3.0 * m_par[0] / 4.0, 3.0 * m_par[0] / 4.0], \
+						[m_par[0] / 4.0, 3.0 * m_par[0] / 4.0, 2.0 * m_par[0] / 4.0, 3.0 * m_par[0] / 4.0 + m_par[4], 3.0 * m_par[0] / 4.0 + m_par[5], 2.0 * m_par[0] / 4.0, 3.0 * m_par[0] / 4.0 + m_par[5], 3.0 * m_par[0] / 4.0 + m_par[4], 3.0 * m_par[0] / 4.0, 2.0 * m_par[0] / 4.0, 2.0 * m_par[0] / 4.0], \
+						[2.0 * m_par[0] / 4.0 + m_par[4], 4.0 * m_par[0] / 4.0 + m_par[4], inf, inf, inf, 3.0 * m_par[0] / 4.0 + m_par[4], 4.0 * m_par[0] / 4.0 + m_par[4] + m_par[5], 4.0 * m_par[0] / 4.0 + 2.0 * m_par[4], inf, 3.0 * m_par[0] / 4.0 + m_par[4], 3.0 * m_par[0] / 4.0 + m_par[4]], \
+						[2.0 * m_par[0] / 4.0 + m_par[5], 4.0 * m_par[0] / 4.0 + m_par[5], 3.0 * m_par[0] / 4.0 + m_par[5], 4.0 * m_par[0] / 4.0 + m_par[5] + m_par[4], 4.0 * m_par[0] / 4.0 + 2.0 * m_par[5], inf, inf, inf, inf, 3.0 * m_par[0] / 4.0 + m_par[5], 3.0 * m_par[0] / 4.0 + m_par[5]], \
+						[m_par[0] / 4.0, 3.0 * m_par[0] / 4.0, 2.0 * m_par[0] / 4.0, 3.0 * m_par[0] / 4.0 + m_par[4], 3.0 * m_par[0] / 4.0 + m_par[5], 2.0 * m_par[0] / 4.0, 3.0 * m_par[0] / 4.0 + m_par[5], 2.0 * m_par[0] / 4.0 + m_par[4], 3.0 * m_par[0] / 4.0, 2.0 * m_par[0] / 4.0, 2.0 * m_par[0] / 4.0], \
+						[2.0 * m_par[0] / 4.0 + m_par[5], 4.0 * m_par[0] / 4.0 + m_par[5], inf, inf, inf, 3.0 * m_par[0] / 4.0 + m_par[5], 4.0 * m_par[0] / 4.0 + 2.0 * m_par[5], 4.0 * m_par[0] / 4.0 + m_par[5] + m_par[4], inf, 3.0 * m_par[0] / 4.0 + m_par[5], 3.0 * m_par[0] / 4.0 + m_par[5]], \
+						[2.0 * m_par[0] / 4.0 + m_par[4], 4.0 * m_par[0] / 4.0 + m_par[4], 3.0 * m_par[0] / 4.0 + m_par[4], 4.0 * m_par[0] / 4.0 + 2.0 * m_par[4], 4.0 * m_par[0] / 4.0 + m_par[4] + m_par[5], inf, inf, inf, inf, 3.0 * m_par[0] / 4.0 + m_par[4], 3.0 * m_par[0] / 4.0 + m_par[4]], \
+						[2.0 * m_par[0] / 4.0, 4.0 * m_par[0] / 4.0 + m_par[1], 3.0 * m_par[0] / 4.0, 4.0 * m_par[0] / 4.0 + m_par[4], 4.0 * m_par[0] / 4.0 + m_par[5], 3.0 * m_par[0] / 4.0, 4.0 * m_par[0] / 4.0 + m_par[5], 4.0 * m_par[0] / 4.0 + m_par[4], 4.0 * m_par[0] / 4.0 + m_par[3], 3.0 * m_par[0] / 4.0, 3.0 * m_par[0] / 4.0], \
+						[m_par[0] / 4.0, 3.0 * m_par[0] / 4.0, inf, inf, inf, 2.0 * m_par[0] / 4.0, 3.0 * m_par[0] / 4.0 + m_par[5], 3.0 * m_par[0] / 4.0 + m_par[4], inf, 2.0 * m_par[0] / 4.0, 2.0 * m_par[0] / 4.0], \
+						[m_par[0] / 4.0, 3.0 * m_par[0] / 4.0, 2.0 * m_par[0] / 4.0, 3.0 * m_par[0] / 4.0 + m_par[4], 3.0 * m_par[0] / 4.0 + m_par[5], inf, inf, inf, inf, 2.0 * m_par[0] / 4.0, 2.0 * m_par[0] / 4.0]]), \
+					np.array([[0, 2.0 * m_par[0] / 4.0, m_par[0] / 4.0, 2.0 * m_par[0] / 4.0 + m_par[4], 2.0 * m_par[0] / 4.0 + m_par[5], inf, inf, inf, inf, m_par[0] / 4.0, m_par[0] / 4.0], \
+						[inf, inf, inf, inf, inf, 3.0 * m_par[0] / 4.0, 4.0 * m_par[0] / 4.0 + m_par[5], 4.0 * m_par[0] / 4.0 + m_par[4], inf, inf, inf], \
+						[m_par[0] / 4.0, 3.0 * m_par[0] / 4.0 + m_par[3], inf, inf, inf, inf, inf, inf, inf, 2.0 * m_par[0] / 4.0, 2.0 * m_par[0] / 4.0], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 4.0 + m_par[4], inf, inf], \
+						[2.0 * m_par[0] / 4.0 + m_par[5], 4.0 * m_par[0] / 4.0 + m_par[5] + m_par[4] + m_par[3], inf, inf, inf, inf, inf, inf, inf, 3.0 * m_par[0] / 4.0 + m_par[5], inf], \
+						[m_par[0] / 4.0, 3.0 * m_par[0] / 4.0 + m_par[2], 2.0 * m_par[0] / 4.0 + m_par[3], 3.0 * m_par[0] / 4.0 + m_par[4] + m_par[3], 3.0 * m_par[0] / 4.0 + m_par[3] + m_par[5], inf, inf, inf, inf, 2.0 * m_par[0] / 4.0, 2.0 * m_par[0] / 4.0], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 4.0 + m_par[5], inf, inf], \
+						[2.0 * m_par[0] / 4.0 + m_par[4], 4.0 * m_par[0] / 4.0 + 2.0 * m_par[4], 3.0 * m_par[0] / 4.0 + m_par[4] + m_par[5], 4.0 * m_par[0] / 4.0 + 2.0 * m_par[4] + m_par[5], 4.0 * m_par[0] / 4.0 + m_par[4] + 2.0 * m_par[5], inf, inf, inf, inf, 3.0 * m_par[0] / 4.0 + m_par[4] + m_par[3], inf], \
+						[2.0 * m_par[0] / 4.0, 4.0 * m_par[0] / 4.0 + m_par[5], 3.0 * m_par[0] / 4.0 + m_par[4], 4.0 * m_par[0] / 4.0 + 2.0 * m_par[4], 4.0 * m_par[0] / 4.0 + m_par[4] + m_par[5], inf, inf, inf, inf, 3.0 * m_par[0] / 4.0 + m_par[2], 3.0 * m_par[0] / 4.0 + m_par[3]], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, 3.0 * m_par[0] / 4.0, inf, inf], \
+						[m_par[0] / 4.0, 3.0 * m_par[0] / 4.0 + m_par[4], 2.0 * m_par[0] / 4.0 + m_par[5], 3.0 * m_par[0] / 4.0 + m_par[3] + m_par[4] + m_par[5], inf, inf, inf, inf, inf, 2.0 * m_par[0] / 4.0 + m_par[3], inf]]), \
+					np.array([[0, 2.0 * m_par[0] / 4.0, m_par[0] / 4.0, 2.0 * m_par[0] / 4.0 + m_par[4], 2.0 * m_par[0] / 4.0 + m_par[5], inf, inf, inf, 2.0 * m_par[0] / 4.0, m_par[0] / 4.0, inf], \
+						[2.0 * m_par[0] / 4.0, inf, 3.0 * m_par[0] / 4.0 + m_par[3], 4.0 * m_par[0] / 4.0 + m_par[3] + m_par[4], inf, inf, inf, inf, 4.0 * m_par[0] / 4.0, 3.0 * m_par[0] / 4.0, inf], \
+						[inf, inf, inf, inf, inf, 2.0 * m_par[0] / 4.0, 3.0 * m_par[0] / 4.0 + m_par[5], 3.0 * m_par[0] / 4.0 + m_par[4], inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 4.0 + 2.0 * m_par[4], inf, inf, inf], \
+						[inf, inf, inf, inf, inf, 3.0 * m_par[0] / 4.0 + m_par[4], 4.0 * m_par[0] / 4.0 + 2.0 * m_par[5] + m_par[2], inf, inf, inf, inf], \
+						[m_par[0] / 4.0, 3.0 * m_par[0] / 4.0 + m_par[3], 2.0 * m_par[0] / 4.0 + m_par[2], 3.0 * m_par[0] / 4.0 + m_par[2] + m_par[4], 3.0 * m_par[0] / 4.0 + m_par[2] + m_par[5], inf, inf, inf, 3.0 * m_par[0] / 4.0, 2.0 * m_par[0] / 4.0 + m_par[1], inf], \
+						[inf, inf, inf, inf, 4.0 * m_par[0] / 4.0 + m_par[2] + 2.0 * m_par[5], inf, inf, inf, inf, inf, 3.0 * m_par[0] / 4.0 + m_par[5]], \
+						[2.0 * m_par[0] / 4.0 + m_par[4], 4.0 * m_par[0] / 4.0 + m_par[3] + m_par[4], 3.0 * m_par[0] / 4.0 + m_par[3] + m_par[4], 4.0 * m_par[0] / 4.0 + 2.0 * m_par[4] + 2.0 * m_par[1] + 2.0 * m_par[2], inf, inf, inf, inf, 4.0 * m_par[0] / 4.0 + m_par[4] + m_par[3], 3.0 * m_par[0] / 4.0 + m_par[1] + m_par[2], inf], \
+						[2.0 * m_par[0] / 4.0, 4.0 * m_par[0] / 4.0, 3.0 * m_par[0] / 4.0, 4.0 * m_par[0] / 4.0 + m_par[4] + m_par[3], inf, inf, inf, inf, inf, 3.0 * m_par[0] / 4.0 + m_par[3], inf], \
+						[inf, inf, inf, inf, 3.0 * m_par[0] / 4.0 + m_par[5], inf, inf, inf, inf, inf, 2.0 * m_par[0] / 4.0], \
+						[m_par[0] / 4.0, 3.0 * m_par[0] / 4.0, 2.0 * m_par[0] / 4.0 + m_par[1], 3.0 * m_par[0] / 4.0 + m_par[1] + m_par[2], inf, inf, inf, inf, 3.0 * m_par[0] / 4.0 + m_par[3], 2.0 * m_par[0] / 4.0 + m_par[2], inf]]), \
+					np.array([[0, inf, m_par[0] / 4.0, 2.0 * m_par[0] / 4.0 + m_par[4], inf, m_par[0] / 4.0, 2.0 * m_par[0] / 4.0 + m_par[5], inf, 2.0 * m_par[0] / 4.0, m_par[0] / 4.0, inf], \
+						[2.0 * m_par[0] / 4.0, inf, 3.0 * m_par[0] / 4.0 + m_par[2], 4.0 * m_par[0] / 4.0 + 2.0 * m_par[4] + m_par[2], inf, 3.0 * m_par[0] / 4.0 + m_par[3], 4.0 * m_par[0] / 4.0 + m_par[4] + m_par[5] + m_par[3], inf, 4.0 * m_par[0] / 4.0 + m_par[5], 3.0 * m_par[0] / 4.0 + m_par[4], inf], \
+						[inf, 3.0 * m_par[0] / 4.0, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, 4.0 * m_par[0] / 4.0 + m_par[4], inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, 4.0 * m_par[0] / 4.0 + m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[m_par[0] / 4.0, inf, 2.0 * m_par[0] / 4.0 + m_par[3], 3.0 * m_par[0] / 4.0 + m_par[4] + m_par[3] + m_par[5], inf, inf, inf, inf, 3.0 * m_par[0] / 4.0 + m_par[4], 2.0 * m_par[0] / 4.0 + m_par[5], inf], \
+						[2.0 * m_par[0] / 4.0, inf, 3.0 * m_par[0] / 4.0 + m_par[3] + m_par[5], inf, inf, inf, inf, inf, 4.0 * m_par[0] / 4.0 + m_par[4] + m_par[3] + m_par[5], inf, inf], \
+						[2.0 * m_par[0] / 4.0 + m_par[4], inf, 3.0 * m_par[0] / 4.0 + m_par[4] + m_par[3], 4.0 * m_par[0] / 4.0 + 2.0 * m_par[3] + 2.0 * m_par[4], inf, inf, inf, inf, 4.0 * m_par[0] / 4.0 + 2.0 * m_par[4] + m_par[2], 3.0 * m_par[0] / 4.0 + m_par[4] + m_par[5] + m_par[3], inf], \
+						[inf, inf, inf, inf, 4.0 * m_par[0] / 4.0 + m_par[5], inf, inf, 4.0 * m_par[0] / 4.0, inf, inf, 3.0 * m_par[0] / 4.0], \
+						[m_par[0] / 4.0, inf, 2.0 * m_par[0] / 4.0, inf, inf, 2.0 * m_par[0] / 4.0, inf, inf, 3.0 * m_par[0] / 4.0 + m_par[3], inf, inf], \
+						[m_par[0] / 4.0, inf, 2.0 * m_par[0] / 4.0, 3.0 * m_par[0] / 4.0 + m_par[3] + m_par[4], inf, 2.0 * m_par[0] / 4.0, 3.0 * m_par[0] / 4.0 + m_par[3] + m_par[5], inf, 3.0 * m_par[0] / 4.0 + m_par[2], 2.0 * m_par[0] / 4.0 + m_par[3], inf]])]
+	elif model == "HT3":
+		matrixes = [np.array([[0, m_par[0] / 9, m_par[0] / 9, m_par[0] / 9, 2.0 * m_par[0] / 9, 2.0 * m_par[0] / 9, m_par[0] / 9, 2.0 * m_par[0] / 9 + m_par[5], 2.0 * m_par[0] / 9 + m_par[5], 2.0 * m_par[0] / 9 + m_par[4], 2.0 * m_par[0] / 9, inf, inf, inf, inf, m_par[0] / 9, 2.0 * m_par[0] / 9 + m_par[4], 2.0 * m_par[0] / 9 + m_par[5], 2.0 * m_par[0] / 9 + m_par[5], 2.0 * m_par[0] / 9, inf, 2.0 * m_par[0] / 9], \
+						[m_par[0] / 9, inf, inf, 3.0 * m_par[0] / 9 + m_par[3], 3.0 * m_par[0] / 9 + m_par[5], 3.0 * m_par[0] / 9 + m_par[4], 3.0 * m_par[0] / 9 + m_par[5], inf, inf, 3.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0 * m_par[0] / 9, inf], \
+						[m_par[0] / 9, 2.0 * m_par[0] / 9 + m_par[3], inf, inf, 3.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[4], inf, inf, inf, inf, 2.0 * m_par[0] / 9 + m_par[5], 3.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0 * m_par[0] / 9, 4.0 * m_par[0] / 9 + m_par[5], 4.0 * m_par[0] / 9 + m_par[4], 4.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, inf, inf, inf], \
+						[2.0 * m_par[0] / 9, 3.0 * m_par[0] / 9, 3.0 * m_par[0] / 9, 3.0 * m_par[0] / 9, 4.0 * m_par[0] / 9 + m_par[3], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[5], inf, 4.0 * m_par[0] / 9 + m_par[4]], \
+						[m_par[0] / 9, 2.0 * m_par[0] / 9, 2.0 * m_par[0] / 9, 2.0 * m_par[0] / 9, 3.0 * m_par[0] / 9, 3.0 * m_par[0] / 9 + m_par[3], inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[2], inf, inf, inf, inf, 2.0 * m_par[0] / 9 + m_par[3], 3.0 * m_par[0] / 9 + m_par[3] + m_par[4], 3.0 * m_par[0] / 9 + m_par[3] + m_par[5], 3.0 * m_par[0] / 9 + m_par[3] + m_par[5], 3.0 * m_par[0] / 9, inf, 3.0 * m_par[0] / 9], \
+						[2.0 * m_par[0] / 9 + m_par[5], inf, inf, 3.0 * m_par[0] / 9 + m_par[5] + m_par[3], 4.0 * m_par[0] / 9 + 2.0 * m_par[5], 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[5], inf], \
+						[2.0 * m_par[0] / 9 + m_par[4], 3.0 * m_par[0] / 9 + m_par[4] + m_par[3], inf, inf, 4.0 * m_par[0] / 9 + m_par[4] + m_par[5], inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + 2.0 * m_par[4] + m_par[2], inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[4] + m_par[5] + m_par[3], 4.0 * m_par[0] / 9 + 2.0 * m_par[4] + m_par[5] + 2.0 * m_par[3], inf, inf, inf, inf, inf], \
+						[2.0 * m_par[0] / 9, 3.0 * m_par[0] / 9, 3.0 * m_par[0] / 9, 3.0 * m_par[0] / 9, 4.0 * m_par[0] / 9 + m_par[3], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[4], inf, 4.0 * m_par[0] / 9 + m_par[5]], \
+						[m_par[0] / 9, 2.0 * m_par[0] / 9, 2.0 * m_par[0] / 9, 2.0 * m_par[0] / 9, 3.0 * m_par[0] / 9, 3.0 * m_par[0] / 9 + m_par[3], inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[3], inf, inf, inf, inf, inf, inf, inf, inf, 3.0 * m_par[0] / 9, inf, 3.0 * m_par[0] / 9], \
+						[2.0 * m_par[0] / 9 + m_par[5], inf, inf, 3.0 * m_par[0] / 9 + m_par[3] + m_par[5], 4.0 * m_par[0] / 9 + 2.0 * m_par[5], 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[4], inf], \
+						[2.0 * m_par[0] / 9 + m_par[5], 3.0 * m_par[0] / 9 + m_par[3] + m_par[5], inf, inf, 4.0 * m_par[0] / 9 + 2.0 * m_par[5], inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[m_par[0] / 9, 2.0 * m_par[0] / 9, 2.0 * m_par[0] / 9, 2.0 * m_par[0] / 9, 3.0 * m_par[0] / 9, 3.0 * m_par[0] / 9 + m_par[2], 2.0 * m_par[0] / 9 + m_par[3], 3.0 * m_par[0] / 9 + m_par[3] + m_par[5], 3.0 * m_par[0] / 9 + m_par[3] + m_par[5], 3.0 * m_par[0] / 9 + m_par[4] + m_par[3], 3.0 * m_par[0] / 9 + m_par[3], inf, inf, inf, inf, inf, inf, inf, inf, 3.0 * m_par[0] / 9, inf, 3.0 * m_par[0] / 9], \
+						[2.0 * m_par[0] / 9 + m_par[4], inf, inf, 3.0 * m_par[0] / 9 + m_par[3] + m_par[4], 4.0 * m_par[0] / 9 + m_par[4] + m_par[5], 4.0 * m_par[0] / 9 + 2.0 * m_par[4] + m_par[3], 3.0 * m_par[0] / 9 + m_par[4] + m_par[5], inf, inf, 4.0 * m_par[0] / 9 + 2.0 * m_par[4] + 2.0 * m_par[3], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[5], inf], \
+						[2.0 * m_par[0] / 9 + m_par[5], 3.0 * m_par[0] / 9 + m_par[3] + m_par[5], inf, inf, 4.0 * m_par[0] / 9 + 2.0 * m_par[5], inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[2.0 * m_par[0] / 9, 3.0 * m_par[0] / 9 + m_par[3], 3.0 * m_par[0] / 9 + m_par[3], 3.0 * m_par[0] / 9 + m_par[2], 4.0 * m_par[0] / 9 + m_par[5], 4.0 * m_par[0] / 9 + m_par[5], 3.0 * m_par[0] / 9 + m_par[4], 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], 4.0 * m_par[0] / 9 + 2.0 * m_par[4] + m_par[2], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[2.0 * m_par[0] / 9, 3.0 * m_par[0] / 9, 3.0 * m_par[0] / 9, 3.0 * m_par[0] / 9, 4.0 * m_par[0] / 9 + m_par[1], 4.0 * m_par[0] / 9 + m_par[5], 3.0 * m_par[0] / 9 + m_par[5], 4.0 * m_par[0] / 9 + 2.0 * m_par[5], 4.0 * m_par[0] / 9 + 2.0 * m_par[5], 4.0 * m_par[0] / 9 + m_par[5] + m_par[4], 4.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[5], 4.0 * m_par[0] / 9 + m_par[5] + m_par[4], 4.0 * m_par[0] / 9 + 2.0 * m_par[5], 4.0 * m_par[0] / 9 + 2.0 * m_par[5], 4.0 * m_par[0] / 9 + m_par[3], inf, 4.0 * m_par[0] / 9 + m_par[3]], \
+						[2.0 * m_par[0] / 9, 3.0 * m_par[0] / 9 + m_par[2], 3.0 * m_par[0] / 9 + m_par[3], 3.0 * m_par[0] / 9 + m_par[3], 4.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[4], 4.0 * m_par[0] / 9 + 2.0 * m_par[4] + m_par[2], 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf, inf, inf]]), \
+					np.array([[0, m_par[0] / 9, m_par[0] / 9, m_par[0] / 9, 2.0 * m_par[0] / 9, inf, inf, inf, inf, inf, 2.0 * m_par[0] / 9, inf, inf, inf, inf, m_par[0] / 9, 2.0 * m_par[0] / 9 + m_par[4], 2.0 * m_par[0] / 9 + m_par[5], 2.0 * m_par[0] / 9 + m_par[5], inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0 * m_par[0] / 9, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0 * m_par[0] / 9], \
+						[m_par[0] / 9, 2.0 * m_par[0] / 9 + m_par[3], inf, inf, 3.0 * m_par[0] / 9 + m_par[4], inf, inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, 2.0 * m_par[0] / 9 + m_par[5], 3.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, 3.0 * m_par[0] / 9, 4.0 * m_par[0] / 9 + m_par[5], 4.0 * m_par[0] / 9 + m_par[5], 4.0 * m_par[0] / 9 + m_par[4], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[m_par[0] / 9, 2.0 * m_par[0] / 9, 2.0 * m_par[0] / 9, 2.0 * m_par[0] / 9, 3.0 * m_par[0] / 9 + m_par[2], inf, inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[3], inf, inf, inf, inf, 2.0 * m_par[0] / 9 + m_par[3], 3.0 * m_par[0] / 9 + m_par[3] + m_par[4], 3.0 * m_par[0] / 9 + m_par[3] + m_par[5], 3.0 * m_par[0] / 9 + m_par[3] + m_par[5], inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[5], inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[5]], \
+						[2.0 * m_par[0] / 9 + m_par[4], 3.0 * m_par[0] / 9 + m_par[4], inf, inf, 4.0 * m_par[0] / 9 + 2.0 * m_par[4] + m_par[2], inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], 4.0 * m_par[0] / 9 + 2.0 * m_par[4] + 2.0 * m_par[5] + 2.0 * m_par[3], inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0 * m_par[0] / 9, 4.0 * m_par[0] / 9 + m_par[5], 4.0 * m_par[0] / 9 + m_par[4], 4.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, inf, inf, inf], \
+						[m_par[0] / 9, 2.0 * m_par[0] / 9, 2.0 * m_par[0] / 9, 2.0 * m_par[0] / 9, 3.0 * m_par[0] / 9 + m_par[3], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[5], inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[4]], \
+						[2.0 * m_par[0] / 9 + m_par[5], 3.0 * m_par[0] / 9 + m_par[3] + m_par[5], inf, inf, 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[m_par[0] / 9, 2.0 * m_par[0] / 9, 2.0 * m_par[0] / 9, 2.0 * m_par[0] / 9, 3.0 * m_par[0] / 9 + m_par[3], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[4], inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[5]], \
+						[2.0 * m_par[0] / 9 + m_par[5], 3.0 * m_par[0] / 9 + m_par[3] + m_par[5], inf, inf, 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9, inf], \
+						[2.0 * m_par[0] / 9, 3.0 * m_par[0] / 9 + m_par[2], 3.0 * m_par[0] / 9 + m_par[3], 3.0 * m_par[0] / 9 + m_par[3], 4.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[4], 4.0 * m_par[0] / 9 + 2.0 * m_par[4] + m_par[2], 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf, inf, inf], \
+						[2.0 * m_par[0] / 9, 3.0 * m_par[0] / 9 + m_par[3], inf, inf, 4.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[4], inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[5], 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf, inf, inf, inf, inf]]), \
+					np.array([[0, m_par[0] / 9, inf, inf, 2.0 * m_par[0] / 9, inf, inf, inf, inf, inf, 2.0 * m_par[0] / 9, inf, inf, inf, inf, m_par[0] / 9, 2.0 * m_par[0] / 9 + m_par[4], inf, inf, 2.0 * m_par[0] / 9, 2.0 * m_par[0] / 9, inf], \
+						[inf, inf, 2.0 * m_par[0] / 9, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf], \
+						[inf, inf, inf, 2.0 * m_par[0] / 9, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[5], inf, inf, inf], \
+						[m_par[0] / 9, 2.0 * m_par[0] / 9 + m_par[2], inf, inf, 3.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, 2.0 * m_par[0] / 9 + m_par[1], 3.0 * m_par[0] / 9 + m_par[1] + m_par[2] + m_par[4], inf, inf, 3.0 * m_par[0] / 9 + m_par[3], 3.0 * m_par[0] / 9 + m_par[3], inf], \
+						[2.0 * m_par[0] / 9, 3.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[3], 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf, inf, 4.0 * m_par[0] / 9 + m_par[4], 4.0 * m_par[0] / 9 + m_par[5], inf], \
+						[2.0 * m_par[0] / 9, 3.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[3], 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf, inf, 4.0 * m_par[0] / 9 + m_par[5], 4.0 * m_par[0] / 9 + m_par[4], inf], \
+						[m_par[0] / 9, 2.0 * m_par[0] / 9 + m_par[1], inf, inf, 3.0 * m_par[0] / 9 + m_par[3], inf, inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[3], inf, inf, inf, inf, 2.0 * m_par[0] / 9 + m_par[2], 3.0 * m_par[0] / 9 + m_par[1] + m_par[2] + m_par[4], inf, inf, 3.0 * m_par[0] / 9 + m_par[5], 3.0 * m_par[0] / 9 + m_par[5], inf], \
+						[inf, inf, 3.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + 2.0 * m_par[5] + m_par[2], inf, inf, inf, inf], \
+						[inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[2] + 2.0 * m_par[5], inf, inf, inf], \
+						[2.0 * m_par[0] / 9 + m_par[4], 3.0 * m_par[0] / 9 + m_par[1] + m_par[2], inf, inf, 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[1] + m_par[2] + m_par[4], 4.0 * m_par[0] / 9 + 2.0 * m_par[1] + 2.0 * m_par[2] + 2.0 * m_par[4], inf, inf, 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf], \
+						[inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, 2.0 * m_par[0] / 9, 3.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[4], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[5], 4.0 * m_par[0] / 9 + m_par[2] + 2.0 * m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 2.0 * m_par[0] / 9, 3.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[4], inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[5], 4.0 * m_par[0] / 9 + 2.0 * m_par[2] + 2.0 * m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9], \
+						[2.0 * m_par[0] / 9, 3.0 * m_par[0] / 9 + m_par[3], inf, inf, 4.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[4], inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[5], 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf, inf, inf, inf, inf], \
+						[2.0 * m_par[0] / 9, 3.0 * m_par[0] / 9 + m_par[3], inf, inf, 4.0 * m_par[0] / 9 + m_par[4], inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[5], 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf, inf, inf, inf, inf]]), \
+					np.array([[0, m_par[0] / 9, inf, inf, inf, inf, m_par[0] / 9, 2.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, m_par[0] / 9, 2.0 * m_par[0] / 9 + m_par[5], inf, inf, m_par[0] / 9, 2.0 * m_par[0] / 9 + m_par[4], inf, inf, 2.0 * m_par[0] / 9, 2.0 * m_par[0] / 9, inf], \
+						[m_par[0] / 9, inf, inf, inf, inf, inf, 2.0 * m_par[0] / 9, inf, inf, inf, inf, 2.0 * m_par[0] / 9, inf, inf, inf, 2.0 * m_par[0] / 9, inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[3], inf], \
+						[m_par[0] / 9, inf, inf, inf, inf, inf, 2.0 * m_par[0] / 9, inf, inf, inf, inf, 2.0 * m_par[0] / 9, inf, inf, inf, 2.0 * m_par[0] / 9, inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[3], inf], \
+						[m_par[0] / 9, 2.0 * m_par[0] / 9 + m_par[3], inf, inf, inf, inf, 2.0 * m_par[0] / 9, 3.0 * m_par[0] / 9 + m_par[3] + m_par[5], inf, inf, inf, 2.0 * m_par[0] / 9, 3.0 * m_par[0] / 9 + m_par[3] + m_par[5], inf, inf, 2.0 * m_par[0] / 9, 3.0 * m_par[0] / 9 + m_par[3] + m_par[4], inf, inf, 3.0 * m_par[0] / 9 + m_par[3], 3.0 * m_par[0] / 9 + m_par[2], inf], \
+						[2.0 * m_par[0] / 9, 3.0 * m_par[0] / 9 + m_par[4], inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[3], 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[3], 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf, inf, 3.0 * m_par[0] / 9 + m_par[2], 4.0 * m_par[0] / 9 + 2.0 * m_par[4] + m_par[2], inf, inf, 4.0 * m_par[0] / 9 + m_par[5], 4.0 * m_par[0] / 9 + m_par[5], inf], \
+						[2.0 * m_par[0] / 9, 3.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[3], 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf, inf, 4.0 * m_par[0] / 9 + m_par[4], 4.0 * m_par[0] / 9 + m_par[5], inf], \
+						[m_par[0] / 9, 2.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 2.0 * m_par[0] / 9 + m_par[3], 3.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf, inf, 3.0 * m_par[0] / 9 + m_par[5], 3.0 * m_par[0] / 9 + m_par[4], inf], \
+						[2.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[3] + m_par[5], inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf], \
+						[2.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[3] + m_par[5], inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf], \
+						[2.0 * m_par[0] / 9 + m_par[4], 3.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0 * m_par[0] / 9 + m_par[4] + m_par[3], 4.0 * m_par[0] / 9 + 2.0 * m_par[3] + 2.0 * m_par[4] + m_par[5], inf, inf, 4.0 * m_par[0] / 9 + m_par[3] + m_par[4] + m_par[5], 4.0 * m_par[0] / 9 + m_par[2] + 2.0 * m_par[4], inf], \
+						[inf, inf, inf, inf, 4.0 * m_par[0] / 9, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, 3.0 * m_par[0] / 9, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[4], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 3.0 * m_par[0] / 9, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[4], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, 3.0 * m_par[0] / 9, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[4], inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9], \
+						[inf, inf, inf, 3.0 * m_par[0] / 9, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[4], inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[5], inf, inf, inf]])]
+	elif model == "qstate":
+		matrixes = [1, 2, 3]
 
-	matrixes = list(matrix_dict.get(model))
-	assert (matrixes is not None), "Error! This model is not in the database"
 	for i in range(len(matrixes)):
 		matrixes[i] = matrixes[i]/(constant*temp)
 		matrixes[i] = np.array([np.exp(line) for line in matrixes[i]])
