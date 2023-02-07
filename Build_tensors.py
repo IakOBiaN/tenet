@@ -268,7 +268,7 @@ def build_matrix (model, temp, m_par, neigbours = 8.0):
 						[inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9], \
 						[inf, inf, inf, 3.0 * m_par[0] / 9, inf, inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[4], inf, inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[5], inf, inf, inf, 4.0 * m_par[0] / 9 + m_par[5], inf, inf, inf]])]
 	elif model == "qstate":
-		mu = m_par[0]
+		mu = m_par[0] / 6
 		c = m_par[1]
 		n = m_par[2]
 		epsilon = m_par[3]
@@ -287,7 +287,7 @@ def build_matrix (model, temp, m_par, neigbours = 8.0):
 						if (cos(alpha_i - 2 * pi * k / c) > 0) and (cos(alpha_j - 2 * pi * l / c) > 0):
 							uij += epsilon * cos(alpha_i - 2 * pi * k / c) ** 2 * cos(alpha_j - 2 * pi * l / c) ** 2
 				uij += delta
-				line.append(uij)
+				line.append(-uij + 2.0 * mu)
 			matrix.append(line)
 		matrixes.append(np.array(matrix))
 		#right
@@ -303,7 +303,7 @@ def build_matrix (model, temp, m_par, neigbours = 8.0):
 						if (cos(alpha_i - 2 * pi * k / c) > 0) and (cos(alpha_j - 2 * pi * l / c) > 0):
 							uij += epsilon * cos(alpha_i - 2 * pi * k / c) ** 2 * cos(alpha_j - 2 * pi * l / c) ** 2
 				uij += delta
-				line.append(uij)
+				line.append(-uij + 2.0 * mu)
 			matrix.append(line)
 		matrixes.append(np.array(matrix))
 		#right-bottom
@@ -319,7 +319,7 @@ def build_matrix (model, temp, m_par, neigbours = 8.0):
 						if (cos(alpha_i - 2 * pi * k / c) > 0) and (cos(alpha_j - 2 * pi * l / c) > 0):
 							uij += epsilon * cos(alpha_i - 2 * pi * k / c) ** 2 * cos(alpha_j - 2 * pi * l / c) ** 2
 				uij += delta
-				line.append(uij)
+				line.append(-uij + 2.0 * mu)
 			matrix.append(line)
 		matrixes.append(np.array(matrix))
 		#print(matrixes)
