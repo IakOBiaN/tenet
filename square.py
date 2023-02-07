@@ -14,9 +14,9 @@ chi_number = 24
 chi_min = 1e-8
 method_tolerance = 1e-8
 
-def simulate(method = "trg", model = "langmuir", lattice = "square", temp = 1.0, m_par = [0.0]*10, temp_size = 300):
+def simulate(method = "trg", model = "langmuir", lattice = "square", T = 1.0, m_par = [0.0]*10, chi_number = 300):
 
-    tensors = bt.build_matrix(model, temp, m_par, 6.0)
+    tensors = bt.build_matrix(model, T, m_par, 6.0)
     tensors = tn.build_tensor(tensors, lattice)
     #tensors = tn.build_triangles_tensor(model, temp, m_par)
 
@@ -28,11 +28,11 @@ def simulate(method = "trg", model = "langmuir", lattice = "square", temp = 1.0,
         nodes = 2.0
 
     i = 0
-    for i in range(temp_size):
+    for i in range(300):
         if method == "trg":
-            (tensors, scale) = tn.trg_step(tensors, scale, chi_number, chi_min, lattice)
+            (tensors, scale) = tn.trg_step(tensors, scale, chi_number, 0, lattice)
         elif method == "hotrg":
-            (tensors, scale) = tn.hotrg_step(tensors, scale, chi_number, chi_min, lattice)
+            (tensors, scale) = tn.hotrg_step(tensors, scale, chi_number, 0, lattice)
         else:
             assert False, "Error! There is no such method."
         if abs(old_scale - scale/4.0) < method_tolerance:
@@ -45,7 +45,7 @@ def simulate(method = "trg", model = "langmuir", lattice = "square", temp = 1.0,
     norm = np.einsum("abab->",tensors[0])
     if norm < 0:
         norm = -norm
-    return (scale+log(norm))/(nodes/(constant*temp))
+    return (scale+log(norm))/(nodes/(constant*T))
 
 def coverage_old(method, model, lattice, temp = 1., m_par = [0.0]*10):
     result = derivative(lambda x: simulate(method, model, lattice, temp, [x]+m_par[1:]), m_par[0], n=1, dx=1e-3)
@@ -83,46 +83,30 @@ def entropy(method, model, lattice, temp = 1., m_par = [0.0]*10):
     result = -(BTP[0]-BTP[1])/(temp_step*2.0)
     return result
 
-def full(method, model, lattice, temp = 1., m_par = [0.0]*10, temp_size = 300):
-    BTP_mu = []
-    BTP_temp = []
-    step = 0.1
-    for mu_TRG in [m_par[0] - step, m_par[0] + step]:
-        lnZ = simulate(method, model, lattice, temp, [mu_TRG] + m_par[1:], temp_size)
-        BTP_mu.append(lnZ)
-    for temp_TRG in [temp - step, temp, temp + step]:
-        lnZ = simulate(method, model, lattice, temp_TRG, m_par, temp_size)
-        BTP_temp.append(lnZ)
-
-    cov = -(BTP_mu[0]-BTP_mu[1])/(step*2.0)
-    ent = -(BTP_temp[0]-BTP_temp[2])/(step*2.0)
-    sus = (BTP_mu[0]-2.0*BTP_temp[1]+BTP_mu[1])/(step**2.0)
-    cap = (BTP_temp[0]-2.0*BTP_temp[1]+BTP_temp[2])/(step**2.0)
-    return cov, ent, sus, cap
+def full(method, model, lattice, chi_number, T = 1., m_par = [0.0]*10):
+    grandPotential_dmu = []
+    grandPotential_dT = []
+    dmu = 0.01
+    dT = 0.01
+    for diff_mu in [m_par[0] - dmu, m_par[0] + dmu]:
+        lnZ = simulate(method, model, lattice, T, [diff_mu] + m_par[1:], chi_number)
+        grandPotential_dmu.append(lnZ)
+    for diff_T in [T - dT, T, T + dT]:
+        lnZ = simulate(method, model, lattice, diff_T, m_par, chi_number)
+        grandPotential_dT.append(lnZ)
+    coverage = - (grandPotential_dmu[0] - grandPotential_dmu[1]) / (dmu * 2.0)
+    entropy = - (grandPotential_dT[0] - grandPotential_dT[2]) / (dT * 2.0)
+    susceptibility = constant * T * (grandPotential_dmu[0] - 2.0 * grandPotential_dT[1] + grandPotential_dmu[1]) / (dT ** 2.0)
+    heat_capacity = T * (grandPotential_dT[0] - 2.0 * grandPotential_dT[1] + grandPotential_dT[2]) / (dT ** 2.0)
+    return coverage, entropy, susceptibility, heat_capacity
 
 method = "trg"
 model = "2NN"
 lattice = "tr_to_sqr"
-temp_square = 2.0/log(1+sqrt(2))
-#temp_hex = 4.0/log(3)
-#temp = temp_hex
-#temp = 4.0/log(3) + 1e-7
-temp = 1.0
-mu = 1.0
-chi_number = 100
-system_size = 3
-for system_size in np.arange(16, 50, 1):
-	print("system_size=", system_size)
-	#m_par = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
-	#for chi_number in np.arange(4, 48, 1):
-	#	print(chi_number, 2.0*simulate(method, model, lattice, temp, m_par))
-	#for temp in np.arange(2.0, 4.41, 0.05):
-	for mu in np.arange(-10.0, 10.01, 0.5):
-		m_par = [mu, 0.0, 0.0, 0.0, 0.0, 0.0]
-		#m_par = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
-		coef = 2.0/1.00
-		#print(mu, full(method, model, lattice, temp, m_par))
-		#print(mu, simulate(method, model, lattice, temp, m_par))
-		result = full(method, model, lattice, temp, m_par, system_size)
-		print(mu, coef*result[0], coef*result[1] , coef*result[2] , coef*result[3])
-		#print(-mu, coef*result[2])
+T = 1.0
+chi_number = 16
+for mu in np.arange(-6.0, 6.01, 0.5):
+	m_par = [mu, 0.0, 0.0, 0.0, 0.0, 0.0]
+	coef = 2.0/1.00
+	result = full(method, model, lattice, chi_number, T, m_par)
+	print(mu, coef*result[0], coef*result[1] , coef*result[2] , coef*result[3])
