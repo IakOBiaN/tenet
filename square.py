@@ -97,16 +97,16 @@ def full(method, model, lattice, chi_number, T = 1., m_par = [0.0]*10):
 
 method = "trg"
 model = "qstate"
-lattice = "tr_to_sqr"
+lattice = "triangular"
 #model params
-c = 2
-n = 3
+c = 1
+n = 6
 epsilon = -1
 delta = 1.0
-T = 0.1
-chi_number = 24
-for mu in np.arange(-1.00, 5.01, 0.5):
+T = 0.05
+chi_number = 40
+for mu in np.arange(-1.00, 7.01, 0.2):
 	m_par = [mu, c, n, epsilon, delta, 0.0]
-	coef = 1.0/1.00
+	coef = 2.0/1.00
 	result = full(method, model, lattice, chi_number, T, m_par)
 	print(mu, coef*result[0], coef*result[1] , coef*result[2] , coef*result[3])

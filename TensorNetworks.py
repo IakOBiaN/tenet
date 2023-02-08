@@ -57,13 +57,13 @@ def build_tensor(matrixes, lattice = "square"):
 	tensor = np.einsum("ab,ibk->iak",matrixes[0], identity(3, leg_size))
 	if (lattice == "square"):
 		tensor = list((np.einsum("abc, bef, ejk, jcn -> afkn", tensor, tensor, tensor, tensor), ))
-	elif (lattice == "tr_to_sqr"):
+	elif (lattice == "triangular"):
 		tensor1 = np.einsum("ab,ajk->bjk",matrixes[0], identity(3, leg_size))
 		tensor2 = np.einsum("ab,bjk->ajk",matrixes[1], identity(3, leg_size))
 		tensor3 = np.einsum("ab,iak->ibk",matrixes[2], identity(3, leg_size))
 		tensor = np.einsum("abc, bef, iea -> cfi",tensor1, tensor2, tensor3)
 		tensor = list((np.einsum("abi, ijk -> abjk", tensor, identity(3, leg_size)), ))
-	elif (lattice == "tr_to_sqr_susmost"):
+	elif (lattice == "triangular_universal"):
 		id4 = identity(4, leg_size)
 		id3 = identity(3, leg_size)
 		#tensor = np.einsum("abcd, efgh, ijk, mno, bi, kf, dn, oh, cg -> ajem", id4, id4, id3, id3, matrixes[0] ** 0.5, matrixes[0] ** 0.5, matrixes[0] ** 0.5, matrixes[0] ** 0.5, matrixes[0])
