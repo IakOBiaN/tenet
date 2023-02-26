@@ -9,18 +9,17 @@ import Build_tensors as bt
 constant = 1.
 method_tolerance = 1e-8
 
-def simulate(method = "trg", model = "langmuir", lattice = "square", T = 1.0, m_par = [0.0]*10, chi_number = 300):
+def calc(method = "trg", model = "langmuir", lattice = "square", T = 1.0, m_par = [0.0]*10, chi_number = 300):
 
-    tensors = bt.build_matrix(model, T, m_par, 6.0)
+    tensors = bt.build_matrix(model, T, m_par, 4.0)
     tensors = tn.build_tensor(tensors, lattice)
     #tensors = tn.build_triangles_tensor(model, temp, m_par)
 
     scale = 0.0
     old_scale = -1.0
-    if lattice == "triangle":
+    nodes = 2.0
+    if lattice == "triangular":
         nodes = 1.0
-    else:
-        nodes = 2.0
 
     i = 0
     for i in range(300):
@@ -40,7 +39,63 @@ def simulate(method = "trg", model = "langmuir", lattice = "square", T = 1.0, m_
     norm = np.einsum("abab->",tensors[0])
     if norm < 0:
         norm = -norm
-    return (scale+log(norm))/(nodes/(constant*T))
+    return (scale + log(norm)) / (nodes / (constant * T))
+
+def simple_hierarchical(method, model, lattice, T = 1.0, m_par = [0.0]*10, size = 1):
+    tensor = bt.build_matrix(model, T, m_par, 4.0)[0]
+    number_of_steps = 100
+    
+    Z = np.empty((number_of_steps+1))
+    Z[0] = tensor.max()
+    tensor = tensor/Z[0]
+    lnZ_list = []
+    cd3 = tn.identity(3, tensor.shape[0])
+    cd4 = tn.identity(4, tensor.shape[0])
+
+    for i in np.arange(1,(number_of_steps+1),1):
+        edges = (1 + size * 2) ** 2
+        dop_tensor = tn.identity(size+2,tensor.shape[0])
+        dop_tensor_2 = tn.identity(size+2,tensor.shape[0])
+
+        doubled_tensor = np.einsum("ij,aic->ajc",tensor,cd3)
+        doubled_tensor = np.einsum("ij,abi->abj",tensor,doubled_tensor)
+        doubled_tensor = np.einsum("ijk,ajk->ai",doubled_tensor,cd3)
+
+        for ii in range(size):
+            dop_tensor = np.tensordot(dop_tensor,doubled_tensor, axes=([1],[0]))
+        dop_tensor = np.tensordot(dop_tensor,tensor, axes=([1],[0]))
+
+        for ii in range(size+(size-1)):
+            dop_tensor = np.tensordot(dop_tensor,tensor, axes=([-1],[0]))
+            for j in range(size):
+                dop_tensor = np.tensordot(dop_tensor,cd3, axes=([-2-j],[0]))
+                dop_tensor = np.tensordot(dop_tensor,tensor, axes=([-2],[0]))
+                dop_tensor = np.tensordot(dop_tensor,cd3, axes=([-1,-3],[0,1]))
+                dop_tensor = np.tensordot(dop_tensor,tensor, axes=([-2],[0]))
+
+        for ii in range(size):
+            dop_tensor = np.tensordot(dop_tensor,doubled_tensor, axes=([1],[0]))
+        dop_tensor = np.tensordot(dop_tensor,tensor, axes=([1],[0]))
+        tensor = np.tensordot(dop_tensor,dop_tensor_2, axes=(np.arange(1,size+2,1),np.arange(1,size+2,1)))
+
+        Z[i] = tensor.max()/2
+        tensor = tensor/Z[i]
+
+        xxx = np.trace(tensor)
+        #print(i, xxx)
+        if xxx < 1e-10:
+            break
+
+        lnZ = np.log(xxx)
+        lnZ /= (edges ** i)
+        logZ_powers_sum = sum(sorted([log(Z[j]) / (edges**j) for j in range(0,i+1)]))
+        lnZ += logZ_powers_sum
+
+        lnZ_list.append(lnZ)
+        if len(lnZ_list) > 3 and abs(lnZ_list[-1] - lnZ_list[-2]) < 1e-9 and abs(lnZ_list[-1] - lnZ_list[-3]) < 1e-9:
+            break
+    beta = 1 / T
+    return (lnZ_list[-1]) / beta * 2.0 
 
 def coverage_old(method, model, lattice, temp = 1., m_par = [0.0]*10):
     result = derivative(lambda x: simulate(method, model, lattice, temp, [x]+m_par[1:]), m_par[0], n=1, dx=1e-3)
@@ -67,6 +122,10 @@ def coverage(method, model, lattice, temp = 1., m_par = [0.0]*10, temp_size = 30
 
     result = -(BTP[0]-BTP[1])/(mu_step*2.0)
     return result
+    
+def coverage_h(func, model, T = 1.0, m_par = [0.0]*10, size = 1):
+	result = derivative(lambda x: func(model, T, [x] + m_par[1:], size), m_par[0], n=1, dx=0.001)
+	return result
 
 def entropy(method, model, lattice, temp = 1., m_par = [0.0]*10):
     BTP = []
@@ -81,8 +140,12 @@ def entropy(method, model, lattice, temp = 1., m_par = [0.0]*10):
 def full(method, model, lattice, chi_number, T = 1., m_par = [0.0]*10):
     grandPotential_dmu = []
     grandPotential_dT = []
-    dmu = 0.01
-    dT = 0.01
+    dmu = 0.001
+    dT = 0.001
+    if method == "hierarchical":
+        simulate = simple_hierarchical
+    else:
+        simulate = calc
     for diff_mu in [m_par[0] - dmu, m_par[0] + dmu]:
         lnZ = simulate(method, model, lattice, T, [diff_mu] + m_par[1:], chi_number)
         grandPotential_dmu.append(lnZ)
@@ -95,7 +158,8 @@ def full(method, model, lattice, chi_number, T = 1., m_par = [0.0]*10):
     heat_capacity = T * (grandPotential_dT[0] - 2.0 * grandPotential_dT[1] + grandPotential_dT[2]) / (dT ** 2.0)
     return coverage, entropy, susceptibility, heat_capacity
 
-method = "trg"
+#qstate_model
+"""method = "trg"
 model = "qstate"
 lattice = "triangular"
 #model params
@@ -108,5 +172,33 @@ chi_number = 40
 for mu in np.arange(-1.00, 7.01, 0.2):
 	m_par = [mu, c, n, epsilon, delta, 0.0]
 	coef = 2.0/1.00
+	result = full(method, model, lattice, chi_number, T, m_par)
+	print(mu, coef*result[0], coef*result[1] , coef*result[2] , coef*result[3])"""
+
+#langmuir
+"""
+method = "hierarchical"
+model = "langmuir"
+lattice = "FSHL"
+#model params
+T = 1.0
+chi_number = 5
+for mu in np.arange(-10.00, 25.01, 0.5):
+	m_par = [mu, 4.0, 0, 0, 0, 0]
+	coef = 1.0/1.00
+	result = full(method, model, lattice, chi_number, T, m_par)
+	print(mu, coef*result[0], coef*result[1] , coef*result[2] , coef*result[3])
+"""
+
+
+method = "hierarchical"
+model = "binary"
+lattice = "FSHL"
+#model params
+T = 1.0
+chi_number = 1
+for mu in np.arange(-10.00, 25.01, 0.5):
+	m_par = [mu, 4.0, 2, 2, 2, 0]
+	coef = 1.0/1.00
 	result = full(method, model, lattice, chi_number, T, m_par)
 	print(mu, coef*result[0], coef*result[1] , coef*result[2] , coef*result[3])
