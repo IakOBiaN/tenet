@@ -78,7 +78,13 @@ def simple_hierarchical(method, model, lattice, T = 1.0, m_par = [0.0]*10, size 
         dop_tensor = np.tensordot(dop_tensor,tensor, axes=([1],[0]))
         tensor = np.tensordot(dop_tensor,dop_tensor_2, axes=(np.arange(1,size+2,1),np.arange(1,size+2,1)))
 
-        Z[i] = tensor.max()/2
+        #if tensor.max() > 1e10:
+        #    Z[i] = tensor.max()
+        #else:
+        Z[i] = tensor.max()#np.trace(tensor)
+        #if Z[i] > 1000:
+        #    Z[i] *= np.sqrt(tensor.max())
+        #Z[i] = np.trace(tensor)#tensor.max()
         tensor = tensor/Z[i]
 
         xxx = np.trace(tensor)
@@ -87,15 +93,15 @@ def simple_hierarchical(method, model, lattice, T = 1.0, m_par = [0.0]*10, size 
             break
 
         lnZ = np.log(xxx)
-        lnZ /= (edges ** i)
+        lnZ /= (edges ** (i+2))
         logZ_powers_sum = sum(sorted([log(Z[j]) / (edges**j) for j in range(0,i+1)]))
         lnZ += logZ_powers_sum
 
         lnZ_list.append(lnZ)
         if len(lnZ_list) > 3 and abs(lnZ_list[-1] - lnZ_list[-2]) < 1e-9 and abs(lnZ_list[-1] - lnZ_list[-3]) < 1e-9:
             break
-    beta = 1 / T
-    return (lnZ_list[-1]) / beta * 2.0 
+    beta = 1 / (constant * T)
+    return (lnZ_list[-1]) / beta * 2.0
 
 def coverage_old(method, model, lattice, temp = 1., m_par = [0.0]*10):
     result = derivative(lambda x: simulate(method, model, lattice, temp, [x]+m_par[1:]), m_par[0], n=1, dx=1e-3)
@@ -203,10 +209,9 @@ method = "hierarchical"
 model = "binary"
 lattice = "FSHL"
 #model params
-T = 1.0
+T = 100.0
 chi_number = 1
-for mu in np.arange(-10.00, 25.01, 0.5):
-	m_par = [mu, 4.0, 2, 2, 2, 0]
-	coef = 1.0/1.00
+for mu in np.arange(-40.00, 30.01, 1.0):
+	m_par = [mu, 10.0, 4.0, 6.0, 0, 0]
 	result = full(method, model, lattice, chi_number, T, m_par)
-	print(mu, coef*result[0], coef*result[1] , coef*result[2] , coef*result[3])
+	print(mu, result[0], result[1] , result[2] , result[3])
