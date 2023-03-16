@@ -6,7 +6,7 @@ from scipy.linalg import sqrtm
 import TensorNetworks as tn
 import Build_tensors as bt
 
-constant = 1.
+constant = 0.008314
 method_tolerance = 1e-8
 
 def calc(method = "trg", model = "langmuir", lattice = "square", T = 1.0, m_par = [0.0]*10, chi_number = 300):
@@ -44,7 +44,7 @@ def calc(method = "trg", model = "langmuir", lattice = "square", T = 1.0, m_par 
 def simple_hierarchical(method, model, lattice, T = 1.0, m_par = [0.0]*10, size = 1):
     tensor = bt.build_matrix(model, T, m_par, 4.0)[0]
     number_of_steps = 100
-    
+
     Z = np.empty((number_of_steps+1))
     Z[0] = tensor.max()
     tensor = tensor/Z[0]
@@ -128,7 +128,7 @@ def coverage(method, model, lattice, temp = 1., m_par = [0.0]*10, temp_size = 30
 
     result = -(BTP[0]-BTP[1])/(mu_step*2.0)
     return result
-    
+
 def coverage_h(func, model, T = 1.0, m_par = [0.0]*10, size = 1):
 	result = derivative(lambda x: func(model, T, [x] + m_par[1:], size), m_par[0], n=1, dx=0.001)
 	return result

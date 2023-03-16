@@ -5,7 +5,7 @@ import scipy.sparse.linalg
 from scipy.linalg import sqrtm
 
 inf = -1e8
-constant = 1.
+constant = 0.008314
 
 def build_matrix (model, temp, m_par, neigbours = 8.0):
 
