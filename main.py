@@ -78,30 +78,17 @@ def simple_hierarchical(method, model, lattice, T = 1.0, m_par = [0.0]*10, size 
         dop_tensor = np.tensordot(dop_tensor,tensor, axes=([1],[0]))
         tensor = np.tensordot(dop_tensor,dop_tensor_2, axes=(np.arange(1,size+2,1),np.arange(1,size+2,1)))
 
-        #if tensor.max() > 1e10:
-        #    Z[i] = tensor.max()
-        #else:
-        Z[i] = tensor.max()#np.trace(tensor)
-        #if Z[i] > 1000:
-        #    Z[i] *= np.sqrt(tensor.max())
-        #Z[i] = np.trace(tensor)#tensor.max()
+        Z[i] = tensor.sum()
         tensor = tensor/Z[i]
 
-        xxx = np.trace(tensor)
-        #print(i, xxx)
-        if xxx < 1e-10:
-            break
-
-        lnZ = np.log(xxx)
-        lnZ /= (edges ** (i+2))
-        logZ_powers_sum = sum(sorted([log(Z[j]) / (edges**j) for j in range(0,i+1)]))
-        lnZ += logZ_powers_sum
+        lnZ = sum(sorted([log(Z[j]) / (edges**j) for j in range(0,i+1)]))
 
         lnZ_list.append(lnZ)
         if len(lnZ_list) > 3 and abs(lnZ_list[-1] - lnZ_list[-2]) < 1e-9 and abs(lnZ_list[-1] - lnZ_list[-3]) < 1e-9:
             break
     beta = 1 / (constant * T)
     return (lnZ_list[-1]) / beta * 2.0
+
 
 def coverage_old(method, model, lattice, temp = 1., m_par = [0.0]*10):
     result = derivative(lambda x: simulate(method, model, lattice, temp, [x]+m_par[1:]), m_par[0], n=1, dx=1e-3)
