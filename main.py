@@ -78,7 +78,7 @@ def simple_hierarchical(method, model, lattice, T = 1.0, m_par = [0.0]*10, size 
         dop_tensor = np.tensordot(dop_tensor,tensor, axes=([1],[0]))
         tensor = np.tensordot(dop_tensor,dop_tensor_2, axes=(np.arange(1,size+2,1),np.arange(1,size+2,1)))
 
-        Z[i] = tensor.sum()
+        Z[i] = tensor.max()
         tensor = tensor/Z[i]
 
         lnZ = sum(sorted([log(Z[j]) / (edges**j) for j in range(0,i+1)]))
@@ -191,7 +191,8 @@ for mu in np.arange(-10.00, 25.01, 0.5):
 	print(mu, coef*result[0], coef*result[1] , coef*result[2] , coef*result[3])
 """
 
-
+#binary gas
+"""
 method = "hierarchical"
 model = "binary"
 lattice = "FSHL"
@@ -201,4 +202,19 @@ chi_number = 1
 for mu in np.arange(-40.00, 30.01, 1.0):
 	m_par = [mu, 10.0, 4.0, 6.0, 0, 0]
 	result = full(method, model, lattice, chi_number, T, m_par)
-	print(mu, result[0], result[1] , result[2] , result[3])
+	print(mu, result[0], result[1] , result[2] , result[3])"""
+
+
+
+method = "hierarchical"
+model = "ising"
+lattice = "FSHL"
+#model params
+T = 1.0 / constant
+chi_number = 10
+for J in np.arange(0.15, 0.85, 0.01):
+	m_par = [0, J, 0, 0, 0, 0]
+	#result = full(method, model, lattice, chi_number, T, m_par)
+	#print(J, result[0], result[1] , result[2] , result[3])
+	result = simple_hierarchical(method, model, lattice, T, m_par, chi_number)
+	print(J, result)

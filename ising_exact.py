@@ -30,6 +30,7 @@ T1 = 2.0/log(1+sqrt(2))
 T2 = 4.0/log(3)
 T3 = 4.0/log(3) + 1e-7
 
+T = 1.0
 #print(exact(T3, 1.0, "triangular"))
-for T3 in np.arange(3.1, 4.41, 0.01):
-	print(T3, exact(T3, 1.0, "triangular")[0])
+for J in np.arange(0.15, 0.85, 0.01):
+	print(J, exact(T, J, "square")[0])
