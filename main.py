@@ -152,7 +152,8 @@ def full(method, model, lattice, chi_number, T = 1., m_par = [0.0]*10):
     return coverage, entropy, susceptibility, heat_capacity, grandPotential_dT[1]
 
 #qstate_model
-"""method = "trg"
+"""
+method = "trg"
 model = "qstate"
 lattice = "triangular"
 #model params
@@ -176,7 +177,7 @@ for mu in np.arange(-1.00, 7.01, 0.2):
 file.close()
 	print(mu, coef*result[0], coef*result[1] , coef*result[2] , coef*result[3])"""
 
-#langmuir
+#mono with interactions
 """
 method = "hierarchical"
 model = "langmuir"
@@ -204,8 +205,7 @@ for mu in np.arange(-40.00, 30.01, 1.0):
 	result = full(method, model, lattice, chi_number, T, m_par)
 	print(mu, result[0], result[1] , result[2] , result[3])"""
 
-
-
+#hierarchical lattice
 method = "hierarchical"
 model = "ising"
 lattice = "FSHL"
