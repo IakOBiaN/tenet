@@ -489,7 +489,7 @@ def build_triangles_tensor(model, temp, m_par):
 
 	#tensor = np.einsum("abcd, efgh, ijk, mno, bi, fk, nd, oh, cg -> ajem", tensor, id4, id3, id3, two, one, one, two, three)
 
-	U, S, V = split_by_svd(tensor, [0, 1], [2, 3])
+	U, S, V = tensor_svd(tensor, [0, 1], [2, 3])
 	S = np.sqrt(S)
 	U = np.einsum("abi,i->abi", U, S)
 	V = np.einsum("ibc,i->ibc",V, S)

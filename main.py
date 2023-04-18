@@ -178,19 +178,19 @@ file.close()
 	print(mu, coef*result[0], coef*result[1] , coef*result[2] , coef*result[3])"""
 
 #mono with interactions
-"""
-method = "hierarchical"
+
+method = "trg"
 model = "langmuir"
-lattice = "FSHL"
+lattice = "square"
 #model params
-T = 1.0
-chi_number = 5
-for mu in np.arange(-10.00, 25.01, 0.5):
-	m_par = [mu, 4.0, 0, 0, 0, 0]
+T = 120.0
+chi_number = 10
+for mu in np.arange(-10.00, 10.01, 0.5):
+	m_par = [mu, 2.0, 0, 0, 0, 0]
 	coef = 1.0/1.00
 	result = full(method, model, lattice, chi_number, T, m_par)
 	print(mu, coef*result[0], coef*result[1] , coef*result[2] , coef*result[3])
-"""
+
 
 #binary gas
 """
@@ -205,8 +205,9 @@ for mu in np.arange(-40.00, 30.01, 1.0):
 	result = full(method, model, lattice, chi_number, T, m_par)
 	print(mu, result[0], result[1] , result[2] , result[3])"""
 
-#hierarchical lattice
-method = "hierarchical"
+
+#hierarchical lattice ising
+"""method = "hierarchical"
 model = "ising"
 lattice = "FSHL"
 #model params
@@ -218,5 +219,4 @@ for J in np.arange(0.15, 0.85, 0.01):
 	#print(J, result[0], result[1] , result[2] , result[3])
 	result = simple_hierarchical(method, model, lattice, T, m_par, chi_number)
 	print(J, result)
-
-#test line
+"""

@@ -13,35 +13,25 @@ def identity(dimensions, elements):
 		id[((i, ) * dimensions)] = 1
 	return id
 
-def matricise(tensor, legs_one, legs_two):
-	one = np.prod([tensor.shape[i] for i in legs_one])
-	two = np.prod([tensor.shape[i] for i in legs_two])
-	return np.moveaxis(tensor, list(legs_one) + list(legs_two), list(range(len(tensor.shape)))).reshape(one, two)
+def tensor_svd(tensor, legs_left, legs_right, chi_number = None):
+	old_shape_left = [tensor.shape[i] for i in legs_left]
+	old_shape_right = [tensor.shape[i] for i in legs_right]
+	left = np.prod(old_shape_left)
+	right = np.prod(old_shape_right)
+	matrix = np.moveaxis(tensor, list(legs_left) + list(legs_right), list(range(len(tensor.shape)))).reshape(right, right)
 
-def split_by_svd(tensor, legs_one, legs_two, chi_min = 0.0, chi_number = None):
-	if legs_one is not None:
-		legs_one = [i % len(tensor.shape) for i in legs_one]
-	if legs_two is not None:
-		legs_two = [i % len(tensor.shape) for i in legs_two]
+	if chi_number is None:
+		chi_number = min(matrix.shape)-1
 
-	if legs_two is None:
-		legs_two = sorted(list(set(range(len(tensor.shape))) - set(legs_one)))
-	elif legs_one is None:
-		legs_one = sorted(list(set(range(len(tensor.shape))) - set(legs_two)))
-
-	shape_one = [tensor.shape[i] for i in legs_one]
-	shape_two = [tensor.shape[i] for i in legs_two]
-	matrix = matricise(tensor, legs_one, legs_two)
-
-	if chi_number is not None and chi_number <= min(matrix.shape)-1:
+	if chi_number <= min(matrix.shape)-1:
 		U, S, V = scipy.sparse.linalg.svds(matrix, k = chi_number)
 	else:
 		U, S, V = scipy.linalg.svd(matrix, full_matrices = False, check_finite = False)
 
-	cut = len([1 for s in S if s > chi_min])
+	cut = len([1 for s in S if s > 1e-12])
 	if cut < 1:
 		cut = 1
-	if chi_number is not None and cut > chi_number:
+	if cut > chi_number:
 		cut = chi_number
 
 	sort = np.argsort(S)[-cut:]
@@ -49,8 +39,8 @@ def split_by_svd(tensor, legs_one, legs_two, chi_min = 0.0, chi_number = None):
 	U = U[:, sort]
 	S = S[sort]
 	V = V[sort, :]
-	gc.collect()
-	return U.reshape(shape_one+ [cut]), S, V.reshape([cut] + shape_two)
+
+	return U.reshape(old_shape_left + [cut]), S, V.reshape([cut] + old_shape_right)
 
 def build_tensor(matrixes, lattice = "square"):
 	leg_size = matrixes[0].shape[0]
@@ -73,7 +63,7 @@ def build_tensor(matrixes, lattice = "square"):
 		tensor = np.einsum("ijklm, ablk, xb -> ijaxm", tensor, id4, matrixes[1] ** 0.5)
 		tensor = np.einsum("ijklm, aml -> ijka", tensor, id3)
 
-		U, S, V = split_by_svd(tensor, [0, 1], [2, 3])
+		U, S, V = tensor_svd(tensor, [0, 1], [2, 3])
 		S = np.sqrt(S)
 		U = np.einsum("abi,i->abi", U, S)
 		V = np.einsum("ibc,i->ibc",V, S)
@@ -121,7 +111,7 @@ def build_tensor(matrixes, lattice = "square"):
 		ten_one = np.einsum("abi, ij->abj",identity(3, leg_size), matrixes[0])
 		tensor = np.einsum("akc, ijk->icja",ten_one, tensor)
 
-		U_1,S_1,V_1 = split_by_svd(tensor, [0, 1], [2, 3])
+		U_1,S_1,V_1 = tensor_svd(tensor, [0, 1], [2, 3])
 		U_2 = identity(3, leg_size)
 		V_2 = identity(3, leg_size)
 
@@ -144,7 +134,7 @@ def hotrg_square(tensor, scale, chi_number = 64, chi_min = 1e-8):
 	hotensor = np.einsum("abcd,cjkl->abjkdl", hotensor, hotensor).reshape(size[0],size[1]*size[1],size[2],size[3]*size[3])
 
 	if size[3]*size[3] > chi_number:
-		U,S,V = split_by_svd(hotensor, [0, 1, 2], [3], chi_min, chi_number)
+		U,S,V = tensor_svd(hotensor, [0, 1, 2], [3], chi_number)
 		S = np.sqrt(S)
 		U = np.einsum("abci,i->abci", U, S)
 		V = np.einsum("ib,i->ib",V, S)
@@ -158,8 +148,8 @@ def hotrg_square(tensor, scale, chi_number = 64, chi_min = 1e-8):
 
 def trg_square(tensor, scale, chi_number = 64, chi_min = 1e-8):
 
-	U_1,S_1,V_1 = split_by_svd(tensor[0], [0, 1], [2, 3], chi_min, chi_number)
-	U_2,S_2,V_2 = split_by_svd(tensor[0], [0, 3], [1, 2], chi_min, chi_number)
+	U_1,S_1,V_1 = tensor_svd(tensor[0], [0, 1], [2, 3], chi_number)
+	U_2,S_2,V_2 = tensor_svd(tensor[0], [0, 3], [1, 2], chi_number)
 
 	S_1 = np.sqrt(S_1)
 	U_1 = np.einsum("abi,i->abi", U_1, S_1)
@@ -181,9 +171,9 @@ def trg_hexagonal(tensors, scale, chi_number = 64, chi_min = 1e-8):
 	tensor2 = np.einsum("abc, ibk -> aikc", tensors[0], tensors[1])
 	tensor3 = np.einsum("abc, ija -> ibcj", tensors[0], tensors[1])
 
-	U_1,S_1,V_1 = split_by_svd(tensor1, [1, 2], [3, 0], chi_min, chi_number)
-	U_2,S_2,V_2 = split_by_svd(tensor2, [0, 1], [2, 3], chi_min, chi_number)
-	U_3,S_3,V_3 = split_by_svd(tensor3, [0, 1], [2, 3], chi_min, chi_number)
+	U_1,S_1,V_1 = tensor_svd(tensor1, [1, 2], [3, 0], chi_number)
+	U_2,S_2,V_2 = tensor_svd(tensor2, [0, 1], [2, 3], chi_number)
+	U_3,S_3,V_3 = tensor_svd(tensor3, [0, 1], [2, 3], chi_number)
 
 	S_1 = np.sqrt(S_1)
 	U_1 = np.einsum("abi,i->abi", U_1, S_1)
