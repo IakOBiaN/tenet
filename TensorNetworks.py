@@ -221,5 +221,3 @@ def trg_step(tensor, scale, chi_number = 64, chi_min = 1e-8, lattice = "square")
 		tensor, scale = trg_square(tensor, scale, chi_number, chi_min)
 	gc.collect()
 	return (tensor, scale)
-
-#test line
