@@ -218,3 +218,5 @@ for J in np.arange(0.15, 0.85, 0.01):
 	#print(J, result[0], result[1] , result[2] , result[3])
 	result = simple_hierarchical(method, model, lattice, T, m_par, chi_number)
 	print(J, result)
+
+#test line
