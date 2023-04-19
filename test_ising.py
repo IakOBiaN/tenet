@@ -5,9 +5,10 @@ method = "trg"
 model = "ising"
 lattice = "square"
 #model params
+constant = 1
 T = 1.0 / constant
 chi_number = 10
-for J in np.arange(0.15, 0.85, 0.01):
+for J in ms.np.arange(0.15, 0.85, 0.01):
 	m_par = [0, J, 0, 0, 0, 0]
 	#result = full(method, model, lattice, chi_number, T, m_par)
 	#print(J, result[0], result[1] , result[2] , result[3])
