@@ -21,7 +21,7 @@ def tensor_svd(tensor, legs_left, legs_right, chi_number = None):
 	matrix = np.moveaxis(tensor, list(legs_left) + list(legs_right), list(range(len(tensor.shape)))).reshape(right, right)
 
 	if chi_number is None:
-		chi_number = min(matrix.shape)-1
+		chi_number = min(matrix.shape)
 
 	if chi_number <= min(matrix.shape)-1:
 		U, S, V = scipy.sparse.linalg.svds(matrix, k = chi_number)
