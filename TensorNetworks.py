@@ -45,8 +45,22 @@ def tensor_svd(tensor, legs_left, legs_right, chi_number = None):
 def build_tensor(matrixes, lattice = "square"):
 	leg_size = matrixes[0].shape[0]
 	tensor = np.einsum("ab,ibk->iak",matrixes[0], identity(3, leg_size))
-	if (lattice == "square"):
+	if (lattice == "square_fusion"):
 		tensor = list((np.einsum("abc, bef, ejk, jcn -> afkn", tensor, tensor, tensor, tensor), ))
+	if (lattice == "square_svd"):
+		U1, S1, V1 = tensor_svd(matrixes[0], [0], [1])
+		S1 = np.sqrt(S1)
+		U1 = np.einsum("ai,i->ai", U1, S1)
+		V1 = np.einsum("ib,i->ib", V1, S1)
+		U2, S2, V2 = tensor_svd(matrixes[1], [0], [1])
+		S2 = np.sqrt(S2)
+		U2 = np.einsum("ai,i->ai", U2, S2)
+		V2 = np.einsum("ib,i->ib", V2, S2)
+		tensor = np.einsum("ijkl, kc, ai, bj, ld -> abcd", identity(4, leg_size), U1, V1, V2, U2)
+		tensor = list((tensor, ))
+	if (lattice == "square"):
+		tensor = np.einsum("ijkl, kc, ld -> ijcd", identity(4, leg_size), matrixes[0], matrixes[1])
+		tensor = list((tensor, ))
 	elif (lattice == "triangular"):
 		tensor1 = np.einsum("ab,ajk->bjk",matrixes[0], identity(3, leg_size))
 		tensor2 = np.einsum("ab,bjk->ajk",matrixes[1], identity(3, leg_size))

@@ -17,7 +17,7 @@ def calc(method = "trg", model = "langmuir", lattice = "square", T = 1.0, m_par 
 
     scale = 0.0
     old_scale = -1.0
-    nodes = 2.0
+    nodes = 1.0
     if lattice == "triangular":
         nodes = 1.0
 
