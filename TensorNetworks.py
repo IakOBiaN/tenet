@@ -18,7 +18,7 @@ def tensor_svd(tensor, legs_left, legs_right, chi_number = None):
 	old_shape_right = [tensor.shape[i] for i in legs_right]
 	left = np.prod(old_shape_left)
 	right = np.prod(old_shape_right)
-	matrix = np.moveaxis(tensor, list(legs_left) + list(legs_right), list(range(len(tensor.shape)))).reshape(right, right)
+	matrix = np.moveaxis(tensor, list(legs_left) + list(legs_right), list(range(len(tensor.shape)))).reshape(left, right)
 
 	if chi_number is None:
 		chi_number = min(matrix.shape)
@@ -145,9 +145,9 @@ def build_tensor(matrixes, lattice = "square"):
 def hotrg_square(tensor, scale, chi_number = 64, chi_min = 1e-8):
 	hotensor = tensor[0]
 	size = hotensor.shape
-	hotensor = np.einsum("abcd,cjkl->abjkdl", hotensor, hotensor).reshape(size[0],size[1]*size[1],size[2],size[3]*size[3])
+	hotensor = np.einsum("abcd,cjkl->abjkdl", hotensor, hotensor).reshape(size[0],size[1] ** 2, size[2], size[3] ** 2)
 
-	if size[3]*size[3] > chi_number:
+	if size[3] ** 2 > chi_number:
 		U,S,V = tensor_svd(hotensor, [0, 1, 2], [3], chi_number)
 		S = np.sqrt(S)
 		U = np.einsum("abci,i->abci", U, S)
