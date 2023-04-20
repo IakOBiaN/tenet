@@ -215,23 +215,28 @@ def hotrg_step(tensor, scale, chi_number = 64, chi_min = 1e-8, lattice = "square
 	tensor, scale = hotrg_square(tensor, scale, chi_number, chi_min)
 	return (tensor, scale)
 
-def trg_step(tensor, scale, chi_number = 64, chi_min = 1e-8, lattice = "square"):
-
-	if (lattice == "hex"):
-		norm = abs(np.einsum("abc, cba -> ", tensor[0], tensor[1]))
+def trg_step(tensors, scale, chi_number = 64, chi_min = 1e-8, lattice = "square"):
+	if (lattice == "hex" or lattice == "square"):
+		if len(tensors) < 2:
+			U, S, V = tensor_svd(tensors[0], [0, 1], [3, 2])
+			S = np.sqrt(S)
+			U = np.einsum("abi, i -> abi", U, S)
+			V = np.einsum("ibc, i -> ibc", V, S)
+			tensors = list((U, V))
+		norm = abs(np.einsum("abc, cba -> ", tensors[0], tensors[1]))
 		if norm != 0:
-			for i, ten in enumerate(tensor):
-				tensor[i] = ten/sqrt(norm)
+			for i, ten in enumerate(tensors):
+				tensors[i] = ten/sqrt(norm)
 			scale += np.log(norm)
-		tensor, scale = trg_hexagonal(tensor, scale, chi_number, chi_min)
-		tensor, scale = trg_hexagonal(tensor, scale, chi_number, chi_min)
+		tensors, scale = trg_hexagonal(tensors, scale, chi_number, chi_min)
+		tensors, scale = trg_hexagonal(tensors, scale, chi_number, chi_min)
 	else:
-		norm = tensor[0].max()
+		norm = tensors[0].max()
 		if norm != 0:
-			for i, ten in enumerate(tensor):
-				tensor[i] = ten/norm
+			for i, ten in enumerate(tensors):
+				tensors[i] = ten/norm
 			scale += np.log(norm)
-		tensor, scale = trg_square(tensor, scale, chi_number, chi_min)
-		tensor, scale = trg_square(tensor, scale, chi_number, chi_min)
+		tensors, scale = trg_square(tensors, scale, chi_number, chi_min)
+		tensors, scale = trg_square(tensors, scale, chi_number, chi_min)
 	gc.collect()
-	return (tensor, scale)
+	return (tensors, scale)
