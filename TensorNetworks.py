@@ -48,6 +48,7 @@ def build_tensor(calc, matrixes):
 	gen_tensor = calc.gen_tensor
 	if lattice == "square":
 		if (gen_tensor == "fusion_rule"):
+			calc.nodes = 2.0
 			tensor = np.einsum("ab, ibk -> iak",matrixes[0], identity(3, leg_size))
 			tensor = list((np.einsum("abc, bef, ejk, jcn -> afkn", tensor, tensor, tensor, tensor), ))
 		elif (gen_tensor == "svd"):

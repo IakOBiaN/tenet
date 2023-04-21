@@ -3,11 +3,13 @@ import timeit
 
 start_time = timeit.default_timer()
 
-#mono with interactions
 calc = ms.CalcConfig()
+
 calc.method = "trg"
+calc.metModification = "default"
 calc.model = "langmuir"
 calc.lattice = "square"
+calc.gen_tensor = "default"
 calc.metParam = 10
 #model params
 T = 120.0
