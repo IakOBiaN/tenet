@@ -6,40 +6,62 @@ from scipy.linalg import sqrtm
 import TensorNetworks as tn
 import BuildTensors as bt
 
-constant = 0.008314
-method_tolerance = 1e-8
+class CalcConfig:
 
-def calc(method = "trg", model = "langmuir", lattice = "square", T = 1.0, m_par = [0.0]*10, chi_number = 300):
+    def __init__(self, methodTolerance = 1e-8, constant = 0.008314, method = "trg", metModification = "default", scale = 4, iterations = 300, model = "ising", lattice = "square", gen_tensor = "default", nodes = 1 , coord = 4, metParam = 10):
+        #tolerance of method
+        self.methodTolerance = methodTolerance
+        #constant. Default is R = 0.008314
+        self.constant = constant
+        #method for partition function calculation
+        self.method = method
+        #internal methdo modification
+        self.metModification = metModification
+        #scale of the method iteration. For trg and square lattice it is 2 * 2
+        self.scale = scale
+        #number of method iterations
+        self.iterations = iterations
+        #model for tensor network constructions
+        self.model = model
+        #lattice geometry
+        self.lattice = lattice
+        #method of tensor network generation
+        self.gen_tensor = gen_tensor
+        #number of initial nodes for first tensor
+        self.nodes = nodes
+        #coordination number of a lattice
+        self.coord = coord
+        #method parameter. For trg it is chi
+        self.metParam = metParam
 
-    tensors = bt.build_matrix(model, T, m_par, 4.0)
-    tensors = tn.build_tensor(tensors, lattice)
-    #tensors = tn.build_triangles_tensor(model, temp, m_par)
+    def __str__(self):
+        return method + "_p_" + str(metParam) + "_" + model + "_" + lattice
+
+def simulate(calc, T = 1.0, m_par = [0.0] * 10):
+
+    matrixes = bt.build_matrix(calc, T, m_par)
+    tensors = tn.build_tensor(calc, matrixes)
 
     scale = 0.0
     old_scale = -1.0
-    nodes = 1.0
-    if lattice == "triangular":
-        nodes = 1.0
+    norm = 0
+    nodes = calc.nodes
 
-    i = 0
-    for i in range(300):
-        if method == "trg":
-            (tensors, scale) = tn.trg_step(tensors, scale, chi_number, 0, lattice)
-        elif method == "hotrg":
-            (tensors, scale) = tn.hotrg_step(tensors, scale, chi_number, 0, lattice)
+    for i in range(calc.iterations):
+        if calc.method == "trg":
+            (tensors, scale, norm) = tn.trg_step(tensors, scale, norm, calc)
+        elif calc.method == "hotrg":
+            (tensors, scale, norm) = tn.hotrg_step(tensors, scale, norm, calc)
         else:
             assert False, "Error! There is no such method."
-        if abs(old_scale - scale/4.0) < method_tolerance:
+        if abs(old_scale - scale / calc.scale) < calc.methodTolerance:
             break
         else:
             old_scale = scale
     if i > 250:
         print("Warning! More than 250 iterations")
-    nodes *= 4.0**(i+1)
-    norm = np.einsum("abab->",tensors[0])
-    if norm < 0:
-        norm = -norm
-    return (scale + log(norm)) / (nodes / (constant * T))
+    nodes *= calc.scale ** (i + 1)
+    return (scale + log(norm)) / (nodes / (calc.constant * T))
 
 def simple_hierarchical(method, model, lattice, T = 1.0, m_par = [0.0]*10, size = 1):
     tensor = bt.build_matrix(model, T, m_par, 4.0)[0]
@@ -130,23 +152,19 @@ def entropy(method, model, lattice, temp = 1., m_par = [0.0]*10):
     result = -(BTP[0]-BTP[1])/(temp_step*2.0)
     return result
 
-def full(method, model, lattice, chi_number, T = 1., m_par = [0.0]*10):
+def full(calc, T = 1., m_par = [0.0]*10):
     grandPotential_dmu = []
     grandPotential_dT = []
     dmu = 0.001
     dT = 0.001
-    if method == "hierarchical":
-        simulate = simple_hierarchical
-    else:
-        simulate = calc
     for diff_mu in [m_par[0] - dmu, m_par[0] + dmu]:
-        lnZ = simulate(method, model, lattice, T, [diff_mu] + m_par[1:], chi_number)
+        lnZ = simulate(calc, T, [diff_mu] + m_par[1:])
         grandPotential_dmu.append(lnZ)
     for diff_T in [T - dT, T, T + dT]:
-        lnZ = simulate(method, model, lattice, diff_T, m_par, chi_number)
+        lnZ = simulate(calc, diff_T, m_par)
         grandPotential_dT.append(lnZ)
     coverage = - (grandPotential_dmu[0] - grandPotential_dmu[1]) / (dmu * 2.0)
     entropy = - (grandPotential_dT[0] - grandPotential_dT[2]) / (dT * 2.0)
-    susceptibility = constant * T * (grandPotential_dmu[0] - 2.0 * grandPotential_dT[1] + grandPotential_dmu[1]) / (dT ** 2.0)
+    susceptibility = calc.constant * T * (grandPotential_dmu[0] - 2.0 * grandPotential_dT[1] + grandPotential_dmu[1]) / (dT ** 2.0)
     heat_capacity = T * (grandPotential_dT[0] - 2.0 * grandPotential_dT[1] + grandPotential_dT[2]) / (dT ** 2.0)
     return coverage, entropy, susceptibility, heat_capacity, grandPotential_dT[1]

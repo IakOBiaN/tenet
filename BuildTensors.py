@@ -5,12 +5,14 @@ import scipy.sparse.linalg
 from scipy.linalg import sqrtm
 
 inf = -1e8
-constant = 0.008314
 
-def build_matrix (model, temp, m_par, neigbours = 8.0):
+def build_matrix (calc, temp, m_par):
+
+	model = calc.model
+	neigbours = calc.coord
 
 	if len(m_par) < 10:
-		m_par = m_par + [0.0]*(10-len(m_par))
+		m_par = m_par + [0.0] * (10 - len(m_par))
 
 	models_dict = {
 		"langmuir" : True,
@@ -29,31 +31,32 @@ def build_matrix (model, temp, m_par, neigbours = 8.0):
 		"qstate" : True
 	}
 
-	exist = models_dict.get(model)
+	exist = models_dict.get(calc.model)
 	assert (exist is not None), "Error! This model is not in the database"
 
 	#[any],[right, bottom],[right-up, right, right-bottom], [right-up, right, right-bottom, bottom]
 	matrixes = []
 	if model == "langmuir":
-		matrixes = [np.array([[0.0, m_par[0]/neigbours],[m_par[0]/neigbours, -m_par[1]+m_par[0]/(neigbours/2.0)]]) ,] * 3
+		matrixes = [np.array([[0.0, m_par[0] / neigbours], [m_par[0] / neigbours, -m_par[1] + m_par[0] / (neigbours / 2.0)]]) ,] * 3
 	elif model == "binary":
 		#m_par: 0 - muA, 1 - muB, 2 - epsAA, 3 - epsBB, 4 - epsAB
-		matrixes = [np.array([[0.0, m_par[0]/neigbours, m_par[1]/neigbours], [m_par[0]/neigbours, -m_par[2] + 2.0 * m_par[0] / neigbours, (m_par[0] + m_par[1]) / neigbours], [m_par[1] / neigbours, (m_par[0] + m_par[1]) / neigbours, -m_par[3] + 2.0 * m_par[1] / neigbours]]) ,] * 3
+		matrixes = [np.array([[0.0, m_par[0] / neigbours, m_par[1] / neigbours], [m_par[0] / neigbours, -m_par[2] + 2.0 * m_par[0] / neigbours, (m_par[0] + m_par[1]) / neigbours], [m_par[1] / neigbours, (m_par[0] + m_par[1]) / neigbours, -m_par[3] + 2.0 * m_par[1] / neigbours]]) ,] * 3
 	elif model == "ising":
-		matrixes = [np.array([[(m_par[1]-m_par[0]/(neigbours/2.0)), (-m_par[1])],[(-m_par[1]), (m_par[1]+m_par[0]/(neigbours/2.0))]]), ] * 3
+		matrixes = [np.array([[(m_par[1] - m_par[0] / (neigbours / 2.0)), (-m_par[1])],[(-m_par[1]), (m_par[1] + m_par[0] / (neigbours / 2.0))]]), ] * 3
 	elif model == "hard-disk":
-		matrixes = [np.array([[0.0, m_par[0]/(neigbours/1.0)],[m_par[0]/(neigbours/1.0), -1000000.0+m_par[0]]]), ] * 3
+		matrixes = [np.array([[0.0, m_par[0] / (neigbours)],[m_par[0] / (neigbours), inf + m_par[0]]]), ] * 3
+	#matrixes only for hex lattice
 	elif model == "dimers":
-		matrixes = [np.array([[0, inf, (m_par[0]+m_par[1])/6.0, (m_par[0]+m_par[1])/6.0, m_par[0]/3.0], \
-						[(m_par[0]+m_par[1])/6.0, inf, inf, inf, inf], \
-						[inf, (m_par[0]+m_par[1])/3.0, inf, inf, inf], \
-						[(m_par[0]+m_par[1])/6.0, inf, inf, inf, inf], \
-						[m_par[0]/3.0, inf, inf, inf, inf]]), \
-					np.array([[0, (m_par[0]+m_par[1])/6.0, (m_par[0]+m_par[1])/6.0, inf, m_par[0]/3.0], \
-						[(m_par[0]+m_par[1])/6.0, inf, inf, inf, inf], \
-						[(m_par[0]+m_par[1])/6.0, inf, inf, inf, inf], \
-						[inf, inf, inf, (m_par[0]+m_par[1])/3.0, inf], \
-						[m_par[0]/3.0, inf, inf, inf, inf]])]
+		matrixes = [np.array([[0, inf, (m_par[0] + m_par[1]) / 6.0, (m_par[0] + m_par[1]) / 6.0, m_par[0] / 3.0], \
+						[(m_par[0] + m_par[1]) / 6.0, inf, inf, inf, inf], \
+						[inf, (m_par[0] + m_par[1]) / 3.0, inf, inf, inf], \
+						[(m_par[0] + m_par[1]) / 6.0, inf, inf, inf, inf], \
+						[m_par[0] / 3.0, inf, inf, inf, inf]]), \
+					np.array([[0, (m_par[0] + m_par[1]) / 6.0, (m_par[0] + m_par[1]) / 6.0, inf, m_par[0] / 3.0], \
+						[(m_par[0] + m_par[1]) / 6.0, inf, inf, inf, inf], \
+						[(m_par[0] + m_par[1]) / 6.0, inf, inf, inf, inf], \
+						[inf, inf, inf, (m_par[0] + m_par[1]) / 3.0, inf], \
+						[m_par[0] / 3.0, inf, inf, inf, inf]])]
 	elif model == "1NN" or model == "2NN" or model == "3NN" or model == "4NN" or model == "5NN":
 		var_1NN_0 = 0
 		var_1NN_mu = m_par[0] / neigbours
@@ -326,14 +329,14 @@ def build_matrix (model, temp, m_par, neigbours = 8.0):
 				line.append(-uij + 2.0 * mu)
 			matrix.append(line)
 		matrixes.append(np.array(matrix))
-		#print(matrixes)
-		#exit()
 
 	for i in range(len(matrixes)):
-		matrixes[i] = matrixes[i] / (constant * temp)
+		matrixes[i] = matrixes[i] / (calc.constant * temp)
 		matrixes[i] = np.array([np.exp(line) for line in matrixes[i]])
 	return matrixes
 
+#old code for triangles
+"""
 def build_triangles_tensor(model, temp, m_par):
 	inf = -1e8
 	if model == "hard_triangles":
@@ -499,10 +502,10 @@ def build_triangles_tensor(model, temp, m_par):
 	tensor = np.swapaxes(tensor, 2, 3)
 	tensor = list((tensor, ))
 
-	"""one = np.einsum("ab,iak->ibk",one,cd)
-	two = np.einsum("ab,iak->ibk",three,cd)
-	three = np.einsum("ab,ibk->iak",two2,cd)
-	tensor = np.einsum("abc,deb,ice->adi",one,two,three)
-	tensor = np.einsum("abi,ijk->abjk", tensor,cd)
-	tensor = list((tensor, ))"""
-	return tensor
+	#one = np.einsum("ab,iak->ibk",one,cd)
+	#two = np.einsum("ab,iak->ibk",three,cd)
+	#three = np.einsum("ab,ibk->iak",two2,cd)
+	#tensor = np.einsum("abc,deb,ice->adi",one,two,three)
+	#tensor = np.einsum("abi,ijk->abjk", tensor,cd)
+	#tensor = list((tensor, ))
+	return tensor"""
