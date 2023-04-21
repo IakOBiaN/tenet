@@ -221,13 +221,15 @@ def hotrg_step(tensor, scale, chi_number = 64, chi_min = 1e-8, lattice = "square
 
 def trg_step(tensors, scale, norm, calc):
 	if (calc.metModification == "hex"):
+		calc.scale = 9
 		if len(tensors) < 2:
 			U, S, V = tensor_svd(tensors[0], [0, 1], [3, 2])
 			S = np.sqrt(S)
 			U = np.einsum("abi, i -> abi", U, S)
 			V = np.einsum("ibc, i -> ibc", V, S)
 			tensors = list((U, V))
-		norm = max(tensors[0].max(), tensors[1].max())
+		#norm = max(tensors[0].max(), tensors[1].max())
+		norm = abs(np.einsum("abc, cba -> ", tensors[0], tensors[1]))
 		if norm != 0:
 			for i, ten in enumerate(tensors):
 				tensors[i] = ten/sqrt(norm)
