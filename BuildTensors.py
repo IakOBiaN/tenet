@@ -16,7 +16,7 @@ def build_matrix (calc, temp, m_par):
 
 	models_dict = {
 		"langmuir" : True,
-        "binary" : True,
+		"binary" : True,
 		"ising" : True,
 		"hard-disk" : True,
 		"dimers" : True,
