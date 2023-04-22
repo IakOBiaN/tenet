@@ -146,19 +146,19 @@ def build_tensor(calc, matrixes):
 	gc.collect()
 	return tensor
 
-def hotrg_square(tensor, scale, chi_number = 64, chi_min = 1e-8):
+def hotrg_square(tensor, scale, calc):
 	hotensor = tensor[0]
 	size = hotensor.shape
-	hotensor = np.einsum("abcd,cjkl->abjkdl", hotensor, hotensor).reshape(size[0],size[1] ** 2, size[2], size[3] ** 2)
+	hotensor = np.einsum("abcd, cjkl -> abjkdl", hotensor, hotensor).reshape(size[0], size[1] ** 2, size[2], size[3] ** 2)
 
-	if size[3] ** 2 > chi_number:
-		U,S,V = tensor_svd(hotensor, [0, 1, 2], [3], chi_number)
+	if size[3] ** 2 > calc.metParam:
+		U, S, V = tensor_svd(hotensor, [0, 1, 2], [3], calc.metParam)
 		S = np.sqrt(S)
-		U = np.einsum("abci,i->abci", U, S)
-		V = np.einsum("ib,i->ib",V, S)
-		hotensor = np.einsum("ajcd,ij->aicd", U, V)
+		U = np.einsum("abci, i -> abci", U, S)
+		V = np.einsum("ib, i -> ib", V, S)
+		hotensor = np.einsum("ajcd, ij -> aicd", U, V)
 
-	tensor[0] = np.einsum("abcd->dabc", hotensor)
+	tensor[0] = np.einsum("abcd -> dabc", hotensor)
 
 	scale *= 2
 	gc.collect()
@@ -209,15 +209,18 @@ def trg_hexagonal(tensors, scale, calc):
 	scale *= 3.0
 	return list((tensor1, tensor2)), scale
 
-def hotrg_step(tensor, scale, chi_number = 64, chi_min = 1e-8, lattice = "square"):
-	norm = tensor[0].max()
+def hotrg_step(tensors, scale, norm, calc):
+	norm = tensors[0].max()
 	if norm != 0:
-		for i, ten in enumerate(tensor):
-			tensor[i] = ten/norm
+		for i, ten in enumerate(tensors):
+			tensors[i] = ten/norm
 		scale += np.log(norm)
-	tensor, scale = hotrg_square(tensor, scale, chi_number, chi_min)
-	tensor, scale = hotrg_square(tensor, scale, chi_number, chi_min)
-	return (tensor, scale)
+	tensors, scale = hotrg_square(tensors, scale, calc)
+	tensors, scale = hotrg_square(tensors, scale, calc)
+	norm = np.einsum("abab->",tensors[0])
+	if norm < 0:
+		norm = -norm
+	return (tensors, scale, norm)
 
 def trg_step(tensors, scale, norm, calc):
 	if (calc.metModification == "hex"):
@@ -228,7 +231,6 @@ def trg_step(tensors, scale, norm, calc):
 			U = np.einsum("abi, i -> abi", U, S)
 			V = np.einsum("ibc, i -> ibc", V, S)
 			tensors = list((U, V))
-		#norm = max(tensors[0].max(), tensors[1].max())
 		norm = abs(np.einsum("abc, cba -> ", tensors[0], tensors[1]))
 		if norm != 0:
 			for i, ten in enumerate(tensors):
