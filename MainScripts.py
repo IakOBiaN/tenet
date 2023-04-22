@@ -45,7 +45,6 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 	scale = 0.0
 	old_scale = -1.0
 	norm = 0
-	nodes = calc.nodes
 
 	for i in range(calc.iterations):
 		if calc.method == "trg":
@@ -53,7 +52,7 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 		elif calc.method == "hotrg":
 			(tensors, scale, norm) = tn.hotrg_step(tensors, scale, norm, calc)
 		elif calc.method == "htn":
-			(tensors, scale, norm) = tn.htn_step(tensors, scale, norm, calc)
+			(tensors, scale, norm) = tn.htn_step(matrixes, scale, norm, calc)
 		else:
 			assert False, "Error! There is no such method."
 		if abs(old_scale - scale / calc.scale) < calc.methodTolerance:
@@ -62,57 +61,9 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 			old_scale = scale
 	if i > 250:
 		print("Warning! More than 250 iterations")
+	nodes = calc.nodes
 	nodes *= calc.scale ** (i + 1)
 	return (scale + log(norm)) / (nodes / (calc.constant * T))
-
-def simple_hierarchical(method, model, lattice, T = 1.0, m_par = [0.0]*10, size = 1):
-	tensor = bt.build_matrix(model, T, m_par, 4.0)[0]
-	number_of_steps = 100
-
-	Z = np.empty((number_of_steps+1))
-	Z[0] = tensor.max()
-	tensor = tensor/Z[0]
-	lnZ_list = []
-	cd3 = tn.identity(3, tensor.shape[0])
-	cd4 = tn.identity(4, tensor.shape[0])
-
-	for i in np.arange(1,(number_of_steps+1),1):
-		edges = (1 + size * 2) ** 2
-		dop_tensor = tn.identity(size+2,tensor.shape[0])
-		dop_tensor_2 = tn.identity(size+2,tensor.shape[0])
-
-		doubled_tensor = np.einsum("ij,aic->ajc",tensor,cd3)
-		doubled_tensor = np.einsum("ij,abi->abj",tensor,doubled_tensor)
-		doubled_tensor = np.einsum("ijk,ajk->ai",doubled_tensor,cd3)
-
-		for ii in range(size):
-			dop_tensor = np.tensordot(dop_tensor,doubled_tensor, axes=([1],[0]))
-		dop_tensor = np.tensordot(dop_tensor,tensor, axes=([1],[0]))
-
-		for ii in range(size+(size-1)):
-			dop_tensor = np.tensordot(dop_tensor,tensor, axes=([-1],[0]))
-			for j in range(size):
-				dop_tensor = np.tensordot(dop_tensor,cd3, axes=([-2-j],[0]))
-				dop_tensor = np.tensordot(dop_tensor,tensor, axes=([-2],[0]))
-				dop_tensor = np.tensordot(dop_tensor,cd3, axes=([-1,-3],[0,1]))
-				dop_tensor = np.tensordot(dop_tensor,tensor, axes=([-2],[0]))
-
-		for ii in range(size):
-			dop_tensor = np.tensordot(dop_tensor,doubled_tensor, axes=([1],[0]))
-		dop_tensor = np.tensordot(dop_tensor,tensor, axes=([1],[0]))
-		tensor = np.tensordot(dop_tensor,dop_tensor_2, axes=(np.arange(1,size+2,1),np.arange(1,size+2,1)))
-
-		Z[i] = tensor.max()
-		tensor = tensor/Z[i]
-
-		lnZ = sum(sorted([log(Z[j]) / (edges**j) for j in range(0,i+1)]))
-
-		lnZ_list.append(lnZ)
-		if len(lnZ_list) > 3 and abs(lnZ_list[-1] - lnZ_list[-2]) < 1e-9 and abs(lnZ_list[-1] - lnZ_list[-3]) < 1e-9:
-			break
-	beta = 1 / (constant * T)
-	return (lnZ_list[-1]) / beta * 2.0
-
 
 def coverage_old(method, model, lattice, temp = 1., m_par = [0.0]*10):
 	result = derivative(lambda x: simulate(method, model, lattice, temp, [x]+m_par[1:]), m_par[0], n=1, dx=1e-3)
