@@ -150,18 +150,23 @@ def hotrg_square(tensor, scale, calc):
 	hotensor = tensor[0]
 	size = hotensor.shape
 	hotensor = np.einsum("abcd, cjkl -> abjkdl", hotensor, hotensor).reshape(size[0], size[1] ** 2, size[2], size[3] ** 2)
-
 	if size[3] ** 2 > calc.metParam:
-		U, S, V = tensor_svd(hotensor, [0, 1, 2], [3])
-		V = np.einsum("ib, i -> ib", V, S)
-		U2, S2, V2 = tensor_svd(U, [1], [0, 2, 3])
-		U2 = np.einsum("i, bi -> bi", S2, U2)
-		VU2 = np.einsum("ab, bc -> ac", V, U2)
-		U3, S3, V3 = tensor_svd(VU2, [0], [1], calc.metParam)
-		S3 = np.sqrt(S3)
-		U3 = np.einsum("ab, b -> ab", U3, S3)
-		V3 = np.einsum("ba, b -> ba", V3, S3)
-		hotensor = np.einsum("abcd, ia, dj -> bicj", V2, V3, U3)
+		if calc.metModification == "projector":
+			print("aaa")
+		else:
+			#default realization of hotrg
+			U, S, V = tensor_svd(hotensor, [0, 1, 2], [3])
+			V = np.einsum("ib, i -> ib", V, S)
+			U2, S2, V2 = tensor_svd(U, [1], [0, 2, 3])
+			U2 = np.einsum("i, bi -> bi", S2, U2)
+			VU2 = np.einsum("ab, bc -> ac", V, U2)
+			U3, S3, V3 = tensor_svd(VU2, [0], [1], calc.metParam)
+			S3 = np.sqrt(S3)
+			U3 = np.einsum("ab, b -> ab", U3, S3)
+			V3 = np.einsum("ba, b -> ba", V3, S3)
+			#hotensor = np.einsum("abcd, ia, dj -> bicj", V2, V3, U3)
+			hotensor = np.einsum("abcd, ia -> bicd", V2, V3)
+			hotensor = np.einsum("abcd, dj -> abcj", hotensor, U3)
 
 	tensor[0] = np.einsum("abcd -> dabc", hotensor)
 
