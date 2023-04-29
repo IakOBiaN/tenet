@@ -150,13 +150,22 @@ def hotrg_square(tensor, scale, calc):
 	hotensor = tensor[0]
 	size = hotensor.shape
 	hotensor = np.einsum("abcd, cjkl -> abjkdl", hotensor, hotensor).reshape(size[0], size[1] ** 2, size[2], size[3] ** 2)
-
 	if size[3] ** 2 > calc.metParam:
-		U, S, V = tensor_svd(hotensor, [0, 1, 2], [3], calc.metParam)
-		S = np.sqrt(S)
-		U = np.einsum("abci, i -> abci", U, S)
-		V = np.einsum("ib, i -> ib", V, S)
-		hotensor = np.einsum("ajcd, ij -> aicd", U, V)
+		simplesvd = np.einsum("abcd, abcl -> ld", hotensor, hotensor)
+		_, S1, V1 = tensor_svd(simplesvd, [0], [1])
+		V1 = np.einsum("ib, i -> ib", V1, np.sqrt(S1))
+		simplesvd = np.einsum("abcd, ajcd -> jb", hotensor, hotensor)
+		_, S2, V2 = tensor_svd(simplesvd, [0], [1])
+		V2 = np.einsum("ib, i -> ib", V2, np.sqrt(S2))
+		V1V2 = np.einsum("ab, cb -> ac", V1, V2)
+		U, S, V = tensor_svd(V1V2, [0], [1], calc.metParam)
+		S = 1 / np.sqrt(S)
+		P1 = np.einsum("ab, ca -> bc", V2, V)
+		P1 = np.einsum("ab, b -> ab", P1, S)
+		P2 = np.einsum("ab, ac -> bc", V1, U)
+		P2 = np.einsum("ab, b -> ab", P2, S)
+		hotensor = np.einsum("abci, ij -> abcj", hotensor, P1)
+		hotensor = np.einsum("aicd, ij -> ajcd", hotensor, P2)
 
 	tensor[0] = np.einsum("abcd -> dabc", hotensor)
 
