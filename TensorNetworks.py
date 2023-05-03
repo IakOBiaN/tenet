@@ -69,12 +69,14 @@ def build_tensor(calc, matrixes):
 			print("ERROR: gen_tensor parameter is incorrect!")
 	elif (lattice == "triangular"):
 		if (gen_tensor == "default"):
+			calc.nodes = 1.5
 			tensor1 = np.einsum("ab,ajk->bjk",matrixes[0], identity(3, leg_size))
 			tensor2 = np.einsum("ab,bjk->ajk",matrixes[1], identity(3, leg_size))
 			tensor3 = np.einsum("ab,iak->ibk",matrixes[2], identity(3, leg_size))
 			tensor = np.einsum("abc, bef, iea -> cfi",tensor1, tensor2, tensor3)
 			tensor = list((np.einsum("abi, ijk -> abjk", tensor, identity(3, leg_size)), ))
 		elif (gen_tensor == "IRF"):
+			calc.nodes = 1.5
 			id4 = identity(4, leg_size)
 			id3 = identity(3, leg_size)
 
