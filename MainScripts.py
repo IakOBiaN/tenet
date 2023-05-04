@@ -111,13 +111,13 @@ def entropy(method, model, lattice, temp = 1., m_par = [0.0]*10):
 def full(calc, T = 1., m_par = [0.0]*10):
 	grandPotential_dmu = []
 	grandPotential_dT = []
-	dmu = 0.001
-	dT = 0.001
+	dmu = 1e-5
+	dT = 1e-5
 	for diff_mu in [m_par[0] - dmu, m_par[0] + dmu]:
 		lnZ = simulate(calc, T, [diff_mu] + m_par[1:])
 		grandPotential_dmu.append(lnZ)
 	for diff_T in [T - dT, T, T + dT]:
-		lnZ = simulate(calc, diff_T, m_par)
+		lnZ = 1#simulate(calc, diff_T, m_par)
 		grandPotential_dT.append(lnZ)
 	coverage = - (grandPotential_dmu[0] - grandPotential_dmu[1]) / (dmu * 2.0)
 	entropy = - (grandPotential_dT[0] - grandPotential_dT[2]) / (dT * 2.0)
