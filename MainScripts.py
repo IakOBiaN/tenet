@@ -39,6 +39,9 @@ class CalcConfig:
 
 def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 
+	if calc.lattice == "triangular":
+		calc.coord = 6
+
 	matrixes = bt.build_matrix(calc, T, m_par)
 	tensors = tn.build_tensor(calc, matrixes)
 
