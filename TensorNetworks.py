@@ -229,6 +229,8 @@ def hotrg_step(tensors, scale, norm, calc):
 	norm = np.einsum("abab->",tensors[0])
 	if norm < 0:
 		norm = -norm
+	if norm == 0:
+		norm = 1
 	return (tensors, scale, norm)
 
 def trg_step(tensors, scale, norm, calc):
