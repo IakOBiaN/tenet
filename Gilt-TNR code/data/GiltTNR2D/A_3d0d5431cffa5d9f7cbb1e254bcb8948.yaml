@@ -1,0 +1,17 @@
+GiltTNR2D_setup_version: 1.0
+H: 0.0
+J: 1.0
+beta: 1.0
+cg_chis: !!python/object/apply:builtins.range
+- 0
+- 21
+- 1
+cg_eps: 1.0e-05
+dtype: !!python/name:numpy.float64 ''
+gilt_eps: 1.0e-07
+initial2x2: false
+initial4x4: false
+iter_count: 6
+model: ising
+symmetry_tensors: true
+tntools.initialtensors_setup_version: 1.0

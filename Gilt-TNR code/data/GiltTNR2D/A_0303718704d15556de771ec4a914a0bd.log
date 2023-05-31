@@ -1,0 +1,60 @@
+2023-05-08 06:35:30 I: ======================================================================
+                       Generating A with Gilt-TNR2D (version 1.0).
+                       iter_count = 7
+2023-05-08 06:35:30 I: 
+                       H = 0.0
+                       J = 1.0
+                       algorithm = GiltTNR2D
+                       beta = 0.4
+                       cg_chis = range(0, 21)
+                       cg_eps = 1e-05
+                       complexion_chis = None
+                       complexion_eps = 1e-05
+                       complexion_padding = 3
+                       complexion_spacestep = 1
+                       complexion_step_direction = 1j
+                       complexion_timestep = 1
+                       database = data/GiltTNR2D/
+                       debug = False
+                       dtype = <class 'numpy.float64'>
+                       gilt_eps = 1e-07
+                       gilt_eps_list = None
+                       gilt_print_envspec = False
+                       gilt_print_envspec_recursive = False
+                       h_long = 0.0
+                       h_trans = 1.0
+                       impurity = None
+                       initial2x2 = False
+                       initial2x2x2 = False
+                       initial2z = False
+                       initial4x4 = False
+                       iter_count = 7
+                       iters = range(0, 9)
+                       model = ising
+                       print_free_energy = True
+                       print_scaldims = 50
+                       print_spectra = False
+                       sixvertex_a = 1.0
+                       sixvertex_b = 1.0
+                       sixvertex_c = 1.4142135623730951
+                       store_data = True
+                       symmetry_tensors = False
+                       tricrit_perturbation_factor = 0.1
+                       verbosity = 10
+2023-05-08 06:35:30 I: Applying Gilt,                      
+2023-05-08 06:35:30 I: Applying Gilt,                      Error = 1.836e-07, shape = (9, 10, 2, 10) [(9, 10, 9, 10)]
+2023-05-08 06:35:30 I: Applying Gilt,                      Error = 2.088e-07, shape = (2, 10, 2, 10) [(9, 10, 9, 10)]
+2023-05-08 06:35:30 I: Applying Gilt,                      Error = 2.092e-07, shape = (2, 10, 2, 2) [(9, 10, 9, 10)]
+2023-05-08 06:35:30 I: Applying Gilt, done.                
+2023-05-08 06:35:30 I: TRG splitting,                      
+2023-05-08 06:35:30 I: TRG splitting, done.                Error = 4.015e-08, chi = 1
+2023-05-08 06:35:30 I: TRG splitting,                      
+2023-05-08 06:35:30 I: TRG splitting, done.                Error = 3.803e-08, chi = 1
+2023-05-08 06:35:30 I: TRG contracting,                    
+2023-05-08 06:35:30 I: TRG contracting, done.              
+2023-05-08 06:35:30 I: TRG splitting,                      
+2023-05-08 06:35:30 I: TRG splitting, done.                Error = 0.000e+00, chi = 1
+2023-05-08 06:35:30 I: TRG splitting,                      
+2023-05-08 06:35:30 I: TRG splitting, done.                Error = 0.000e+00, chi = 1
+2023-05-08 06:35:30 I: TRG contracting,                    
+2023-05-08 06:35:30 I: TRG contracting, done.              

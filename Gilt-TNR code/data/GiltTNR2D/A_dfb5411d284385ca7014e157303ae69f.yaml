@@ -1,0 +1,9 @@
+H: 0.0
+J: 1.0
+beta: 1.0
+dtype: !!python/name:numpy.float64 ''
+initial2x2: false
+initial4x4: false
+model: ising
+symmetry_tensors: true
+tntools.initialtensors_setup_version: 1.0

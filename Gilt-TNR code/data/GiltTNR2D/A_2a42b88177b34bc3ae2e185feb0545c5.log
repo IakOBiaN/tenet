@@ -1,0 +1,60 @@
+2020-09-24 12:32:41 I: ======================================================================
+                       Generating A with Gilt-TNR2D (version 1.0).
+                       iter_count = 3
+2020-09-24 12:32:41 I: 
+                       H = 0.0
+                       J = 1.0
+                       algorithm = GiltTNR2D
+                       beta = 1.0
+                       cg_chis = range(0, 21)
+                       cg_eps = 1e-05
+                       complexion_chis = None
+                       complexion_eps = 1e-05
+                       complexion_padding = 3
+                       complexion_spacestep = 1
+                       complexion_step_direction = 1j
+                       complexion_timestep = 1
+                       database = data/GiltTNR2D/
+                       debug = False
+                       dtype = <class 'numpy.float64'>
+                       gilt_eps = 1e-07
+                       gilt_eps_list = None
+                       gilt_print_envspec = False
+                       gilt_print_envspec_recursive = False
+                       h_long = 0.0
+                       h_trans = 1.0
+                       impurity = None
+                       initial2x2 = False
+                       initial2x2x2 = False
+                       initial2z = False
+                       initial4x4 = False
+                       iter_count = 3
+                       iters = range(0, 9)
+                       model = ising
+                       print_free_energy = True
+                       print_scaldims = 50
+                       print_spectra = True
+                       sixvertex_a = 1.0
+                       sixvertex_b = 1.0
+                       sixvertex_c = 1.4142135623730951
+                       store_data = True
+                       symmetry_tensors = True
+                       tricrit_perturbation_factor = 0.1
+                       verbosity = 10
+2020-09-24 12:32:41 I: Applying Gilt,                      
+2020-09-24 12:32:41 I: Applying Gilt,                      Error = 1.316e-07, shape = (12, 12, 4, 12) [(12, 12, 12, 12)]
+2020-09-24 12:32:41 I: Applying Gilt,                      Error = 2.630e-07, shape = (4, 12, 4, 12) [(12, 12, 12, 12)]
+2020-09-24 12:32:41 I: Applying Gilt,                      Error = 2.682e-07, shape = (4, 12, 4, 4) [(12, 12, 12, 12)]
+2020-09-24 12:32:41 I: Applying Gilt, done.                
+2020-09-24 12:32:41 I: TRG splitting,                      
+2020-09-24 12:32:41 I: TRG splitting, done.                Error = 8.576e-06, chi = 5
+2020-09-24 12:32:41 I: TRG splitting,                      
+2020-09-24 12:32:41 I: TRG splitting, done.                Error = 7.469e-08, chi = 6
+2020-09-24 12:32:41 I: TRG contracting,                    
+2020-09-24 12:32:41 I: TRG contracting, done.              
+2020-09-24 12:32:41 I: TRG splitting,                      
+2020-09-24 12:32:41 I: TRG splitting, done.                Error = 1.335e-07, chi = 6
+2020-09-24 12:32:41 I: TRG splitting,                      
+2020-09-24 12:32:41 I: TRG splitting, done.                Error = 1.337e-07, chi = 6
+2020-09-24 12:32:41 I: TRG contracting,                    
+2020-09-24 12:32:41 I: TRG contracting, done.              
