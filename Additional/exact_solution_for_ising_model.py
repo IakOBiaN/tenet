@@ -23,7 +23,7 @@ def exact(T = 1.0, J = 1.0, lattice = "square"):
 	return (res*T, result[1])
 
 def heat_capasity(T = 1.0, J = 1.0, lattice = "square"):
-	result = derivative(lambda x: exact(x, J, lattice)[0], T, n=2, dx=1e-5)
+	result = T * derivative(lambda x: exact(x, J, lattice)[0], T, n=2, dx=1e-5)
 	return (result, )
 
 T1 = 2.0/log(1+sqrt(2))

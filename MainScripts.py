@@ -76,8 +76,8 @@ def magnetization(method,model,size, temp = 1., field = 0, int = [0]):
 	result = derivative(lambda x: simulate(model,size,temp,field,[x]), int[0], n=1, dx=1e-5)
 	return result
 
-def heat_capasity(method, model, lattice, temp = 1., m_par = [0.0]*10):
-	result = derivative(lambda x: simulate(method, model, lattice, x, m_par), temp, n=2, dx=1e-3)
+def heat_capasity(calc, T = 1., m_par = [0.0]*10):
+	result = T * derivative(lambda x: simulate(calc, x, m_par), T, n=2, dx=1e-5)
 	return result
 
 def enthropy_old(method,model,size, temp = 1., field = 0, int = [0]):

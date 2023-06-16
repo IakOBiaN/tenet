@@ -143,6 +143,8 @@ def build_tensor(calc, matrixes):
 
 			tensor = np.swapaxes(tensor, 2, 3)
 			tensor = list((tensor, ))
+	else:
+		tensor = list((matrixes[0], ))
 	gc.collect()
 	return tensor
 
