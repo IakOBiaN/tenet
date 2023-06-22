@@ -10,10 +10,10 @@ calc.metModification = "default"
 calc.model = "langmuir"
 calc.lattice = "square"
 calc.gen_tensor = "default"
-calc.metParam = 10
+calc.metParam = 16
 #model params
 T = 120.0
-for mu in ms.np.arange(-10.00, 20.01, 0.5):
+for mu in ms.np.arange(-8.00, 23.01, 0.5):
 	m_par = [mu, 4.0, 0, 0, 0, 0]
 	result = ms.full(calc, T, m_par)
 	calc_time = timeit.default_timer() - start_time
