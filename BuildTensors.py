@@ -16,6 +16,7 @@ def build_matrix (calc, temp, m_par):
 
 	models_dict = {
 		"langmuir" : True,
+		"langmuir_m" : True,
 		"binary" : True,
 		"ising" : True,
 		"hard-disk" : True,
@@ -38,6 +39,11 @@ def build_matrix (calc, temp, m_par):
 	matrixes = []
 	if model == "langmuir":
 		matrixes = [np.array([[0.0, m_par[0] / neigbours], [m_par[0] / neigbours, -m_par[1] + m_par[0] / (neigbours / 2.0)]]) ,] * 3
+	#m_par: 0 - mu, 1 - eps, 2 - multipartical interaction
+	if model == "langmuir_m":
+		mult = np.zeros((2, 2, 2))
+		mult[1, 1, 1] = -m_par[2]
+		matrixes = [np.array([[0.0, m_par[0] / neigbours], [m_par[0] / neigbours, -m_par[1] + m_par[0] / (neigbours / 2.0)]]) ,] * 3 + [mult]
 	elif model == "binary":
 		#m_par: 0 - muA, 1 - muB, 2 - epsAA, 3 - epsBB, 4 - epsAB
 		matrixes = [np.array([[0.0, m_par[0] / neigbours, m_par[1] / neigbours], [m_par[0] / neigbours, -m_par[2] + 2.0 * m_par[0] / neigbours, (m_par[0] + m_par[1]) / neigbours], [m_par[1] / neigbours, (m_par[0] + m_par[1]) / neigbours, -m_par[3] + 2.0 * m_par[1] / neigbours]]) ,] * 3

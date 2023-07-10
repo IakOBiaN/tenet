@@ -74,6 +74,20 @@ def build_tensor(calc, matrixes):
 			tensor3 = np.einsum("ab,iak->ibk",matrixes[2], identity(3, leg_size))
 			tensor = np.einsum("abc, bef, iea -> cfi",tensor1, tensor2, tensor3)
 			tensor = list((np.einsum("abi, ijk -> abjk", tensor, identity(3, leg_size)), ))
+		if (gen_tensor == "default_m"):
+			tensor = np.einsum("ijkl, jp, koz, mnop -> imnzl",identity(4, leg_size), matrixes[0], matrixes[-1], identity(4, leg_size))
+			tensor = np.einsum("ijklm, kr, my, xylr -> ijx", tensor, matrixes[0], matrixes[0], identity(4, leg_size))
+			tensor = np.einsum("ijk, aiz, dxk, xyz -> ajdy", tensor, identity(3, leg_size), identity(3, leg_size), matrixes[-1])
+
+			U, S, V = tensor_svd(tensor, [0, 1], [2, 3])
+			S = np.sqrt(S)
+			U = np.einsum("abi,i->abi", U, S)
+			V = np.einsum("ibc,i->ibc",V, S)
+			tensor_1 = np.tensordot(identity(3, leg_size), V, ([1], [2]))
+			tensor_2 = np.tensordot(U, identity(3, leg_size), ([1], [1]))
+			tensor = np.tensordot(tensor_1, tensor_2, ([1, 3],[0, 2]))
+			tensor = np.swapaxes(tensor, 2, 3)
+			tensor = list((tensor, ))
 		elif (gen_tensor == "IRF"):
 			id4 = identity(4, leg_size)
 			id3 = identity(3, leg_size)
