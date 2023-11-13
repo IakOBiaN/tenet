@@ -20,6 +20,7 @@ def build_matrix (calc, temp, m_par):
 		"binary" : True,
 		"ising" : True,
 		"hard-disk" : True,
+		"TLAT" : True,
 		"dimers" : True,
 		"1NN" : True,
 		"2NN" : True,
@@ -51,6 +52,8 @@ def build_matrix (calc, temp, m_par):
 		matrixes = [np.array([[(m_par[1] - m_par[0] / (neigbours / 2.0)), (-m_par[1])],[(-m_par[1]), (m_par[1] + m_par[0] / (neigbours / 2.0))]]), ] * 3
 	elif model == "hard-disk":
 		matrixes = [np.array([[0.0, m_par[0] / (neigbours)],[m_par[0] / (neigbours), inf + m_par[0]]]), ] * 3
+	elif model == "TLAT":
+		matrixes = [np.array([[-m_par[1] - m_par[2] - m_par[3], -m_par[1] + m_par[2] + m_par[3], m_par[1] - m_par[2] + m_par[3], m_par[1] + m_par[2] - m_par[3]], [-m_par[1] + m_par[2] + m_par[3], -m_par[1] - m_par[2] - m_par[3], m_par[1] + m_par[2] - m_par[3], m_par[1] - m_par[2] + m_par[3]], [m_par[1] - m_par[2] + m_par[3], m_par[1] + m_par[2] - m_par[3], -m_par[1] - m_par[2] - m_par[3], -m_par[1] + m_par[2] + m_par[3]], [m_par[1] + m_par[2] - m_par[3], m_par[1] - m_par[2] + m_par[3], -m_par[1] + m_par[2] + m_par[3], -m_par[1] - m_par[2] - m_par[3]]]), ] * 3
 	#matrixes only for hex lattice
 	elif model == "dimers":
 		matrixes = [np.array([[0, inf, (m_par[0] + m_par[1]) / 6.0, (m_par[0] + m_par[1]) / 6.0, m_par[0] / 3.0], \
