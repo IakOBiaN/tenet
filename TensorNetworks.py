@@ -74,7 +74,7 @@ def build_tensor(calc, matrixes):
 			tensor3 = np.einsum("ab,iak->ibk",matrixes[2], identity(3, leg_size))
 			tensor = np.einsum("abc, bef, iea -> cfi",tensor1, tensor2, tensor3)
 			tensor = list((np.einsum("abi, ijk -> abjk", tensor, identity(3, leg_size)), ))
-		if (gen_tensor == "default_m"):
+		elif (gen_tensor == "default_m"):
 			tensor = np.einsum("ijkl, jp, koz, mnop -> imnzl",identity(4, leg_size), matrixes[0], matrixes[-1], identity(4, leg_size))
 			tensor = np.einsum("ijklm, kr, my, xylr -> ijx", tensor, matrixes[0], matrixes[0], identity(4, leg_size))
 			tensor = np.einsum("ijk, aiz, dxk, xyz -> ajdy", tensor, identity(3, leg_size), identity(3, leg_size), matrixes[-1])

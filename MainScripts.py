@@ -15,7 +15,7 @@ class CalcConfig:
 		self.constant = constant
 		#method for partition function calculation
 		self.method = method
-		#internal methdo modification
+		#internal method modification
 		self.metModification = metModification
 		#scale of the method iteration. For trg and square lattice it is 2 * 2
 		self.scale = scale
@@ -43,7 +43,8 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 		calc.coord = 6
 
 	matrixes = bt.build_matrix(calc, T, m_par)
-	tensors = tn.build_tensor(calc, matrixes)
+	if calc.method != "htn":
+		tensors = tn.build_tensor(calc, matrixes)
 
 	scale = 0.0
 	old_scale = -1.0
