@@ -109,11 +109,9 @@ def entropy(method, model, lattice, temp = 1., m_par = [0.0]*10):
 	result = -(BTP[0]-BTP[1])/(temp_step*2.0)
 	return result
 
-def full(calc, T = 1., m_par = [0.0]*10):
+def full(calc, T = 1., m_par = [0.0] * 10, dmu = 1e-3, dT = 1e-3, derivatives = [1, ] + [0] * 10):
 	grandPotential_dmu = []
 	grandPotential_dT = []
-	dmu = 1e-5
-	dT = 1e-5
 	for diff_mu in [m_par[0] - dmu, m_par[0] + dmu]:
 		lnZ = simulate(calc, T, [diff_mu] + m_par[1:])
 		grandPotential_dmu.append(lnZ)
