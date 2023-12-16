@@ -8,7 +8,7 @@ import BuildTensors as bt
 
 class CalcConfig:
 
-	def __init__(self, methodTolerance = 1e-8, constant = 0.008314, method = "trg", metModification = "default", scale = 4, iterations = 300, model = "ising", lattice = "square", gen_tensor = "default", nodes = 1 , coord = 4, metParam = 10):
+	def __init__(self, methodTolerance = 1e-8, constant = 0.008314, method = "trg", metModification = "default", scale = 4, iterations = 300, model = "ising", lattice = "square", gen_tensor = "default", nodes = 1 , coord = 4, metParam = 10, join_tensors = [1, 1]):
 		#tolerance of method
 		self.methodTolerance = methodTolerance
 		#constant. Default is R = 0.008314
@@ -33,6 +33,8 @@ class CalcConfig:
 		self.coord = coord
 		#method parameter. For trg it is chi
 		self.metParam = metParam
+		#joining nodes
+		self.join_tensors = join_tensors
 
 	def __str__(self):
 		return method + "_p_" + str(metParam) + "_" + model + "_" + lattice
@@ -50,6 +52,28 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 	old_scale = -1.0
 	norm = 0
 
+	if calc.join_tensors[0] > 1:
+		temp_tensor = tensors[0]
+		for _ in range(calc.join_tensors[0] - 1):
+			tensor = tensors[0]
+
+			temp_sh = temp_tensor.shape
+			t_sh = tensor.shape
+			temp_tensor = np.einsum("ijkl, kbcd -> ijbcld", temp_tensor, tensor).reshape(temp_sh[0], temp_sh[1] * t_sh[1], temp_sh[2], temp_sh[3] * t_sh[3])
+
+		tensors = list((temp_tensor, ))
+
+	if calc.join_tensors[1] > 1:
+		temp_tensor = tensors[0]
+		for _ in range(calc.join_tensors[1] - 1):
+			tensor = tensors[0]
+
+			temp_sh = temp_tensor.shape
+			t_sh = tensor.shape
+			temp_tensor = np.einsum("ijkl, alcd -> aijck", temp_tensor, tensor).reshape(temp_sh[0] * t_sh[0], temp_sh[1], temp_sh[2] * t_sh[2], temp_sh[3])
+
+		tensors = list((temp_tensor, ))
+
 	for i in range(calc.iterations):
 		if calc.method == "trg":
 			(tensors, scale, norm) = tn.trg_step(tensors, scale, norm, calc)
@@ -65,7 +89,7 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 			old_scale = scale
 	if i > 250:
 		print("Warning! More than 250 iterations")
-	nodes = calc.nodes
+	nodes = calc.nodes * calc.join_tensors[0] * calc.join_tensors[1]
 	nodes *= calc.scale ** (i + 1)
 	return (scale + log(norm)) / (nodes / (calc.constant * T))
 
@@ -109,23 +133,30 @@ def entropy(method, model, lattice, temp = 1., m_par = [0.0]*10):
 	result = -(BTP[0]-BTP[1])/(temp_step*2.0)
 	return result
 
-def full(calc, T = 1., m_par = [0.0] * 10, dmu = 1e-3, dT = 1e-3, derivatives = [1, ] + [0] * 2):
+def full(calc, T = 1., m_par = [0.0] * 10, dmu = 1e-3, dT = 1e-3, derivatives = [1, ] + [0] * 2, T_derivative = True, mu_derivative = True):
 	grandPotential_dmu = []
 	grandPotential_dT = []
-	der_par = m_par[:]
-	for i, par in enumerate(derivatives):
-		if par == 1:
-			der_par[i] -= dmu
-	for _ in range(2):
-		lnZ = simulate(calc, T, der_par)
-		grandPotential_dmu.append(lnZ)
+	if mu_derivative:
+		der_par = m_par[:]
 		for i, par in enumerate(derivatives):
 			if par == 1:
-				der_par[i] += 2.0 * dmu
-	del der_par
-	for diff_T in [T - dT, T, T + dT]:
-		lnZ = simulate(calc, diff_T, m_par)
-		grandPotential_dT.append(lnZ)
+				der_par[i] -= dmu
+		for _ in range(2):
+			lnZ = simulate(calc, T, der_par)
+			grandPotential_dmu.append(lnZ)
+			for i, par in enumerate(derivatives):
+				if par == 1:
+					der_par[i] += 2.0 * dmu
+		del der_par
+	else:
+		grandPotential_dmu = [0, 0]
+	if T_derivative:
+		for diff_T in [T - dT, T, T + dT]:
+			lnZ = simulate(calc, diff_T, m_par)
+			grandPotential_dT.append(lnZ)
+	else:
+		grandPotential_dT = [0, 0, 0]
+
 	coverage = - (grandPotential_dmu[0] - grandPotential_dmu[1]) / (dmu * 2.0)
 	entropy = - (grandPotential_dT[0] - grandPotential_dT[2]) / (dT * 2.0)
 	susceptibility = calc.constant * T * (grandPotential_dmu[0] - 2.0 * grandPotential_dT[1] + grandPotential_dmu[1]) / (dT ** 2.0)
