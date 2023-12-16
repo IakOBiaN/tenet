@@ -31,7 +31,8 @@ def build_matrix (calc, temp, m_par):
 		"HT2" : True,
 		"HT3" : True,
 		"qstate" : True,
-		"CHD_simple" : True
+		"CHD_simple" : True,
+		"CHD_complex" : True
 	}
 
 	exist = models_dict.get(calc.model)
@@ -72,6 +73,31 @@ def build_matrix (calc, temp, m_par):
 						[mu_d_sigma, mu_d_sigma * 2.0 + e_d_d_out, mu_d_sigma + mu_t_sigma / 2.0 + e_d_t_out, mu_d_sigma + mu_t_sigma / 2.0 + e_d_t_out], \
 						[mu_t_sigma / 2.0, mu_d_sigma + mu_t_sigma / 2.0 + e_d_t_out, mu_t_sigma + e_t_t_out / 2.0, mu_t_sigma], \
 						[mu_t_sigma / 2.0, mu_d_sigma + mu_t_sigma / 2.0 + e_d_t_out, mu_t_sigma, mu_t_sigma + e_t_t_out / 2.0]])]
+	elif model == "CHD_complex":
+		mu_t_sigma = m_par[0] / neigbours
+		mu_d_sigma = m_par[1] / neigbours
+		e_d_d_hor_same = -m_par[2]
+		e_d_d_hor_dif_in = -m_par[3]
+		e_d_d_hor_dif_out = -m_par[4]
+		e_d_t_hor_in = -m_par[5]
+		e_d_t_hor_out = -m_par[6]
+		e_t_t_hor = -m_par[7]
+
+		e_d_d_vert_same = -m_par[8]
+		e_d_d_vert_dif = -m_par[9]
+		e_d_t_vert_in = -m_par[10]
+		e_d_t_vert_out = -m_par[11]
+		e_t_t_vert = -m_par[12]
+		matrixes = [np.array([[0, mu_t_sigma / 2.0, inf, mu_d_sigma, mu_d_sigma], \
+						[inf, inf, mu_t_sigma, inf, inf], \
+						[mu_t_sigma / 2.0, mu_t_sigma + e_t_t_hor, inf, mu_t_sigma / 2.0 + mu_d_sigma + e_d_t_hor_in, mu_t_sigma / 2.0 + mu_d_sigma + e_d_t_hor_out], \
+						[mu_d_sigma, mu_t_sigma / 2.0 + mu_d_sigma + e_d_t_hor_out, inf, mu_d_sigma * 2.0 + e_d_d_hor_same, mu_d_sigma * 2.0 + e_d_d_hor_dif_out], \
+						[mu_d_sigma, mu_t_sigma / 2.0 + mu_d_sigma + e_d_t_hor_in, inf, mu_d_sigma * 2.0 + e_d_d_hor_dif_in, mu_d_sigma * 2.0 + e_d_d_hor_same]]), \
+					np.array([[0, mu_t_sigma / 2.0, mu_t_sigma / 2.0, mu_d_sigma, mu_d_sigma], \
+						[mu_t_sigma / 2.0, mu_t_sigma + e_t_t_vert / 2.0, mu_t_sigma, mu_t_sigma / 2.0 + mu_d_sigma + e_d_t_vert_out, mu_t_sigma / 2.0 + mu_d_sigma + e_d_t_vert_in], \
+						[mu_t_sigma / 2.0, mu_t_sigma, mu_t_sigma + e_t_t_vert / 2.0, mu_t_sigma / 2.0 + mu_d_sigma + e_d_t_vert_in, mu_t_sigma / 2.0 + mu_d_sigma + e_d_t_vert_out], \
+						[mu_d_sigma, mu_t_sigma / 2.0 + mu_d_sigma + e_d_t_vert_out, mu_t_sigma / 2.0 + mu_d_sigma + e_d_t_vert_in, mu_d_sigma * 2.0 + e_d_d_vert_same, mu_d_sigma * 2.0 + e_d_d_vert_dif], \
+						[mu_d_sigma, mu_t_sigma / 2.0 + mu_d_sigma + e_d_t_vert_in, mu_t_sigma / 2.0 + mu_d_sigma + e_d_t_vert_out, mu_d_sigma * 2.0 + e_d_d_vert_dif, mu_d_sigma * 2.0 + e_d_d_vert_same]])]
 	#matrixes only for hex lattice
 	elif model == "dimers":
 		matrixes = [np.array([[0, inf, (m_par[0] + m_par[1]) / 6.0, (m_par[0] + m_par[1]) / 6.0, m_par[0] / 3.0], \
