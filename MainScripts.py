@@ -52,28 +52,6 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 	old_scale = -1.0
 	norm = 0
 
-	if calc.join_tensors[0] > 1:
-		temp_tensor = tensors[0]
-		for _ in range(calc.join_tensors[0] - 1):
-			tensor = tensors[0]
-
-			temp_sh = temp_tensor.shape
-			t_sh = tensor.shape
-			temp_tensor = np.einsum("ijkl, kbcd -> ijbcld", temp_tensor, tensor).reshape(temp_sh[0], temp_sh[1] * t_sh[1], temp_sh[2], temp_sh[3] * t_sh[3])
-
-		tensors = list((temp_tensor, ))
-
-	if calc.join_tensors[1] > 1:
-		temp_tensor = tensors[0]
-		for _ in range(calc.join_tensors[1] - 1):
-			tensor = tensors[0]
-
-			temp_sh = temp_tensor.shape
-			t_sh = tensor.shape
-			temp_tensor = np.einsum("ijkl, alcd -> aijck", temp_tensor, tensor).reshape(temp_sh[0] * t_sh[0], temp_sh[1], temp_sh[2] * t_sh[2], temp_sh[3])
-
-		tensors = list((temp_tensor, ))
-
 	for i in range(calc.iterations):
 		if calc.method == "trg":
 			(tensors, scale, norm) = tn.trg_step(tensors, scale, norm, calc)
@@ -81,6 +59,9 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 			(tensors, scale, norm) = tn.hotrg_step(tensors, scale, norm, calc)
 		elif calc.method == "htn":
 			(tensors, scale, norm) = tn.htn_step(matrixes, scale, norm, calc)
+		elif calc.method == "tm":
+			calc.scale = 2
+			(tensors, scale, norm) = tn.tm_step(tensors, scale, norm, calc)
 		else:
 			assert False, "Error! There is no such method."
 		if abs(old_scale - scale / calc.scale) < calc.methodTolerance:
@@ -90,6 +71,8 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 	if i > 250:
 		print("Warning! More than 250 iterations")
 	nodes = calc.nodes * calc.join_tensors[0] * calc.join_tensors[1]
+	if calc.method == "tm":
+		nodes *= calc.metParam
 	nodes *= calc.scale ** (i + 1)
 	return (scale + log(norm)) / (nodes / (calc.constant * T))
 

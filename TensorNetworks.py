@@ -5,8 +5,6 @@ import scipy.sparse.linalg
 from scipy.linalg import sqrtm
 import gc
 
-constant = 1.
-
 def identity(dimensions, elements):
 	id = np.zeros((elements, ) * dimensions)
 	for i in range(elements):
@@ -173,8 +171,62 @@ def build_tensor(calc, matrixes):
 			tensor = list((tensor, ))
 	else:
 		tensor = list((matrixes[0], ))
+
+	if calc.join_tensors[0] > 1:
+		temp_ten = tensor[0]
+		for _ in range(calc.join_tensors[0] - 1):
+			ten = tensor[0]
+
+			temp_sh = temp_ten.shape
+			t_sh = ten.shape
+			temp_ten = np.einsum("ijkl, kbcd -> ijbcld", temp_ten, ten).reshape(temp_sh[0], temp_sh[1] * t_sh[1], temp_sh[2], temp_sh[3] * t_sh[3])
+
+		tensor = list((temp_ten, ))
+
+	if calc.join_tensors[1] > 1:
+		temp_ten = tensor[0]
+		for _ in range(calc.join_tensors[1] - 1):
+			ten = tensor[0]
+
+			temp_sh = temp_ten.shape
+			t_sh = ten.shape
+			temp_ten = np.einsum("ijkl, alcd -> aijckd", temp_ten, ten).reshape(temp_sh[0] * t_sh[0], temp_sh[1], temp_sh[2] * t_sh[2], temp_sh[3])
+
+		tensor = list((temp_ten, ))
+
+	if calc.method == "tm":
+		ten = tensor[0]
+		if calc.metParam > 1:
+			ten_dop = ten
+			t_sh = ten.shape
+			for i in range(calc.metParam - 1):
+				sh = ten_dop.shape
+				ten_dop = np.einsum("ijkl, alcd -> aijkcd", ten_dop, ten).reshape(sh[0] * t_sh[0], sh[1], sh[2] * t_sh[0], sh[3])
+			ten = ten_dop
+		ten = np.einsum("abcb->ac", ten)
+		tensor = list((ten, ))
+
+
 	gc.collect()
 	return tensor
+
+def tm_step(tensors, scale, norm, calc):
+	norm = tensors[0].max()
+	if norm != 0:
+		for i, ten in enumerate(tensors):
+			tensors[i] = ten / norm
+		scale += np.log(norm)
+
+	tensors[0] = np.einsum("ab, bd -> ad", tensors[0], tensors[0])
+	scale *= 2
+
+	norm = np.einsum("aa->", tensors[0])
+	if norm < 0:
+		norm = -norm
+	if norm == 0:
+		norm = 1
+	gc.collect()
+	return (tensors, scale, norm)
 
 def hotrg_square(tensor, scale, calc):
 	hotensor = tensor[0]
