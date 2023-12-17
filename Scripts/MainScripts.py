@@ -3,8 +3,8 @@ import numpy as np
 from scipy.misc import derivative
 import scipy.sparse.linalg
 from scipy.linalg import sqrtm
-import TensorNetworks as tn
-import BuildTensors as bt
+import Scripts.TensorNetworks as tn
+import Scripts.BuildTensors as bt
 
 class CalcConfig:
 

@@ -1,4 +1,4 @@
-import MainScripts as ms
+import Scripts.MainScripts as ms
 import timeit
 
 start_time = timeit.default_timer()

@@ -1,4 +1,4 @@
-import MainScripts as ms
+import Scripts.MainScripts as ms
 import timeit
 
 model_name = 'TRG_IRF'
