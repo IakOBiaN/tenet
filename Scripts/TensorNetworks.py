@@ -202,6 +202,53 @@ def build_tensor(calc, matrixes):
 			for i in range(calc.metParam - 1):
 				sh = ten_dop.shape
 				ten_dop = np.einsum("ijkl, alcd -> aijkcd", ten_dop, ten).reshape(sh[0] * t_sh[0], sh[1], sh[2] * t_sh[0], sh[3])
+
+			if calc.metModification != "default":
+				tmXhi = calc.metModification[1]
+				for i in range(calc.metModification[0] - 1):
+					if ten_dop.shape[0] > tmXhi:
+						#horizontal tesor reduction
+						"""U1, S1, V1 = tensor_svd(ten_dop, [0, 1, 3], [2])
+						S1 = np.sqrt(S1)
+						V1 = np.einsum("ib, i -> ib", V1, S1)
+						U1 = np.einsum("abci, i -> abci", U1, S1)
+
+						U1 = np.einsum("abcd -> abdc", U1)
+
+						U2, S2, V2 = tensor_svd(U1, [0], [1, 2, 3])
+						S2 = np.sqrt(S2)
+
+						V2 = np.einsum("ijkl, i -> ijkl", V2, S2)
+						U2 = np.einsum("ji, i -> ji", U2, S2)
+
+						V1U2 = np.einsum("ij, jb -> ib", V1, U2)
+						U, S, V = tensor_svd(V1U2, [0], [1], tmXhi)
+						S = np.sqrt(S)
+						U = np.einsum("ai, i -> ai", U, S)
+						V = np.einsum("ib, i -> ib", V, S)
+						#ten_dop = np.einsum("ijkl, kb, xi -> xjbl", V2, U, V)
+						ten_dop = np.einsum("ijkl, kb -> ijbl", V2, U)
+						ten_dop = np.einsum("ijkl, xi -> xjkl", ten_dop, V)"""
+						ten_dop = np.einsum("ijkl->lijk", ten_dop)
+						simplesvd = np.tensordot(ten_dop, ten_dop, ([0, 1, 2], [0, 1, 2]))
+						_, S1, V1 = tensor_svd(simplesvd, [0], [1])
+						V1 = np.einsum("ib, i -> ib", V1, np.sqrt(S1))
+						simplesvd = np.tensordot(ten_dop, ten_dop, ([0, 2, 3], [0, 2, 3]))
+						_, S2, V2 = tensor_svd(simplesvd, [0], [1])
+						V2 = np.einsum("ib, i -> ib", V2, np.sqrt(S2))
+						V1V2 = np.einsum("ab, cb -> ac", V1, V2)
+						U, S, V = tensor_svd(V1V2, [0], [1], tmXhi)
+						S = 1 / np.sqrt(S)
+						P1 = np.einsum("ab, ca -> bc", V2, V)
+						P1 = np.einsum("ab, b -> ab", P1, S)
+						P2 = np.einsum("ab, ac -> bc", V1, U)
+						P2 = np.einsum("ab, b -> ab", P2, S)
+						ten_dop = np.einsum("abci, ij -> abcj", ten_dop, P1)
+						ten_dop = np.einsum("aicd, ij -> ajcd", ten_dop, P2)
+						ten_dop = np.einsum("lijk->ijkl", ten_dop)
+					sh = ten_dop.shape
+					ten_dop = np.einsum("ijkl, alcd -> aijkcd", ten_dop, ten_dop).reshape(sh[0] ** 2, sh[1], sh[2] ** 2, sh[3])
+
 			ten = ten_dop
 		ten = np.einsum("abcb->ac", ten)
 		tensor = list((ten, ))

@@ -73,6 +73,8 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 	nodes = calc.nodes * calc.join_tensors[0] * calc.join_tensors[1]
 	if calc.method == "tm":
 		nodes *= calc.metParam
+		if calc.metModification != "default":
+			nodes *= 2 ** (calc.metModification[0] - 1)
 	nodes *= calc.scale ** (i + 1)
 	return (scale + log(norm)) / (nodes / (calc.constant * T))
 

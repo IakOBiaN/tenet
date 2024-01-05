@@ -100,16 +100,18 @@ def build_matrix (calc, temp, m_par):
 						[mu_d_sigma, mu_t_sigma / 2.0 + mu_d_sigma + e_d_t_vert_in, mu_t_sigma / 2.0 + mu_d_sigma + e_d_t_vert_out, mu_d_sigma * 2.0 + e_d_d_vert_dif, mu_d_sigma * 2.0 + e_d_d_vert_same]])]
 	#matrixes only for hex lattice
 	elif model == "dimers":
-		matrixes = [np.array([[0, inf, (m_par[0] + m_par[1]) / 6.0, (m_par[0] + m_par[1]) / 6.0, m_par[0] / 3.0], \
-						[(m_par[0] + m_par[1]) / 6.0, inf, inf, inf, inf], \
-						[inf, (m_par[0] + m_par[1]) / 3.0, inf, inf, inf], \
-						[(m_par[0] + m_par[1]) / 6.0, inf, inf, inf, inf], \
-						[m_par[0] / 3.0, inf, inf, inf, inf]]), \
-					np.array([[0, (m_par[0] + m_par[1]) / 6.0, (m_par[0] + m_par[1]) / 6.0, inf, m_par[0] / 3.0], \
-						[(m_par[0] + m_par[1]) / 6.0, inf, inf, inf, inf], \
-						[(m_par[0] + m_par[1]) / 6.0, inf, inf, inf, inf], \
-						[inf, inf, inf, (m_par[0] + m_par[1]) / 3.0, inf], \
-						[m_par[0] / 3.0, inf, inf, inf, inf]])]
+		neigbours = 3.0
+		calc.nodes = 2.0
+		matrixes = [np.array([[0, inf, (m_par[0] + m_par[1]) / (neigbours * 2.0), (m_par[0] + m_par[1]) / (neigbours * 2.0), m_par[0] / neigbours], \
+						[(m_par[0] + m_par[1]) / (neigbours * 2.0), inf, inf, inf, inf], \
+						[inf, (m_par[0] + m_par[1]) / neigbours, inf, inf, inf], \
+						[(m_par[0] + m_par[1]) / (neigbours * 2.0), inf, inf, inf, inf], \
+						[m_par[0] / neigbours, inf, inf, inf, inf]]), \
+					np.array([[0, (m_par[0] + m_par[1]) / (neigbours * 2.0), (m_par[0] + m_par[1]) / (neigbours * 2.0), inf, m_par[0] / neigbours], \
+						[(m_par[0] + m_par[1]) / (neigbours * 2.0), inf, inf, inf, inf], \
+						[(m_par[0] + m_par[1]) / (neigbours * 2.0), inf, inf, inf, inf], \
+						[inf, inf, inf, (m_par[0] + m_par[1]) / neigbours, inf], \
+						[m_par[0] / neigbours, inf, inf, inf, inf]])]
 	elif model == "1NN" or model == "2NN" or model == "3NN" or model == "4NN" or model == "5NN":
 		var_1NN_0 = 0
 		var_1NN_mu = m_par[0] / neigbours
