@@ -208,27 +208,6 @@ def build_tensor(calc, matrixes):
 				for i in range(calc.metModification[0] - 1):
 					if ten_dop.shape[0] > tmXhi:
 						#horizontal tesor reduction
-						"""U1, S1, V1 = tensor_svd(ten_dop, [0, 1, 3], [2])
-						S1 = np.sqrt(S1)
-						V1 = np.einsum("ib, i -> ib", V1, S1)
-						U1 = np.einsum("abci, i -> abci", U1, S1)
-
-						U1 = np.einsum("abcd -> abdc", U1)
-
-						U2, S2, V2 = tensor_svd(U1, [0], [1, 2, 3])
-						S2 = np.sqrt(S2)
-
-						V2 = np.einsum("ijkl, i -> ijkl", V2, S2)
-						U2 = np.einsum("ji, i -> ji", U2, S2)
-
-						V1U2 = np.einsum("ij, jb -> ib", V1, U2)
-						U, S, V = tensor_svd(V1U2, [0], [1], tmXhi)
-						S = np.sqrt(S)
-						U = np.einsum("ai, i -> ai", U, S)
-						V = np.einsum("ib, i -> ib", V, S)
-						#ten_dop = np.einsum("ijkl, kb, xi -> xjbl", V2, U, V)
-						ten_dop = np.einsum("ijkl, kb -> ijbl", V2, U)
-						ten_dop = np.einsum("ijkl, xi -> xjkl", ten_dop, V)"""
 						ten_dop = np.einsum("ijkl->lijk", ten_dop)
 						simplesvd = np.tensordot(ten_dop, ten_dop, ([0, 1, 2], [0, 1, 2]))
 						_, S1, V1 = tensor_svd(simplesvd, [0], [1])
