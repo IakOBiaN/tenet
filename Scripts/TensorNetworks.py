@@ -243,7 +243,7 @@ def tm_step(tensors, scale, norm, calc):
 			tensors[i] = ten / norm
 		scale += np.log(norm)
 
-	tensors[0] = np.einsum("ab, bd -> ad", tensors[0], tensors[0])
+	tensors[0] = np.dot(tensors[0], tensors[0])
 	scale *= 2
 
 	norm = np.einsum("aa->", tensors[0])
