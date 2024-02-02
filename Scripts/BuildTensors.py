@@ -32,6 +32,7 @@ def build_matrix (calc, temp, m_par):
 		"HT3" : True,
 		"qstate" : True,
 		"CHD_simple" : True,
+		"Pentacene_model_1" : True,
 		"CHD_complex" : True
 	}
 
@@ -56,6 +57,25 @@ def build_matrix (calc, temp, m_par):
 		matrixes = [np.array([[0.0, m_par[0] / (neigbours)],[m_par[0] / (neigbours), inf + m_par[0]]]), ] * 3
 	elif model == "TLAT":
 		matrixes = [np.array([[-m_par[1] - m_par[2] - m_par[3], -m_par[1] + m_par[2] + m_par[3], m_par[1] - m_par[2] + m_par[3], m_par[1] + m_par[2] - m_par[3]], [-m_par[1] + m_par[2] + m_par[3], -m_par[1] - m_par[2] - m_par[3], m_par[1] + m_par[2] - m_par[3], m_par[1] - m_par[2] + m_par[3]], [m_par[1] - m_par[2] + m_par[3], m_par[1] + m_par[2] - m_par[3], -m_par[1] - m_par[2] - m_par[3], -m_par[1] + m_par[2] + m_par[3]], [m_par[1] + m_par[2] - m_par[3], m_par[1] - m_par[2] + m_par[3], -m_par[1] + m_par[2] + m_par[3], -m_par[1] - m_par[2] - m_par[3]]]), ] * 3
+	elif model == "Pentacene_model_1":
+		mu = m_par[0] / neigbours
+		e_close = -m_par[1]
+		e_one = -m_par[2]
+		e_two = -m_par[3]
+		matrixes = [np.array([[0, mu / 4.0, mu / 2.0, inf, inf, inf, inf], \
+						[inf, inf, inf, 3.0 / 4.0 * mu , inf, inf, inf], \
+						[inf, inf, inf, inf, mu, inf, inf], \
+						[inf, inf, inf, inf, inf, 3.0 / 4.0 * mu, mu + e_close], \
+						[mu / 2.0, 3.0 / 4.0 * mu + e_one, mu + e_close, inf, inf, inf, inf], \
+						[mu / 4.0, mu / 2.0 + e_two, 3.0 / 4.0 * mu + e_one, inf, inf, inf, inf], \
+						[inf, inf, inf, mu + e_close, inf, inf, inf]]), \
+					np.array([[0, mu / 4.0, mu / 2.0, mu / 2.0, mu / 2.0, mu / 4.0, mu / 2.0], \
+						[mu / 4.0, mu / 2.0, 3.0 / 4.0 * mu, 3.0 / 4.0 * mu, 3.0 / 4.0 * mu, mu / 2.0, 3.0 / 4.0 * mu], \
+						[mu / 2.0, 3.0 / 4.0 * mu, mu, mu, mu, 3.0 / 4.0 * mu, mu], \
+						[mu / 2.0, 3.0 / 4.0 * mu, mu, mu, mu, 3.0 / 4.0 * mu, mu], \
+						[mu / 2.0, 3.0 / 4.0 * mu, mu, mu, mu, 3.0 / 4.0 * mu, mu], \
+						[mu / 4.0, mu / 2.0, 3.0 / 4.0 * mu, 3.0 / 4.0 * mu, 3.0 / 4.0 * mu, mu / 2.0, 3.0 / 4.0 * mu], \
+						[mu / 2.0, 3.0 / 4.0 * mu, mu, mu, mu, 3.0 / 4.0 * mu, mu]])]
 	elif model == "CHD_simple":
 		mu_t_sigma = m_par[0] / neigbours
 		mu_d_sigma = m_par[1] / neigbours
