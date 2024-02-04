@@ -1,5 +1,6 @@
 from math import exp, log,sqrt, pi, cos, radians
 import numpy as np
+from itertools import product
 from scipy.misc import derivative
 import scipy.sparse.linalg
 from scipy.linalg import sqrtm
@@ -62,20 +63,92 @@ def build_matrix (calc, temp, m_par):
 		e_close = -m_par[1]
 		e_one = -m_par[2]
 		e_two = -m_par[3]
-		matrixes = [np.array([[0, mu / 4.0, mu / 2.0, inf, inf, inf, inf], \
-						[inf, inf, inf, 3.0 / 4.0 * mu , inf, inf, inf], \
-						[inf, inf, inf, inf, mu, inf, inf], \
-						[inf, inf, inf, inf, inf, 3.0 / 4.0 * mu, mu + e_close], \
-						[mu / 2.0, 3.0 / 4.0 * mu + e_one, mu + e_close, inf, inf, inf, inf], \
-						[mu / 4.0, mu / 2.0 + e_two, 3.0 / 4.0 * mu + e_one, inf, inf, inf, inf], \
-						[inf, inf, inf, mu + e_close, inf, inf, inf]]), \
-					np.array([[0, mu / 4.0, mu / 2.0, mu / 2.0, mu / 2.0, mu / 4.0, mu / 2.0], \
-						[mu / 4.0, mu / 2.0, 3.0 / 4.0 * mu, 3.0 / 4.0 * mu, 3.0 / 4.0 * mu, mu / 2.0, 3.0 / 4.0 * mu], \
-						[mu / 2.0, 3.0 / 4.0 * mu, mu, mu, mu, 3.0 / 4.0 * mu, mu], \
-						[mu / 2.0, 3.0 / 4.0 * mu, mu, mu, mu, 3.0 / 4.0 * mu, mu], \
-						[mu / 2.0, 3.0 / 4.0 * mu, mu, mu, mu, 3.0 / 4.0 * mu, mu], \
-						[mu / 4.0, mu / 2.0, 3.0 / 4.0 * mu, 3.0 / 4.0 * mu, 3.0 / 4.0 * mu, mu / 2.0, 3.0 / 4.0 * mu], \
-						[mu / 2.0, 3.0 / 4.0 * mu, mu, mu, mu, 3.0 / 4.0 * mu, mu]])]
+		states = 3
+		nodes = 4
+		calc.nodes = nodes
+		"""exist = [[1, 1, 0, 0, 0], \
+						[0, 0, 1, 0, 0], \
+						[0, 0, 0, 1, 0], \
+						[0, 0, 0, 0, 1], \
+						[1, 1, 0, 0, 0]]
+		energies = [[0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 0], \
+						[0, e_close, 0, 0, 0]]
+		#combination with e_one energy
+		energy_one = [4, 0, 1]
+		#combination with e_two energy
+		energy_two = [4, 0, 0, 1]
+		chem = [0, mu / 4.0, mu / 4.0, mu / 4.0, mu / 4.0]"""
+		exist = [[1, 1, 0], \
+						[0, 0, 1], \
+						[1, 1, 0]]
+		energies = [[0, 0, 0], \
+						[0, 0, 0], \
+						[0, e_close, 0]]
+		#combination with e_one energy
+		energy_one = [2, 0, 1]
+		#combination with e_two energy
+		energy_two = [2, 0, 0, 1]
+		chem = [0, mu / 2.0, mu / 2.0]
+		all_combinations = product(range(states), repeat = nodes)
+		combinations = []
+		combinations_mu = []
+		combinations_en = []
+		for cur in all_combinations:
+			cur_mu = chem[cur[0]]
+			cur_en = 0
+			comb_no = False
+			for i in range(nodes - 1):
+				cur_mu += chem[cur[i + 1]]
+				cur_en += energies[cur[i]][cur[i + 1]] / 2.0
+				if exist[cur[i]][cur[i + 1]] == 0:
+					comb_no = True
+			if len(cur) > 2:
+				for i in range(len(cur) - 2):
+					if list(cur[i:i + 3]) == list(energy_one):
+						cur_en += e_one / 2.0
+			if len(cur) > 3:
+				for i in range(len(cur) - 3):
+					if list(cur[i:i + 4]) == list(energy_two):
+						cur_en += e_two / 2.0
+			if comb_no:
+				continue
+			combinations.append(cur)
+			combinations_mu.append(cur_mu)
+			combinations_en.append(cur_en)
+		mat1 = []
+		mat2 = []
+		for l_num, left in enumerate(combinations):
+			line = []
+			line2 = []
+			for r_num, right in enumerate(combinations):
+				cur_mu = combinations_mu[l_num] + combinations_mu[r_num]
+				if exist[left[-1]][right[0]] == 0:
+					line.append(inf)
+					line2.append(cur_mu)
+					continue
+				cur_en = combinations_en[l_num] + combinations_en[r_num] + energies[left[-1]][right[0]]
+				cur = left + right
+				cur = [1,2,9,8]
+				for i in range(2):
+					if i + 3 > len(cur):
+						break
+					comp_list_one = list(cur[i:i + 3])
+					if comp_list_one == energy_one:
+						cur_en += e_one
+				for i in range(3):
+					if i + 4 > len(cur):
+						break
+					comp_list_two = list(cur[i:i + 4])
+					if comp_list_two == energy_two:
+						cur_en += e_two
+				line.append(cur_mu + cur_en)
+				line2.append(cur_mu)
+			mat1.append(line)
+			mat2.append(line2)
+		matrixes = [np.array(mat1), np.array(mat2)]
 	elif model == "CHD_simple":
 		mu_t_sigma = m_par[0] / neigbours
 		mu_d_sigma = m_par[1] / neigbours
