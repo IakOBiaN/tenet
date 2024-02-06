@@ -63,10 +63,10 @@ def build_matrix (calc, temp, m_par):
 		e_close = -m_par[1]
 		e_one = -m_par[2]
 		e_two = -m_par[3]
-		states = 3
-		nodes = 4
+		states = 5
+		nodes = 3
 		calc.nodes = nodes
-		"""exist = [[1, 1, 0, 0, 0], \
+		exist = [[1, 1, 0, 0, 0], \
 						[0, 0, 1, 0, 0], \
 						[0, 0, 0, 1, 0], \
 						[0, 0, 0, 0, 1], \
@@ -80,8 +80,8 @@ def build_matrix (calc, temp, m_par):
 		energy_one = [4, 0, 1]
 		#combination with e_two energy
 		energy_two = [4, 0, 0, 1]
-		chem = [0, mu / 4.0, mu / 4.0, mu / 4.0, mu / 4.0]"""
-		exist = [[1, 1, 0], \
+		chem = [0, mu / 4.0, mu / 4.0, mu / 4.0, mu / 4.0]
+		"""exist = [[1, 1, 0], \
 						[0, 0, 1], \
 						[1, 1, 0]]
 		energies = [[0, 0, 0], \
@@ -91,7 +91,16 @@ def build_matrix (calc, temp, m_par):
 		energy_one = [2, 0, 1]
 		#combination with e_two energy
 		energy_two = [2, 0, 0, 1]
-		chem = [0, mu / 2.0, mu / 2.0]
+		chem = [0, mu / 2.0, mu / 2.0]"""
+		"""exist = [[1, 1], \
+						[1, 1]]
+		energies = [[0, 0], \
+						[0, e_close]]
+		#combination with e_one energy
+		energy_one = [1, 0, 1]
+		#combination with e_two energy
+		energy_two = [1, 0, 0, 1]
+		chem = [0, mu]"""
 		all_combinations = product(range(states), repeat = nodes)
 		combinations = []
 		combinations_mu = []
@@ -105,6 +114,8 @@ def build_matrix (calc, temp, m_par):
 				cur_en += energies[cur[i]][cur[i + 1]] / 2.0
 				if exist[cur[i]][cur[i + 1]] == 0:
 					comb_no = True
+			if comb_no:
+				continue
 			if len(cur) > 2:
 				for i in range(len(cur) - 2):
 					if list(cur[i:i + 3]) == list(energy_one):
@@ -113,8 +124,6 @@ def build_matrix (calc, temp, m_par):
 				for i in range(len(cur) - 3):
 					if list(cur[i:i + 4]) == list(energy_two):
 						cur_en += e_two / 2.0
-			if comb_no:
-				continue
 			combinations.append(cur)
 			combinations_mu.append(cur_mu)
 			combinations_en.append(cur_en)
@@ -131,17 +140,16 @@ def build_matrix (calc, temp, m_par):
 					continue
 				cur_en = combinations_en[l_num] + combinations_en[r_num] + energies[left[-1]][right[0]]
 				cur = left + right
-				cur = [1,2,9,8]
 				for i in range(2):
 					if i + 3 > len(cur):
 						break
-					comp_list_one = list(cur[i:i + 3])
+					comp_list_one = list(cur[nodes - 2 + i:nodes - 2 + 3 + i])
 					if comp_list_one == energy_one:
 						cur_en += e_one
 				for i in range(3):
 					if i + 4 > len(cur):
 						break
-					comp_list_two = list(cur[i:i + 4])
+					comp_list_two = list(cur[nodes - 3 + i:nodes - 3 + 4 + i])
 					if comp_list_two == energy_two:
 						cur_en += e_two
 				line.append(cur_mu + cur_en)

@@ -16,14 +16,14 @@ T = 300.0
 mu_pentacene = 0#-656.7944123
 inf = 1e10
 e_close = inf#60.7
-e_one = inf#48.8
+e_one = 0#48.8
 e_two = 0#38.4
 
 #for this model it is better, if we join tensors in line
 #calc.join_tensors = [2, 1]
 
 print("Chemical_potential", "Coverage", "Entropy", "Susceptibility", "Heat_capacity", "Grand_potential")
-for mu in ms.np.arange(-10, 40.01, 2.0):
+for mu in ms.np.arange(59, 60.01, 22.0):
 	m_par = [mu_pentacene + mu, e_close, e_one, e_two]
 	result = ms.full(calc, T, m_par, dmu = 1e-2, dT = 1e-2, T_derivative = False)
 	calc_time = timeit.default_timer() - start_time
