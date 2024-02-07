@@ -137,6 +137,38 @@ def build_matrix (calc, temp, m_par):
 			mat1.append(line)
 			mat2.append(line2)
 		matrixes = [np.array(mat1), np.array(mat2)]
+	elif model == "Pentacene_model_3":
+		mu_pentacene_per = m_par[0] / neigbours
+		mu_pentacene_par = m_par[1] / neigbours
+		e_v1 = -m_par[2]
+		e_v2 = -m_par[3]
+		e_v3 = -m_par[4]
+		e_v4 = -m_par[5]
+		e_v5 = -m_par[6]
+		e_v6 = -m_par[7]
+		e_v7 = -m_par[8]
+		e_h1 = -m_par[9]
+		e_h2 = -m_par[10]
+		e_h3 = -m_par[11]
+		e_h4 = -m_par[12]
+		matrixes = [np.array([[0, 0, 0, 0, 0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 0, 0, 0, 0, 0]]), \
+					np.array([[0, 0, 0, 0, 0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 0, 0, 0, 0, 0]])]
 	elif model == "CHD_simple":
 		mu_t_sigma = m_par[0] / neigbours
 		mu_d_sigma = m_par[1] / neigbours
