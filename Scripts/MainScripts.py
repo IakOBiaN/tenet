@@ -52,6 +52,8 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 	old_scale = -1.0
 	norm = 0
 
+	minimum_iterations = 5
+
 	for i in range(calc.iterations):
 		if calc.method == "trg":
 			(tensors, scale, norm) = tn.trg_step(tensors, scale, norm, calc)
@@ -64,7 +66,7 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 			(tensors, scale, norm) = tn.tm_step(tensors, scale, norm, calc)
 		else:
 			assert False, "Error! There is no such method."
-		if abs(old_scale - scale / calc.scale) < calc.methodTolerance:
+		if abs(old_scale - scale / calc.scale) < calc.methodTolerance and i > minimum_iterations:
 			break
 		else:
 			old_scale = scale

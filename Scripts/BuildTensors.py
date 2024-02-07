@@ -81,26 +81,6 @@ def build_matrix (calc, temp, m_par):
 		#combination with e_two energy
 		energy_two = [4, 0, 0, 1]
 		chem = [0, mu / 4.0, mu / 4.0, mu / 4.0, mu / 4.0]
-		"""exist = [[1, 1, 0], \
-						[0, 0, 1], \
-						[1, 1, 0]]
-		energies = [[0, 0, 0], \
-						[0, 0, 0], \
-						[0, e_close, 0]]
-		#combination with e_one energy
-		energy_one = [2, 0, 1]
-		#combination with e_two energy
-		energy_two = [2, 0, 0, 1]
-		chem = [0, mu / 2.0, mu / 2.0]"""
-		"""exist = [[1, 1], \
-						[1, 1]]
-		energies = [[0, 0], \
-						[0, e_close]]
-		#combination with e_one energy
-		energy_one = [1, 0, 1]
-		#combination with e_two energy
-		energy_two = [1, 0, 0, 1]
-		chem = [0, mu]"""
 		all_combinations = product(range(states), repeat = nodes)
 		combinations = []
 		combinations_mu = []
