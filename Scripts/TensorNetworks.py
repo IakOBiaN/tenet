@@ -118,6 +118,28 @@ def build_tensor(calc, matrixes):
 			tensor = np.tensordot(tensor_1, tensor_2, ([1, 3],[0, 2]))
 			tensor = np.swapaxes(tensor, 2, 3)
 			tensor = list((tensor, ))
+		elif (gen_tensor == "six_leg_tensor"):
+			tensor = matrixes[0]
+			U1, S1, V1 = tensor_svd(tensor, [0, 1], [2, 3, 4, 5])
+			S1 = np.sqrt(S1)
+			U1 = np.einsum("abi,i->abi", U1, S1)
+			V1 = np.einsum("icdef,i->cdefi",V1, S1)
+
+			U2, S2, V2 = tensor_svd(V1, [0, 1], [2, 3, 4])
+			S2 = np.sqrt(S2)
+			U2 = np.einsum("cdi,i->cdi", U2, S2)
+			V2 = np.einsum("iefx,i->efxi",V2, S2)
+
+			U3, S3, V3 = tensor_svd(V2, [0, 1], [2, 3])
+			S3 = np.sqrt(S3)
+			U3 = np.einsum("efi,i->efi", U3, S3)
+			V3 = np.einsum("xzi,i->xzi",V3, S3)
+
+			tensor_temp = np.einsum("abc, iak, bin -> knc", U1, U2, U3)
+
+			tensor = np.einsum("abc, bjk -> ajkc", tensor_temp, V3)
+
+			tensor = list((tensor, ))
 	elif (lattice == "hexagonal"):
 		if (gen_tensor == "default"):
 			U_1, S_1, V_1 = scipy.linalg.svd(matrixes[0])
