@@ -41,6 +41,7 @@ def build_matrix (calc, temp, m_par):
 		"qstate" : True,
 		"CHD_simple" : True,
 		"Pentacene_model_1" : True,
+		"Pentacene_model_3" : True,
 		"CHD_complex" : True
 	}
 
@@ -156,35 +157,43 @@ def build_matrix (calc, temp, m_par):
 	elif model == "Pentacene_model_3":
 		mu_pentacene_per = m_par[0] / neigbours
 		mu_pentacene_par = m_par[1] / neigbours
-		e_v1 = -m_par[2]
-		e_v2 = -m_par[3]
-		e_v3 = -m_par[4]
-		e_v4 = -m_par[5]
-		e_v5 = -m_par[6]
+		e_v1 = -m_par[2] / 4.0
+		e_v2 = -m_par[3] / 3.0
+		e_v3 = -m_par[4] / 2.0
+		e_v4 = -m_par[5] / 2.0
+		e_v5 = -m_par[6] / 2.0
 		e_v6 = -m_par[7]
-		e_v7 = -m_par[8]
-		e_h1 = -m_par[9]
+		e_v7 = -m_par[8] / 2.0
+		e_h1 = -m_par[9] / 2.0
 		e_h2 = -m_par[10]
 		e_h3 = -m_par[11]
 		e_h4 = -m_par[12]
-		matrixes = [np.array([[0, 0, 0, 0, 0, 0, 0, 0, 0], \
-						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
-						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
-						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
-						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
-						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
-						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
-						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
-						[0, 0, 0, 0, 0, 0, 0, 0, 0]]), \
-					np.array([[0, 0, 0, 0, 0, 0, 0, 0, 0], \
-						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
-						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
-						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
-						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
-						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
-						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
-						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
-						[0, 0, 0, 0, 0, 0, 0, 0, 0]])]
+		chem_pot = np.array([0, mu_pentacene_par / 4.0, mu_pentacene_par / 4.0, mu_pentacene_par / 4.0, mu_pentacene_par / 4.0, mu_pentacene_per / 4.0, mu_pentacene_per / 4.0, mu_pentacene_per / 4.0, mu_pentacene_per / 4.0])
+		matrixes = [np.array([[0, 0, inf, inf, inf, 0, inf, 0, inf], \
+						[inf, inf, 0, inf, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, 0, inf, inf, inf, inf, inf], \
+						[inf, inf, inf, inf, 0, inf, inf, inf, inf], \
+						[0, e_h4, inf, inf, inf, e_h3, inf, e_h3, inf], \
+						[inf, inf, inf, inf, inf, inf, 0, inf, inf], \
+						[0, e_h3, inf, inf, inf, e_h1, inf, e_h2, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, 0], \
+						[0, e_h3, inf, inf, inf, e_h2, inf, e_h1, inf]]), \
+						np.array([[0, 0, 0, 0, 0, 0, 0, inf, inf], \
+						[0, e_v1, e_v2, e_v3, 0, e_v5, e_v6, inf, inf], \
+						[0, e_v2, e_v1, e_v2, e_v3, e_v4, e_v5, inf, inf], \
+						[0, e_v3, e_v2, e_v1, e_v2, e_v5, e_v4, inf, inf], \
+						[0, 0, e_v3, e_v2, e_v1, e_v6, e_v5, inf, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, 0, inf], \
+						[inf, inf, inf, inf, inf, inf, inf, inf, 0], \
+						[0, e_v5, e_v4, e_v5, e_v6, e_v7, 0, inf, inf], \
+						[0, e_v6, e_v5, e_v4, e_v5, 0, e_v7, inf, inf]])]
+		for i in range(len(matrixes[0][0])):
+			for j in range(len(matrixes[0][0])):
+				if (matrixes[0][i][j] - 0.1) > inf:
+					matrixes[0][i][j] += chem_pot[i] + chem_pot[j]
+				if (matrixes[1][i][j] - 0.1) > inf:
+					matrixes[1][i][j] += chem_pot[i] + chem_pot[j]
+
 	elif model == "CHD_simple":
 		mu_t_sigma = m_par[0] / neigbours
 		mu_d_sigma = m_par[1] / neigbours
