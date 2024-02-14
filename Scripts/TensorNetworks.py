@@ -61,7 +61,9 @@ def build_tensor(calc, matrixes):
 			tensor = np.einsum("ijkl, kc, ai, bj, ld -> abcd", identity(4, leg_size), U1, V1, V2, U2)
 			tensor = list((tensor, ))
 		elif (gen_tensor == "default"):
-			tensor = np.einsum("ijkl, kc, ld -> ijcd", identity(4, leg_size), matrixes[0], matrixes[1])
+			id4 = identity(4, leg_size)
+			tensor = np.einsum("ijkl, kc -> ijcl", id4, matrixes[0])
+			tensor = np.einsum("ijkl, ld -> ijkd", tensor, matrixes[1])
 			tensor = list((tensor, ))
 		else:
 			print("ERROR: gen_tensor parameter is incorrect!")

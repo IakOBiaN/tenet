@@ -34,7 +34,7 @@ e_h3 = -15.1
 e_h4 = 60.7
 
 print("Chemical_potential", "Coverage", "Entropy", "Susceptibility", "Heat_capacity", "Grand_potential")
-for mu in ms.np.arange(-50, 400.01, 5.0):
+for mu in ms.np.arange(-100, 400.01, 5.0):
 	m_par = [mu_pentacene_per + mu, mu_pentacene_par + mu, e_v1, e_v2, e_v3, e_v4, e_v5, e_v6, e_v7, e_h1, e_h2, e_h3, e_h4]
 	result = ms.full(calc, T, m_par, dmu = 1e-2, dT = 1e-2, derivatives = [1, 1], T_derivative = False)
 	calc_time = timeit.default_timer() - start_time
