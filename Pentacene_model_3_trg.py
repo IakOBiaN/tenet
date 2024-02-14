@@ -10,7 +10,7 @@ calc.metModification = "default"
 calc.model = "Pentacene_model_3"
 calc.lattice = "square"
 calc.gen_tensor = "default"
-calc.metParam = 24
+calc.metParam = 32
 #model params
 T = 300.0
 mu_pentacene_par = -607.7

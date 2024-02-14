@@ -212,7 +212,7 @@ def build_matrix (calc, temp, m_par):
 		e_23_12 = -m_par[47]
 
 		states = 15
-		nodes = 2
+		nodes = 3
 		calc.nodes = nodes
 		exist = [[1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0], \
 						[0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], \
@@ -350,8 +350,8 @@ def build_matrix (calc, temp, m_par):
 			mat2.append(line2)
 		matrixes = [np.array(mat1), np.array(mat2)]
 	elif model == "Pentacene_model_3":
-		mu_pentacene_per = m_par[0] / neigbours
-		mu_pentacene_par = m_par[1] / neigbours
+		mu_pentacene_per = m_par[0] / neigbours / 4.0
+		mu_pentacene_par = m_par[1] / neigbours / 4.0
 		e_v1 = -m_par[2] / 4.0
 		e_v2 = -m_par[3] / 3.0
 		e_v3 = -m_par[4] / 2.0
@@ -363,7 +363,7 @@ def build_matrix (calc, temp, m_par):
 		e_h2 = -m_par[10]
 		e_h3 = -m_par[11]
 		e_h4 = -m_par[12]
-		chem_pot = np.array([0, mu_pentacene_par / 4.0, mu_pentacene_par / 4.0, mu_pentacene_par / 4.0, mu_pentacene_par / 4.0, mu_pentacene_per / 4.0, mu_pentacene_per / 4.0, mu_pentacene_per / 4.0, mu_pentacene_per / 4.0])
+		chem_pot = np.array([0, mu_pentacene_par, mu_pentacene_par, mu_pentacene_par, mu_pentacene_par, mu_pentacene_per, mu_pentacene_per, mu_pentacene_per, mu_pentacene_per])
 		matrixes = [np.array([[0, 0, inf, inf, inf, 0, inf, 0, inf], \
 						[inf, inf, 0, inf, inf, inf, inf, inf, inf], \
 						[inf, inf, inf, 0, inf, inf, inf, inf, inf], \
