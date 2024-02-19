@@ -7,7 +7,7 @@ calc = ms.CalcConfig()
 
 calc.method = "tm"
 calc.metModification = "default"
-calc.model = "Pentacene_model_1"
+calc.model = "Pentacene_model_1_simple"
 calc.lattice = "square"
 calc.gen_tensor = "default"
 calc.metParam = 1

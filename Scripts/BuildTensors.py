@@ -40,7 +40,8 @@ def build_matrix (calc, temp, m_par):
 		"HT3" : True,
 		"qstate" : True,
 		"CHD_simple" : True,
-		"Pentacene_model_1" : True,
+		"Pentacene_model_1_simple" : True,
+		"Pentacene_model_1_complex" : True,
 		"Pentacene_model_2" : True,
 		"Pentacene_model_3" : True,
 		"CHD_complex" : True
@@ -76,7 +77,86 @@ def build_matrix (calc, temp, m_par):
 		matrixes = [np.array([[0.0, m_par[0] / (neigbours)],[m_par[0] / (neigbours), inf + m_par[0]]]), ] * 3
 	elif model == "TLAT":
 		matrixes = [np.array([[-m_par[1] - m_par[2] - m_par[3], -m_par[1] + m_par[2] + m_par[3], m_par[1] - m_par[2] + m_par[3], m_par[1] + m_par[2] - m_par[3]], [-m_par[1] + m_par[2] + m_par[3], -m_par[1] - m_par[2] - m_par[3], m_par[1] + m_par[2] - m_par[3], m_par[1] - m_par[2] + m_par[3]], [m_par[1] - m_par[2] + m_par[3], m_par[1] + m_par[2] - m_par[3], -m_par[1] - m_par[2] - m_par[3], -m_par[1] + m_par[2] + m_par[3]], [m_par[1] + m_par[2] - m_par[3], m_par[1] - m_par[2] + m_par[3], -m_par[1] + m_par[2] + m_par[3], -m_par[1] - m_par[2] - m_par[3]]]), ] * 3
-	elif model == "Pentacene_model_1":
+	elif model == "Pentacene_model_1_simple":
+		mu = m_par[0] / neigbours
+		e_close = -m_par[1]
+		e_one = -m_par[2]
+		e_two = -m_par[3]
+		states = 5
+		nodes = 3
+		calc.nodes = nodes
+		exist = [[1, 1, 0, 0, 0], \
+						[0, 0, 1, 0, 0], \
+						[0, 0, 0, 1, 0], \
+						[0, 0, 0, 0, 1], \
+						[1, 1, 0, 0, 0]]
+		energies = [[0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 0], \
+						[0, e_close, 0, 0, 0]]
+		#combination with e_one energy
+		energy_one = [4, 0, 1]
+		#combination with e_two energy
+		energy_two = [4, 0, 0, 1]
+		chem = [0, mu / 4.0, mu / 4.0, mu / 4.0, mu / 4.0]
+		all_combinations = product(range(states), repeat = nodes)
+		combinations = []
+		combinations_mu = []
+		combinations_en = []
+		for cur in all_combinations:
+			cur_mu = chem[cur[0]]
+			cur_en = 0
+			comb_no = False
+			for i in range(nodes - 1):
+				cur_mu += chem[cur[i + 1]]
+				cur_en += energies[cur[i]][cur[i + 1]] / 2.0
+				if exist[cur[i]][cur[i + 1]] == 0:
+					comb_no = True
+			if comb_no:
+				continue
+			if len(cur) > 2:
+				for i in range(len(cur) - 2):
+					if list(cur[i:i + 3]) == list(energy_one):
+						cur_en += e_one / 2.0
+			if len(cur) > 3:
+				for i in range(len(cur) - 3):
+					if list(cur[i:i + 4]) == list(energy_two):
+						cur_en += e_two / 2.0
+			combinations.append(cur)
+			combinations_mu.append(cur_mu)
+			combinations_en.append(cur_en)
+		mat1 = []
+		mat2 = []
+		for l_num, left in enumerate(combinations):
+			line = []
+			line2 = []
+			for r_num, right in enumerate(combinations):
+				cur_mu = combinations_mu[l_num] + combinations_mu[r_num]
+				if exist[left[-1]][right[0]] == 0:
+					line.append(inf)
+					line2.append(cur_mu)
+					continue
+				cur_en = combinations_en[l_num] + combinations_en[r_num] + energies[left[-1]][right[0]]
+				cur = left + right
+				for i in range(2):
+					if i + 3 > len(cur):
+						break
+					comp_list_one = list(cur[nodes - 2 + i:nodes - 2 + 3 + i])
+					if comp_list_one == energy_one:
+						cur_en += e_one
+				for i in range(3):
+					if i + 4 > len(cur):
+						break
+					comp_list_two = list(cur[nodes - 3 + i:nodes - 3 + 4 + i])
+					if comp_list_two == energy_two:
+						cur_en += e_two
+				line.append(cur_mu + cur_en)
+				line2.append(cur_mu)
+			mat1.append(line)
+			mat2.append(line2)
+		matrixes = [np.array(mat1), np.array(mat2)]
+	elif model == "Pentacene_model_1_complex":
 		mu = m_par[0] / neigbours
 		e_close = -m_par[1]
 		e_one = -m_par[2]
