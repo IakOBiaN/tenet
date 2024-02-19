@@ -157,28 +157,62 @@ def build_matrix (calc, temp, m_par):
 			mat2.append(line2)
 		matrixes = [np.array(mat1), np.array(mat2)]
 	elif model == "Pentacene_model_1_complex":
-		mu = m_par[0] / neigbours
-		e_close = -m_par[1]
-		e_one = -m_par[2]
-		e_two = -m_par[3]
-		states = 5
+		mu_pentacene_per = m_par[0] / neigbours / 4.0
+		mu_pentacene_par = m_par[1] / neigbours / 4.0
+		e_1 = -m_par[2]
+		e_2 = -m_par[3]
+		e_3 = -m_par[4]
+		e_4 = -m_par[5]
+		e_5 = -m_par[6]
+		e_6 = -m_par[7]
+		e_7 = -m_par[8]
+		e_8 = -m_par[9]
+		e_9 = -m_par[10]
+		e_10 = -m_par[11]
+		e_11 = -m_par[12]
+		e_12 = -m_par[13]
+		states = 9
 		nodes = 3
 		calc.nodes = nodes
-		exist = [[1, 1, 0, 0, 0], \
-						[0, 0, 1, 0, 0], \
-						[0, 0, 0, 1, 0], \
-						[0, 0, 0, 0, 1], \
-						[1, 1, 0, 0, 0]]
-		energies = [[0, 0, 0, 0, 0], \
-						[0, 0, 0, 0, 0], \
-						[0, 0, 0, 0, 0], \
-						[0, 0, 0, 0, 0], \
-						[0, e_close, 0, 0, 0]]
-		#combination with e_one energy
-		energy_one = [4, 0, 1]
+		exist = [[1, 1, 0, 0, 0, 1, 0, 1, 0], \
+						[0, 0, 1, 0, 0, 0, 0, 0, 0], \
+						[0, 0, 0, 1, 0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 1, 0, 0, 0, 0], \
+						[1, 1, 0, 0, 0, 1, 0, 1, 0], \
+						[0, 0, 0, 0, 0, 0, 1, 0, 0], \
+						[1, 1, 0, 0, 0, 1, 0, 1, 0], \
+						[0, 0, 0, 0, 0, 0, 0, 0, 1], \
+						[1, 1, 0, 0, 0, 1, 0, 1, 0]]
+		energies = [[0, 0, 0, 0, 0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
+						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
+						[0, e_1, 0, 0, 0, e_10, 0, e_10, 0], \
+						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
+						[0, e_10, 0, 0, 0, e_4, 0, e_7, 0], \
+						[0, 0, 0, 0, 0, 0, 0, 0, 0], \
+						[0, e_10, 0, 0, 0, e_7, 0, e_4, 0]]
+		energy_one = {str([4, 0, 1]): e_2, \
+				str([4, 0, 5]): e_11, \
+				str([4, 0, 7]): e_11, \
+				str([6, 0, 1]): e_11, \
+				str([8, 0, 1]): e_11, \
+				str([6, 0, 5]): e_5, \
+				str([6, 0, 7]): e_8, \
+				str([8, 0, 5]): e_8, \
+				str([8, 0, 7]): e_5}
 		#combination with e_two energy
-		energy_two = [4, 0, 0, 1]
-		chem = [0, mu / 4.0, mu / 4.0, mu / 4.0, mu / 4.0]
+		energy_two = {str([4, 0, 0, 1]): e_3, \
+				str([4, 0, 0, 5]): e_12, \
+				str([4, 0, 0, 7]): e_12, \
+				str([6, 0, 0, 1]): e_12, \
+				str([8, 0, 0, 1]): e_12, \
+				str([6, 0, 0, 5]): e_6, \
+				str([6, 0, 0, 7]): e_9, \
+				str([8, 0, 0, 5]): e_9, \
+				str([8, 0, 0, 7]): e_6}
+		chem = [0, mu_pentacene_par, mu_pentacene_par, mu_pentacene_par, mu_pentacene_par, \
+				mu_pentacene_per, mu_pentacene_per, mu_pentacene_per, mu_pentacene_per]
 		all_combinations = product(range(states), repeat = nodes)
 		combinations = []
 		combinations_mu = []
@@ -196,12 +230,10 @@ def build_matrix (calc, temp, m_par):
 				continue
 			if len(cur) > 2:
 				for i in range(len(cur) - 2):
-					if list(cur[i:i + 3]) == list(energy_one):
-						cur_en += e_one / 2.0
+					cur_en += energy_one.get(str(list(cur[i:i + 3])), 0) / 2.0
 			if len(cur) > 3:
 				for i in range(len(cur) - 3):
-					if list(cur[i:i + 4]) == list(energy_two):
-						cur_en += e_two / 2.0
+					cur_en += energy_two.get(str(list(cur[i:i + 4])), 0) / 2.0
 			combinations.append(cur)
 			combinations_mu.append(cur_mu)
 			combinations_en.append(cur_en)
