@@ -363,6 +363,7 @@ def build_matrix (calc, temp, m_par):
 		e_h2 = -m_par[10]
 		e_h3 = -m_par[11]
 		e_h4 = -m_par[12]
+		e_v8 = -m_par[12]
 		chem_pot = np.array([0, mu_pentacene_par, mu_pentacene_par, mu_pentacene_par, mu_pentacene_par, mu_pentacene_per, mu_pentacene_per, mu_pentacene_per, mu_pentacene_per])
 		matrixes = [np.array([[0, 0, inf, inf, inf, 0, inf, 0, inf], \
 						[inf, inf, 0, inf, inf, inf, inf, inf, inf], \
@@ -374,10 +375,10 @@ def build_matrix (calc, temp, m_par):
 						[inf, inf, inf, inf, inf, inf, inf, inf, 0], \
 						[0, e_h3, inf, inf, inf, e_h2, inf, e_h1, inf]]), \
 						np.array([[0, 0, 0, 0, 0, 0, 0, inf, inf], \
-						[0, e_v1, e_v2, e_v3, 0, e_v5, e_v6, inf, inf], \
+						[0, e_v1, e_v2, e_v3, e_v8, e_v5, e_v6, inf, inf], \
 						[0, e_v2, e_v1, e_v2, e_v3, e_v4, e_v5, inf, inf], \
 						[0, e_v3, e_v2, e_v1, e_v2, e_v5, e_v4, inf, inf], \
-						[0, 0, e_v3, e_v2, e_v1, e_v6, e_v5, inf, inf], \
+						[0, e_v8, e_v3, e_v2, e_v1, e_v6, e_v5, inf, inf], \
 						[inf, inf, inf, inf, inf, inf, inf, 0, inf], \
 						[inf, inf, inf, inf, inf, inf, inf, inf, 0], \
 						[0, e_v5, e_v4, e_v5, e_v6, e_v7, 0, inf, inf], \
