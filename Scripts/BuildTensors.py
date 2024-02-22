@@ -23,7 +23,6 @@ def build_matrix (calc, temp, m_par):
 
 	models_dict = {
 		"langmuir" : True,
-		"langmuir_test" : True,
 		"langmuir_m" : True,
 		"binary" : True,
 		"ising" : True,
@@ -54,15 +53,6 @@ def build_matrix (calc, temp, m_par):
 	matrixes = []
 	if model == "langmuir":
 		matrixes = [np.array([[0.0, m_par[0] / neigbours], [m_par[0] / neigbours, -m_par[1] + m_par[0] / (neigbours / 2.0)]]) ,] * 3
-	elif model == "langmuir_test":
-		matrixes = [np.array([[0.0, m_par[0] / neigbours], [m_par[0] / neigbours, -m_par[1] + m_par[0] / (neigbours / 2.0)]]) ,] * 3
-		for i in range(len(matrixes)):
-			matrixes[i] = matrixes[i] / (calc.constant * temp)
-			matrixes[i] = np.array([np.exp(line) for line in matrixes[i]])
-		id6 = identity(6, 2)
-		matrixes[0] = np.einsum("abcdef, ia, kb, mc -> ikmdef", id6, matrixes[0], matrixes[1], matrixes[2])
-		return matrixes
-
 	#m_par: 0 - mu, 1 - eps, 2 - multipartical interaction
 	elif model == "langmuir_m":
 		mult = np.zeros((2, 2, 2))
