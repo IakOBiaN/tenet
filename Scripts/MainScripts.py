@@ -43,6 +43,10 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 
 	if calc.lattice == "triangular":
 		calc.coord = 6
+	#elif calc.lattice == "diamond":
+	#	calc.coord = 3
+	#elif calc.lattice == "FSHL":
+	#	calc.coord = 6
 
 	matrixes = bt.build_matrix(calc, T, m_par)
 	if calc.method != "htn":
@@ -54,22 +58,29 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 
 	minimum_iterations = 5
 
+	covergence = [-1e8, ]
 	for i in range(calc.iterations):
 		if calc.method == "trg":
 			(tensors, scale, norm) = tn.trg_step(tensors, scale, norm, calc)
 		elif calc.method == "hotrg":
 			(tensors, scale, norm) = tn.hotrg_step(tensors, scale, norm, calc)
 		elif calc.method == "htn":
+			calc.scale = i
 			(tensors, scale, norm) = tn.htn_step(matrixes, scale, norm, calc)
+			covergence.append((scale + log(norm)) / (calc.nodes / (calc.constant * T)))
+			if abs(covergence[-2] - covergence[-1]) < (calc.methodTolerance / 100) and i > minimum_iterations:
+				break
 		elif calc.method == "tm":
 			calc.scale = 2
 			(tensors, scale, norm) = tn.tm_step(tensors, scale, norm, calc)
 		else:
 			assert False, "Error! There is no such method."
-		if abs(old_scale - scale / calc.scale) < calc.methodTolerance and i > minimum_iterations:
-			break
-		else:
-			old_scale = scale
+
+		if calc.method != "htn":
+			if abs(old_scale - scale / calc.scale) < calc.methodTolerance and i > minimum_iterations:
+				break
+			else:
+				old_scale = scale
 	if i > 250:
 		print("Warning! More than 250 iterations")
 	nodes = calc.nodes * calc.join_tensors[0] * calc.join_tensors[1]
@@ -77,7 +88,8 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 		nodes *= calc.metParam
 		if calc.metModification != "default":
 			nodes *= 2 ** (calc.metModification[0] - 1)
-	nodes *= calc.scale ** (i + 1)
+	if calc.method != "htn":
+		nodes *= calc.scale ** (i + 1)
 	return (scale + log(norm)) / (nodes / (calc.constant * T))
 
 def coverage_old(method, model, lattice, temp = 1., m_par = [0.0]*10):
