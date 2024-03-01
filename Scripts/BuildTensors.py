@@ -466,6 +466,7 @@ def build_matrix (calc, temp, m_par):
 		e_h3 = -m_par[11]
 		e_h4 = -m_par[12]
 		e_v8 = -m_par[12]
+		e_v9 = -m_par[13]
 		chem_pot = np.array([0, mu_pentacene_par, mu_pentacene_par, mu_pentacene_par, mu_pentacene_par, mu_pentacene_per, mu_pentacene_per, mu_pentacene_per, mu_pentacene_per])
 		matrixes = [np.array([[0, 0, inf, inf, inf, 0, inf, 0, inf], \
 						[inf, inf, 0, inf, inf, inf, inf, inf, inf], \
@@ -483,8 +484,8 @@ def build_matrix (calc, temp, m_par):
 						[0, e_v8, e_v3, e_v2, e_v1, e_v6, e_v5, inf, inf], \
 						[inf, inf, inf, inf, inf, inf, inf, 0, inf], \
 						[inf, inf, inf, inf, inf, inf, inf, inf, 0], \
-						[0, e_v5, e_v4, e_v5, e_v6, e_v7, 0, inf, inf], \
-						[0, e_v6, e_v5, e_v4, e_v5, 0, e_v7, inf, inf]])]
+						[0, e_v5, e_v4, e_v5, e_v6, e_v7, e_v9, inf, inf], \
+						[0, e_v6, e_v5, e_v4, e_v5, e_v9, e_v7, inf, inf]])]
 		for i in range(len(matrixes[0][0])):
 			for j in range(len(matrixes[0][0])):
 				if (matrixes[0][i][j] - 0.1) > inf:
