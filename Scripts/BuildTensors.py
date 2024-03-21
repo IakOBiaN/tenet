@@ -347,7 +347,8 @@ def build_matrix (calc, temp, m_par):
 						[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], \
 						[0, e_24_1, 0, e_24_2, 0, e_34_2, 0, 0, e_34_1, 0, 0, e_44_1, 0, 0, 0]]
 		#combination with e_one energy
-		energy_one = {str([2, 0, 1]): e_22_4, \
+		energy_one = {str([14, 0, 11]): e_44_2, \
+				str([2, 0, 1]): e_22_4, \
 				str([4, 0, 3]): e_22_4, \
 				str([4, 0, 1]): e_22_6, \
 				str([2, 0, 3]): e_22_8, \
@@ -372,7 +373,8 @@ def build_matrix (calc, temp, m_par):
 				str([4, 0, 5]): e_23_11, \
 				str([10, 0, 1]): e_23_11}
 		#combination with e_two energy
-		energy_two = {str([2, 0, 0, 1]): e_22_5, \
+		energy_two = {str([14, 0, 0, 11]): e_44_3, \
+				str([2, 0, 0, 1]): e_22_5, \
 				str([4, 0, 0, 3]): e_22_5, \
 				str([4, 0, 0, 1]): e_22_7, \
 				str([2, 0, 0, 3]): e_22_9, \
