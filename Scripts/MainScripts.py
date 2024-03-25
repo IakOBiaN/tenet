@@ -101,7 +101,23 @@ def magnetization(method,model,size, temp = 1., field = 0, int = [0]):
 	return result
 
 def heat_capasity(calc, T = 1., m_par = [0.0]*10):
-	result = T * derivative(lambda x: simulate(calc, x, m_par), T, n=2, dx=1e-5)
+	result = T * derivative(lambda x: simulate(calc, x, m_par), T, n=2, dx=1e-4)
+	return result
+
+def susceptibility(calc, T = 1., m_par = [0.0]*10, dmu = 1e-4, derivatives = [1, ] + [0] * 2):
+	grandPotential_dmu = []
+	der_par = m_par[:]
+	for i, par in enumerate(derivatives):
+		if par == 1:
+			der_par[i] -= dmu
+	for _ in range(3):
+		lnZ = simulate(calc, T, der_par)
+		grandPotential_dmu.append(lnZ)
+		for i, par in enumerate(derivatives):
+			if par == 1:
+				der_par[i] += dmu
+	del der_par
+	result = calc.constant * T * (grandPotential_dmu[0] - 2.0 * grandPotential_dmu[1] + grandPotential_dmu[2]) / (dmu ** 2.0)
 	return result
 
 def enthropy_old(method,model,size, temp = 1., field = 0, int = [0]):
