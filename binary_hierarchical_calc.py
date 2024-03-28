@@ -11,9 +11,34 @@ calc.metParam = 1
 
 
 #model params
+f = open("data2.dat", "w")
 T = 100.0
+muA = -10
 muB = -10
-for muA in ms.np.arange(-10.00, 25.01, 0.2):
-	m_par = [muA, muB, 4.0, 6.0, 0, 0]
-	result = minimize(lambda x: -ms.susceptibility(calc, T, [x[0]] + m_par[1:], derivatives = [1, 1]), 0, tol = 0.001)
-	print(muA, result.x[0])
+maximum = []
+for muB in ms.np.arange(-5.00, 5.01, 0.1):
+	max_counter = 0
+	old_value = -1000
+	old_A = 0
+	old_B = 0
+	for muA in ms.np.arange(10.00, 20.01, 0.01):
+		m_par = [muA, muB, 4.0, 6.0, 0, 0]
+		result = ms.susceptibility(calc, T, m_par)
+		if result > old_value:
+			old_value = result
+			old_A = muA
+			old_B = muB
+			max_counter = 0
+		else:
+			max_counter += 1
+		if max_counter == 5:
+			maximum.append([old_B, old_A, old_value])
+			print(old_B, old_A, old_value, file = f, flush = True)
+		print(muA, muB, result)
+
+for aaa in maximum:
+	for bbb in aaa:
+		print(bbb, end = " ")
+	print()
+
+f.close()
