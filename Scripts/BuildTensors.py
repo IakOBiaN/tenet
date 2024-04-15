@@ -43,7 +43,8 @@ def build_matrix (calc, temp, m_par):
 		"Pentacene_model_1_complex" : True,
 		"Pentacene_model_2" : True,
 		"Pentacene_model_3" : True,
-		"CHD_complex" : True
+		"CHD_complex" : True,
+		"six_leg_test" : True
 	}
 
 	exist = models_dict.get(calc.model)
@@ -58,6 +59,53 @@ def build_matrix (calc, temp, m_par):
 		mult = np.zeros((2, 2, 2))
 		mult[1, 1, 1] = -m_par[2]
 		matrixes = [np.array([[0.0, m_par[0] / neigbours], [m_par[0] / neigbours, -m_par[1] + m_par[0] / (neigbours / 2.0)]]) ,] * 3 + [mult]
+	elif model == "six_leg_test":
+		mu = m_par[0]
+		eps = -m_par[1]
+		eps_m = -m_par[2]
+		states = tuple(product(range(3), repeat = 2))
+		dimens_size = len(states)
+		tensor = np.zeros((dimens_size, ) * 6)
+		keys = {}
+		for i, state in enumerate(states):
+			keys[state] = i
+		combination = product(states, repeat = 6)
+		for state in combination:
+			energy = 0
+			if state[0][1] == state[1][1] == state[2][1] == state[3][0] == state[4][0] == state[5][0]:
+				nodes = [state[0][1], state[0][0], state[1][0], state[2][0], state[3][1], state[4][1], state[5][1]]
+				#chemical potential
+				sum0 = 0
+				for node in nodes:
+					if node > 0:
+						sum0 += 1
+				energy += sum0 * mu / 7.0
+
+				condition = np.prod(state[0]) + np.prod(state[1]) + np.prod(state[2]) + np.prod(state[3]) + np.prod(state[4]) + np.prod(state[5])
+				condition += state[0][0] * state[1][0] + state[1][0] * state[2][0] + state[2][0] * state[3][1] + state[3][1] * state[4][1] + state[4][1] * state[5][1] + state[5][1] * state[0][0]
+				if condition:
+					tensor[keys[state[0]]][keys[state[1]]][keys[state[2]]][keys[state[3]]][keys[state[4]]][keys[state[5]]] = inf
+					continue
+
+				if nodes[2] == 1 and nodes[5] == 2:
+					energy += eps
+				if nodes[1] == 2 and nodes[4] == 1:
+					energy += eps
+				if nodes[3] == 2 and nodes[6] == 1:
+					energy += eps
+
+				if nodes[1] == 1 and nodes[3] == 1 and nodes[5] == 1:
+					energy += eps_m
+				if nodes[2] == 2 and nodes[4] == 2 and nodes[6] == 2:
+					energy += eps_m
+
+				tensor[keys[state[0]]][keys[state[1]]][keys[state[2]]][keys[state[3]]][keys[state[4]]][keys[state[5]]] = energy
+			else:
+				tensor[keys[state[0]]][keys[state[1]]][keys[state[2]]][keys[state[3]]][keys[state[4]]][keys[state[5]]] = inf
+				continue
+		matrixes.append(tensor)
+		#print(count)
+		#exit()
 	elif model == "binary":
 		#m_par: 0 - muA, 1 - muB, 2 - epsAA, 3 - epsBB, 4 - epsAB
 		matrixes = [np.array([[0.0, m_par[0] / neigbours, m_par[1] / neigbours], [m_par[0] / neigbours, -m_par[2] + 2.0 * m_par[0] / neigbours, (m_par[0] + m_par[1]) / neigbours], [m_par[1] / neigbours, (m_par[0] + m_par[1]) / neigbours, -m_par[3] + 2.0 * m_par[1] / neigbours]]) ,] * 3
