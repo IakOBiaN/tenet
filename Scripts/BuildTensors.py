@@ -60,10 +60,21 @@ def build_matrix (calc, temp, m_par):
 		mult[1, 1, 1] = -m_par[2]
 		matrixes = [np.array([[0.0, m_par[0] / neigbours], [m_par[0] / neigbours, -m_par[1] + m_par[0] / (neigbours / 2.0)]]) ,] * 3 + [mult]
 	elif model == "six_leg_test":
-		mu = m_par[0]
-		eps = -m_par[1]
-		eps_m = -m_par[2]
-		states = tuple(product(range(3), repeat = 2))
+		mu_TPB = m_par[0]
+		mu_Cu = m_par[1]
+
+		w2 = -m_par[2]
+		w3 = -m_par[3]
+		w3_1 = - m_par[4]
+		w4 = -m_par[5]
+
+		#additions
+		r_w2 = w2
+		r_w3 = w3 - 2 * w2
+		r_w3_1 = w3_1 - 2 * w2
+		r_w4 = w4 - 3 * w2 - 3 * r_w3_1
+
+		states = tuple(product(range(4), repeat = 2))
 		dimens_size = len(states)
 		tensor = np.zeros((dimens_size, ) * 6)
 		keys = {}
@@ -74,30 +85,83 @@ def build_matrix (calc, temp, m_par):
 			energy = 0
 			if state[0][1] == state[1][1] == state[2][1] == state[3][0] == state[4][0] == state[5][0]:
 				nodes = [state[0][1], state[0][0], state[1][0], state[2][0], state[3][1], state[4][1], state[5][1]]
-				#chemical potential
-				sum0 = 0
-				for node in nodes:
-					if node > 0:
-						sum0 += 1
-				energy += sum0 * mu / 7.0
 
-				condition = np.prod(state[0]) + np.prod(state[1]) + np.prod(state[2]) + np.prod(state[3]) + np.prod(state[4]) + np.prod(state[5])
-				condition += state[0][0] * state[1][0] + state[1][0] * state[2][0] + state[2][0] * state[3][1] + state[3][1] * state[4][1] + state[4][1] * state[5][1] + state[5][1] * state[0][0]
+				#close contact of TPB check
+				close = [1 if (i == 1 or i == 2) else 0 for i in nodes]
+				condition = 0
+				#other neigbours
+				for i in range(1, 7):
+					next = i + 1
+					if next > 6:
+						next = 1
+					condition += close[i] * close[next]
+					condition += close[i] * close[0]
 				if condition:
 					tensor[keys[state[0]]][keys[state[1]]][keys[state[2]]][keys[state[3]]][keys[state[4]]][keys[state[5]]] = inf
 					continue
 
-				if nodes[2] == 1 and nodes[5] == 2:
-					energy += eps
-				if nodes[1] == 2 and nodes[4] == 1:
-					energy += eps
-				if nodes[3] == 2 and nodes[6] == 1:
-					energy += eps
+				#chemical potential block
+				sum_TPB = sum([1 for i in nodes if (i == 1 or i == 2)])
+				sum_Cu = sum([1 for i in nodes if i == 3])
+				energy += sum_TPB * mu_TPB / 7.0 + sum_Cu * mu_Cu / 7.0
 
-				if nodes[1] == 1 and nodes[3] == 1 and nodes[5] == 1:
-					energy += eps_m
-				if nodes[2] == 2 and nodes[4] == 2 and nodes[6] == 2:
-					energy += eps_m
+				sum_w2 = 0
+				#pair interactions
+				if nodes[1] == 2 and nodes[0] == 3:
+					sum_w2 += 1
+				if nodes[2] == 1 and nodes[0] == 3:
+					sum_w2 += 1
+				if nodes[3] == 2 and nodes[0] == 3:
+					sum_w2 += 1
+				if nodes[4] == 1 and nodes[0] == 3:
+					sum_w2 += 1
+				if nodes[5] == 2 and nodes[0] == 3:
+					sum_w2 += 1
+				if nodes[6] == 1 and nodes[0] == 3:
+					sum_w2 += 1
+
+				if nodes[1] == 3 and nodes[0] == 1:
+					sum_w2 += 1
+				if nodes[2] == 3 and nodes[0] == 2:
+					sum_w2 += 1
+				if nodes[3] == 3 and nodes[0] == 1:
+					sum_w2 += 1
+				if nodes[4] == 3 and nodes[0] == 2:
+					sum_w2 += 1
+				if nodes[5] == 3 and nodes[0] == 1:
+					sum_w2 += 1
+				if nodes[6] == 3 and nodes[0] == 2:
+					sum_w2 += 1
+
+				energy += sum_w2 * r_w2 / 2.0
+
+				#triple interations line
+				if nodes[2] == 1 and nodes[5] == 2 and nodes[0] == 3:
+					energy += r_w3
+				if nodes[1] == 2 and nodes[4] == 1 and nodes[0] == 3:
+					energy += r_w3
+				if nodes[3] == 2 and nodes[6] == 1 and nodes[0] == 3:
+					energy += r_w3
+
+				#triple interations angle
+				if nodes[0] == 3 and nodes[1] == 2 and nodes[3] == 2:
+					energy += r_w3_1
+				if nodes[0] == 3 and nodes[2] == 1 and nodes[4] == 1:
+					energy += r_w3_1
+				if nodes[0] == 3 and nodes[3] == 2 and nodes[5] == 2:
+					energy += r_w3_1
+				if nodes[0] == 3 and nodes[4] == 1 and nodes[6] == 1:
+					energy += r_w3_1
+				if nodes[0] == 3 and nodes[5] == 2 and nodes[1] == 2:
+					energy += r_w3_1
+				if nodes[0] == 3 and nodes[6] == 1 and nodes[2] == 1:
+					energy += r_w3_1
+
+				#quad interactions
+				if nodes[1] == 2 and nodes[3] == 2 and nodes[5] == 2 and nodes[0] == 3:
+					energy += r_w4
+				if nodes[2] == 1 and nodes[4] == 1 and nodes[6] == 1 and nodes[0] == 3:
+					energy += r_w4
 
 				tensor[keys[state[0]]][keys[state[1]]][keys[state[2]]][keys[state[3]]][keys[state[4]]][keys[state[5]]] = energy
 			else:
