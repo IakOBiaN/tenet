@@ -44,7 +44,8 @@ def build_matrix (calc, temp, m_par):
 		"Pentacene_model_2" : True,
 		"Pentacene_model_3" : True,
 		"CHD_complex" : True,
-		"six_leg_test" : True
+		"six_leg_test" : True,
+		"dimers_test" : True
 	}
 
 	exist = models_dict.get(calc.model)
@@ -67,12 +68,14 @@ def build_matrix (calc, temp, m_par):
 		w3 = -m_par[3]
 		w3_1 = - m_par[4]
 		w4 = -m_par[5]
+		eps = -m_par[6]
 
 		#additions
 		r_w2 = w2
 		r_w3 = w3 - 2 * w2
 		r_w3_1 = w3_1 - 2 * w2
 		r_w4 = w4 - 3 * w2 - 3 * r_w3_1
+		r_eps = eps
 
 		states = tuple(product(range(4), repeat = 2))
 		dimens_size = len(states)
@@ -104,6 +107,14 @@ def build_matrix (calc, temp, m_par):
 				sum_TPB = sum([1 for i in nodes if (i == 1 or i == 2)])
 				sum_Cu = sum([1 for i in nodes if i == 3])
 				energy += sum_TPB * mu_TPB / 7.0 + sum_Cu * mu_Cu / 7.0
+
+				#if two TPB molecules too close, we add eps to the energy
+				if close[1] == 1 and close[3] == 1:
+					energy += r_eps
+				if close[2] == 1 and close[4] == 1:
+					energy += r_eps
+				if close[3] == 1 and close[5] == 1:
+					energy += r_eps
 
 				sum_w2 = 0
 				#pair interactions
@@ -579,8 +590,8 @@ def build_matrix (calc, temp, m_par):
 		e_h2 = -m_par[10]
 		e_h3 = -m_par[11]
 		e_h4 = -m_par[12]
-		e_v8 = -m_par[12]
-		e_v9 = -m_par[13]
+		e_v8 = -m_par[13]
+		e_v9 = -m_par[14]
 		chem_pot = np.array([0, mu_pentacene_par, mu_pentacene_par, mu_pentacene_par, mu_pentacene_par, mu_pentacene_per, mu_pentacene_per, mu_pentacene_per, mu_pentacene_per])
 		matrixes = [np.array([[0, 0, inf, inf, inf, 0, inf, 0, inf], \
 						[inf, inf, 0, inf, inf, inf, inf, inf, inf], \
@@ -663,6 +674,20 @@ def build_matrix (calc, temp, m_par):
 						[(m_par[0] + m_par[1]) / (neigbours * 2.0), inf, inf, inf, inf], \
 						[inf, inf, inf, (m_par[0] + m_par[1]) / neigbours, inf], \
 						[m_par[0] / neigbours, inf, inf, inf, inf]])]
+	elif model == "dimers_test":
+		mu = m_par[0] / neigbours
+		matrixes = [np.array([[0, mu / 2.0, inf, mu / 2.0, mu / 2.0, mu], \
+						[inf, inf, mu, inf, inf, inf], \
+						[mu / 2.0, mu, inf, mu, mu, 3.0 / 2.0 * mu], \
+						[mu / 2.0, mu, inf, mu, mu, 3.0 / 2.0 * mu], \
+						[mu / 2.0, mu, inf, mu, mu, 3.0 / 2.0 * mu], \
+						[mu, 3.0 / 2.0 * mu, inf, 3.0 / 2.0 * mu, 3.0 / 2.0 * mu, 2.0 * mu]]), \
+					np.array([[0, mu / 2.0, mu / 2.0, mu / 2.0, inf, mu], \
+						[mu / 2.0, mu, mu, mu, inf, 3.0 / 2.0 * mu], \
+						[mu / 2.0, mu, mu, mu, inf, 3.0 / 2.0 * mu], \
+						[inf, inf, inf, inf, mu, inf], \
+						[mu / 2.0, mu, mu, mu, inf, 3.0 / 2.0 * mu], \
+						[mu, 3.0 / 2.0 * mu, 3.0 / 2.0 * mu, 3.0 / 2.0 * mu, inf, 2.0 * mu]])]
 	elif model == "1NN" or model == "2NN" or model == "3NN" or model == "4NN" or model == "5NN":
 		var_1NN_0 = 0
 		var_1NN_mu = m_par[0] / neigbours

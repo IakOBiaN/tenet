@@ -122,17 +122,17 @@ def build_tensor(calc, matrixes):
 			tensor = list((tensor, ))
 		elif (gen_tensor == "six_leg_tensor"):
 			tensor = matrixes[0]
-			U1, S1, V1 = tensor_svd(tensor, [0, 1], [2, 3, 4, 5])
+			U1, S1, V1 = tensor_svd(tensor, [0, 1], [2, 3, 4, 5], chi_number = calc.metParam)
 			S1 = np.sqrt(S1)
 			U1 = np.einsum("abi,i->abi", U1, S1)
 			V1 = np.einsum("icdef,i->cdefi",V1, S1)
 
-			U2, S2, V2 = tensor_svd(V1, [0, 1], [2, 3, 4])
+			U2, S2, V2 = tensor_svd(V1, [0, 1], [2, 3, 4], chi_number = calc.metParam)
 			S2 = np.sqrt(S2)
 			U2 = np.einsum("cdi,i->cdi", U2, S2)
 			V2 = np.einsum("iefx,i->efxi",V2, S2)
 
-			U3, S3, V3 = tensor_svd(V2, [0, 1], [2, 3])
+			U3, S3, V3 = tensor_svd(V2, [0, 1], [2, 3], chi_number = calc.metParam)
 			S3 = np.sqrt(S3)
 			U3 = np.einsum("efi,i->efi", U3, S3)
 			V3 = np.einsum("ixz,i->ixz",V3, S3)
