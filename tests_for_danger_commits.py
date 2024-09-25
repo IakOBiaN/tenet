@@ -1,0 +1,17 @@
+import subprocess
+
+subprocess.run("python.exe -u binary_hierarchical.py", shell = True)
+subprocess.run("python.exe -u ising_hierarchical.py", shell = True)
+subprocess.run("python.exe -u mono_tm.py", shell = True)
+subprocess.run("python.exe -u mono.py", shell = True)
+subprocess.run("python.exe -u binary.py", shell = True)
+subprocess.run("python.exe -u ising.py", shell = True)
+subprocess.run("python.exe -u dimer_tm.py", shell = True)
+subprocess.run("python.exe -u 14CHD_Si_simple_tm.py", shell = True)
+subprocess.run("python.exe -u 14CHD_Si_complex_tm.py", shell = True)
+subprocess.run("python.exe -u 14CHD_Si_simple_trg.py", shell = True)
+subprocess.run("python.exe -u 14CHD_Si_complex_trg.py", shell = True)
+subprocess.run("python.exe -u Pentacene_model_1_simple_tm.py", shell = True)
+subprocess.run("python.exe -u Pentacene_model_1_complex_tm.py", shell = True)
+subprocess.run("python.exe -u Pentacene_model_2_tm.py", shell = True)
+subprocess.run("python.exe -u Pentacene_model_3_trg.py", shell = True)
