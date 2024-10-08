@@ -45,7 +45,8 @@ def build_matrix (calc, temp, m_par):
 		"Pentacene_model_3" : True,
 		"CHD_complex" : True,
 		"six_leg_test" : True,
-		"dimers_test" : True
+		"dimers_test" : True,
+		"long-range" : True
 	}
 
 	exist = models_dict.get(calc.model)
@@ -56,6 +57,60 @@ def build_matrix (calc, temp, m_par):
 	if model == "langmuir":
 		matrixes = [np.array([[0.0, m_par[0] / neigbours], [m_par[0] / neigbours, -m_par[1] + m_par[0] / (neigbours / 2.0)]]) ,] * 3
 	#m_par: 0 - mu, 1 - eps, 2 - multipartical interaction
+	elif model == "long-range":
+		mu = m_par[0]
+		chem = [0, mu]
+		interactions_with_neighbours = m_par[1]
+
+		merged_nodes = int(m_par[-1])
+		calc.nodes = merged_nodes
+		if len(interactions_with_neighbours) > merged_nodes:
+			print("ERROR! You should increase size of merged nodes!")
+			exit()
+		states = 2 #it is for langmuir model
+		new_nodes_combinations = product(range(states), repeat = merged_nodes)
+		combinations = []
+		combinations_mu = []
+		combinations_en = []
+		for comb in new_nodes_combinations:
+			cur_mu = chem[comb[0]]
+			cur_en = 0
+			for i in range(merged_nodes - 1):
+				cur_mu += chem[comb[i + 1]]
+				for j in range(len(interactions_with_neighbours)):
+					inter_node = i + (j + 1)
+					if inter_node >= merged_nodes:
+						break
+					cur_en += interactions_with_neighbours[j] * comb[i] * comb[i + (j + 1)]
+
+			combinations.append(comb)
+			combinations_mu.append(cur_mu / neigbours)
+			combinations_en.append(cur_en / neigbours)
+
+		#interactions between new nodes
+		matrix = []
+		for n1, comb1 in enumerate(combinations):
+			line = []
+			for n2, comb2 in enumerate(combinations):
+				cur_mu = combinations_mu[n1] + combinations_mu[n2]
+				cur_en = combinations_en[n1] + combinations_en[n2]
+				for i in range(1, len(interactions_with_neighbours) + 1):
+					for j in range(i):
+						if j >= merged_nodes:
+							break
+						cur_en += interactions_with_neighbours[i - 1] * comb2[j] * comb1[-1-j]
+				line.append((cur_mu - cur_en))
+			matrix.append(line)
+		matrixes = [np.array(matrix) ,]
+		#print(matrixes)
+		#matrixes = [np.array([[0.0, m_par[0] / neigbours], [m_par[0] / neigbours, -m_par[1] + m_par[0] / (neigbours / 2.0)]]) ,]
+		#matrixes = [np.array([[0, mu / 4.0, mu / 4.0, mu / 2.0 - m_par[1] / 4.0],
+		#matrixes = [np.array([[0, mu / 2.0, mu / 2.0, mu - m_par[1] / 2.0],
+		#			[mu / 2.0, mu, mu - m_par[1], 3 / 2 * mu - 3 / 2 * m_par[1]],
+		#			[mu / 2.0, mu, mu, 3 / 2 * mu - m_par[1] / 2.0],
+		#			[mu - m_par[1] / 2.0, 3 / 2 * mu - m_par[1] / 2, 3 / 2 * mu - 3 / 2 * m_par[1], 2 * mu - 2 * m_par[1]]]) ,]
+		#print(matrixes)
+		#exit()
 	elif model == "langmuir_m":
 		mult = np.zeros((2, 2, 2))
 		mult[1, 1, 1] = -m_par[2]

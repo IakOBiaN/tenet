@@ -43,13 +43,11 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 
 	if calc.lattice == "triangular":
 		calc.coord = 6
-	#elif calc.lattice == "diamond":
-	#	calc.coord = 3
-	#elif calc.lattice == "FSHL":
-	#	calc.coord = 6
+	if calc.metParam == 1 and calc.method == "tm":
+		calc.coord = 2
 
 	matrixes = bt.build_matrix(calc, T, m_par)
-	if calc.method != "htn":
+	if calc.method != "htn" and (calc.metParam > 1 and calc.method != "tm"):
 		tensors = tn.build_tensor(calc, matrixes)
 
 	scale = 0.0
@@ -72,7 +70,10 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 				break
 		elif calc.method == "tm":
 			calc.scale = 2
-			(tensors, scale, norm) = tn.tm_step(tensors, scale, norm, calc)
+			if calc.metParam == 1:
+				(tensors, scale, norm) = tn.tm_step(matrixes, scale, norm, calc)
+			else:
+				(tensors, scale, norm) = tn.tm_step(tensors, scale, norm, calc)
 		else:
 			assert False, "Error! There is no such method."
 
