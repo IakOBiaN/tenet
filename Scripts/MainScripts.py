@@ -1,4 +1,4 @@
-from math import exp, log,sqrt
+from math import exp, log, sqrt
 import numpy as np
 from scipy.misc import derivative
 import scipy.sparse.linalg
