@@ -62,11 +62,11 @@ def build_matrix (calc, temp, m_par):
 		chem = [0, mu]
 		interactions_with_neighbours = m_par[1]
 
-		merged_nodes = int(m_par[-1])
+		merged_nodes = len(interactions_with_neighbours)#int(m_par[-1])
 		calc.nodes = merged_nodes
-		if len(interactions_with_neighbours) > merged_nodes:
-			print("ERROR! You should increase size of merged nodes!")
-			exit()
+		#if len(interactions_with_neighbours) > merged_nodes:
+		#	print("ERROR! You should increase size of merged nodes!")
+		#	exit()
 		states = 2 #it is for langmuir model
 		new_nodes_combinations = product(range(states), repeat = merged_nodes)
 		combinations = []
@@ -96,21 +96,12 @@ def build_matrix (calc, temp, m_par):
 				cur_en = combinations_en[n1] + combinations_en[n2]
 				for i in range(1, len(interactions_with_neighbours) + 1):
 					for j in range(i):
-						if j >= merged_nodes:
-							break
-						cur_en += interactions_with_neighbours[i - 1] * comb2[j] * comb1[-1-j]
+						#if (i - 1 - j) > (merged_nodes - 1) or (-1 - j) < -merged_nodes:
+						#	continue
+						cur_en += interactions_with_neighbours[i - 1] * comb2[i - 1 - j] * comb1[-1 - j]
 				line.append((cur_mu - cur_en))
 			matrix.append(line)
 		matrixes = [np.array(matrix) ,]
-		#print(matrixes)
-		#matrixes = [np.array([[0.0, m_par[0] / neigbours], [m_par[0] / neigbours, -m_par[1] + m_par[0] / (neigbours / 2.0)]]) ,]
-		#matrixes = [np.array([[0, mu / 4.0, mu / 4.0, mu / 2.0 - m_par[1] / 4.0],
-		#matrixes = [np.array([[0, mu / 2.0, mu / 2.0, mu - m_par[1] / 2.0],
-		#			[mu / 2.0, mu, mu - m_par[1], 3 / 2 * mu - 3 / 2 * m_par[1]],
-		#			[mu / 2.0, mu, mu, 3 / 2 * mu - m_par[1] / 2.0],
-		#			[mu - m_par[1] / 2.0, 3 / 2 * mu - m_par[1] / 2, 3 / 2 * mu - 3 / 2 * m_par[1], 2 * mu - 2 * m_par[1]]]) ,]
-		#print(matrixes)
-		#exit()
 	elif model == "langmuir_m":
 		mult = np.zeros((2, 2, 2))
 		mult[1, 1, 1] = -m_par[2]
