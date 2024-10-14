@@ -59,6 +59,8 @@ def build_matrix (calc, temp, m_par):
 	#m_par: 0 - mu, 1 - eps, 2 - multipartical interaction
 	elif model == "long-range":
 		mu = m_par[0]
+		mean_field = m_par[2]
+		mu += mean_field
 		chem = [0, mu]
 		interactions_with_neighbours = m_par[1]
 
