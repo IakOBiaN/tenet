@@ -62,6 +62,8 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 	for i in range(calc.iterations):
 		if calc.method == "trg":
 			(tensors, scale, norm) = tn.trg_step(tensors, scale, norm, calc)
+		elif calc.method == "btrg":
+			(tensors, scale, norm) = tn.btrg_step(tensors, scale, norm, calc)
 		elif calc.method == "hotrg":
 			(tensors, scale, norm) = tn.hotrg_step(tensors, scale, norm, calc)
 		elif calc.method == "htn":

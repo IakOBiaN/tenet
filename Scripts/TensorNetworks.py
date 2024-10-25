@@ -325,6 +325,42 @@ def trg_square(tensor, scale, calc):
 	gc.collect()
 	return tensor, scale
 
+def btrg_square(tensor, scale, calc):
+	k = -0.5
+
+	S1_btrg = tensor[1]
+	S2_btrg = tensor[2]
+
+	U_1,S_1,V_1 = tensor_svd(tensor[0], [0, 1], [2, 3], calc.metParam)
+	U_2,S_2,V_2 = tensor_svd(tensor[0], [0, 3], [1, 2], calc.metParam)
+
+	E = np.einsum("ab, b -> ab", np.eye(len(S_1)), np.power(S_1, k))
+	F = np.einsum("ab, b -> ab", np.eye(len(S_2)), np.power(S_2, k))
+
+	S_1 = np.power(S_1, (1.0 - k) / 2.0)
+	U_1 = np.einsum("abi, i -> abi", U_1, S_1)
+	V_1 = np.einsum("ibc, i -> ibc", V_1, S_1)
+	S_2 = np.power(S_2, (1.0 - k) / 2.0)
+	U_2 = np.einsum("abi, i -> abi", U_2, S_2)
+	V_2 = np.einsum("ibc, i -> ibc",V_2, S_2)
+
+	#BTRG part
+	V_1 = np.einsum("aic, ij -> ajc", V_1, S2_btrg)
+	V_2 = np.einsum("ajc, ij -> aic", V_2, S1_btrg)
+	U_1 = np.einsum("jbc, ij -> ibc", U_1, S2_btrg)
+	U_2 = np.einsum("aic, ij -> ajc", U_2, S1_btrg)
+	tensor[1] = E
+	tensor[2] = F
+
+	tensor_1 = np.tensordot(V_2, V_1, ([1], [2]))
+	tensor_2 = np.tensordot(U_1, U_2, ([1], [1]))
+	tensor[0] = np.tensordot(tensor_1, tensor_2, ([1, 3], [0, 2]))
+	tensor[0] = np.swapaxes(tensor[0], 2, 3)
+
+	scale *= 2
+	gc.collect()
+	return tensor, scale
+
 def trg_hexagonal(tensors, scale, calc):
 	tensor1 = np.einsum("abc, cjk -> abkj", tensors[0], tensors[1])
 	tensor2 = np.einsum("abc, ibk -> aikc", tensors[0], tensors[1])
@@ -392,6 +428,46 @@ def trg_step(tensors, scale, norm, calc):
 			scale += np.log(norm)
 		tensors, scale = trg_square(tensors, scale, calc)
 		tensors, scale = trg_square(tensors, scale, calc)
+		norm = np.einsum("abab->",tensors[0])
+		if norm < 0:
+			norm = -norm
+	gc.collect()
+	return (tensors, scale, norm)
+
+def btrg_step(tensors, scale, norm, calc):
+	if (calc.metModification == "hex"):
+		print("Error! HEX now is not ready!")
+		exit()
+		"""calc.scale = 9
+		if len(tensors) < 2:
+			U, S, V = tensor_svd(tensors[0], [0, 1], [3, 2])
+			S = np.sqrt(S)
+			U = np.einsum("abi, i -> abi", U, S)
+			V = np.einsum("ibc, i -> ibc", V, S)
+			tensors = list((U, V))
+		norm = abs(np.einsum("abc, cba -> ", tensors[0], tensors[1]))
+		if norm != 0:
+			for i, ten in enumerate(tensors):
+				tensors[i] = ten/sqrt(norm)
+			scale += np.log(norm)
+		tensors, scale = trg_hexagonal(tensors, scale, calc)
+		tensors, scale = trg_hexagonal(tensors, scale, calc)
+		norm = abs(np.einsum("abc, cba -> ", tensors[0], tensors[1]))
+		if norm < 0:
+			norm = -norm"""
+	else:
+		if len(tensors) == 1:
+			tensors.append(np.eye(tensors[0].shape[1]))
+			tensors.append(np.eye(tensors[0].shape[0]))
+		norm = tensors[0].max()
+		print(norm)
+		if norm != 0:
+			tensors[0] /= norm
+			scale += np.log(norm)
+		tensors, scale = btrg_square(tensors, scale, calc)
+		tensors, scale = btrg_square(tensors, scale, calc)
+		#norm = np.einsum("ajkd, ij, kl->aild",tensors[0], tensors[1], tensors[2])
+		#norm = np.einsum("abab->",norm)
 		norm = np.einsum("abab->",tensors[0])
 		if norm < 0:
 			norm = -norm
