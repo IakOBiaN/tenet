@@ -326,7 +326,10 @@ def trg_square(tensor, scale, calc):
 	return tensor, scale
 
 def btrg_square(tensor, scale, calc):
-	k = -0.5
+	if calc.metModification == "default":
+		k = -0.5
+	else:
+		k = calc.metModification
 
 	S1_btrg = tensor[1]
 	S2_btrg = tensor[2]

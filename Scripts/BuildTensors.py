@@ -26,7 +26,7 @@ def build_matrix (calc, temp, m_par):
 		"langmuir_m" : True,
 		"binary" : True,
 		"ising" : True,
-		"hard-disk" : True,
+		"hard-hexagon" : True,
 		"TLAT" : True,
 		"dimers" : True,
 		"1NN" : True,
@@ -186,7 +186,7 @@ def build_matrix (calc, temp, m_par):
 		matrixes = [np.array([[0.0, m_par[0] / neigbours, m_par[1] / neigbours], [m_par[0] / neigbours, -m_par[2] + 2.0 * m_par[0] / neigbours, (m_par[0] + m_par[1]) / neigbours], [m_par[1] / neigbours, (m_par[0] + m_par[1]) / neigbours, -m_par[3] + 2.0 * m_par[1] / neigbours]]) ,] * 3
 	elif model == "ising":
 		matrixes = [np.array([[(m_par[1] - m_par[0] / (neigbours / 2.0)), (-m_par[1])],[(-m_par[1]), (m_par[1] + m_par[0] / (neigbours / 2.0))]]), ] * 3
-	elif model == "hard-disk":
+	elif model == "hard-hexagon":
 		matrixes = [np.array([[0.0, m_par[0] / (neigbours)],[m_par[0] / (neigbours), inf + m_par[0]]]), ] * 3
 	elif model == "TLAT":
 		matrixes = [np.array([[-m_par[1] - m_par[2] - m_par[3], -m_par[1] + m_par[2] + m_par[3], m_par[1] - m_par[2] + m_par[3], m_par[1] + m_par[2] - m_par[3]], [-m_par[1] + m_par[2] + m_par[3], -m_par[1] - m_par[2] - m_par[3], m_par[1] + m_par[2] - m_par[3], m_par[1] - m_par[2] + m_par[3]], [m_par[1] - m_par[2] + m_par[3], m_par[1] + m_par[2] - m_par[3], -m_par[1] - m_par[2] - m_par[3], -m_par[1] + m_par[2] + m_par[3]], [m_par[1] + m_par[2] - m_par[3], m_par[1] - m_par[2] + m_par[3], -m_par[1] + m_par[2] + m_par[3], -m_par[1] - m_par[2] - m_par[3]]]), ] * 3
