@@ -459,16 +459,16 @@ def btrg_step(tensors, scale, norm, calc):
 		if len(tensors) == 1:
 			tensors.append(np.eye(tensors[0].shape[1]))
 			tensors.append(np.eye(tensors[0].shape[0]))
-		norm = tensors[0].max()
-		print(norm)
+		temp_tensor = np.einsum("ajkd, ij, kl->aild",tensors[0], tensors[1], tensors[2])
+		norm = temp_tensor.max()
 		if norm != 0:
 			tensors[0] /= norm
 			scale += np.log(norm)
 		tensors, scale = btrg_square(tensors, scale, calc)
 		tensors, scale = btrg_square(tensors, scale, calc)
-		#norm = np.einsum("ajkd, ij, kl->aild",tensors[0], tensors[1], tensors[2])
-		#norm = np.einsum("abab->",norm)
-		norm = np.einsum("abab->",tensors[0])
+		norm = np.einsum("ajkd, ij, kl->aild",tensors[0], tensors[1], tensors[2])
+		norm = np.einsum("abab->",norm)
+		#norm = np.einsum("abab->",tensors[0])
 		if norm < 0:
 			norm = -norm
 	gc.collect()
