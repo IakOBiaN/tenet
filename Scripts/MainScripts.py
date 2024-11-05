@@ -46,11 +46,11 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 	if calc.metParam == 1 and calc.method == "tm":
 		calc.coord = 2
 
-	matrixes = bt.build_matrix(calc, T, m_par)
+	matrixes, first_norm = bt.build_matrix(calc, T, m_par)
 	if calc.method != "htn" and (calc.metParam > 1 and calc.method != "tm"):
 		tensors = tn.build_tensor(calc, matrixes)
 
-	scale = 0.0
+	scale = first_norm
 	old_scale = -1.0
 	norm = 0
 

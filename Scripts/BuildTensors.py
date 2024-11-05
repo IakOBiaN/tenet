@@ -860,8 +860,18 @@ def build_matrix (calc, temp, m_par):
 
 	for i in range(len(matrixes)):
 		matrixes[i] = matrixes[i] / (calc.constant * temp)
+		max_value = matrixes[i].max()
+		first_norm = 0
+		if max_value > 650:
+			temp_norm = matrixes[i] / (matrixes[i] - first_norm)
+			for k, a in enumerate(temp_norm):
+				for m, b in enumerate(a):
+					if b == 0:
+						temp_norm[k][m] = 1
+			matrixes[i] = np.divide(matrixes[i], temp_norm)
 		matrixes[i] = np.array([np.exp(line) for line in matrixes[i]])
-	return matrixes
+
+	return matrixes, first_norm
 
 #old code for triangles
 """
