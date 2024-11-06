@@ -24,20 +24,20 @@ start_time = timeit.default_timer()
 
 calc = ms.CalcConfig()
 
-calc.method = "tm"
+calc.method = "trg"
 calc.metModification = "default"
-calc.model = "1D_long-range"
-calc.lattice = "square"
+calc.model = "2D_long-range"
+calc.lattice = "triangular"
 calc.gen_tensor = "default"
-calc.metParam = 1
+calc.metParam = 16
 #model params
-T = 0.1
+T = 1.0
 calc.constant = 1
-#interactions = repulsions(sigma = 5, int_distance = 5)
+interactions = repulsions(sigma = 5, int_distance = 2)
 #interactions = lennard_jones(sigma = 1.782, eps_lj = 1, int_distance = 5)
 #interactions = nonmonotonic(eps_f = 12.5, q_f = 1.06, delta_f = pi / 2, int_distance = 10)
-interactions = [1.0, 0.57735, 0.5, 0.37796, 0.33333, 0.28868, 0.27735, 0.25, 0.22942]
-for mu in ms.np.arange(-1, 10.01, 0.1):
+#interactions = [1.0, 0.57735, 0.5, 0.37796, 0.33333, 0.28868, 0.27735, 0.25, 0.22942]
+for mu in ms.np.arange(-5, 10.01, 0.1):
 	m_par = [mu, interactions, 0, 0, 0, 0]
 	result = ms.full(calc, T, m_par, T_derivative = False)
 	calc_time = timeit.default_timer() - start_time

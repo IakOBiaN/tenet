@@ -46,7 +46,8 @@ def build_matrix (calc, temp, m_par):
 		"CHD_complex" : True,
 		"six_leg_test" : True,
 		"dimers_test" : True,
-		"long-range" : True
+		"1D_long-range" : True,
+		"2D_long-range" : True
 	}
 
 	exist = models_dict.get(calc.model)
@@ -57,7 +58,7 @@ def build_matrix (calc, temp, m_par):
 	if model == "langmuir":
 		matrixes = [np.array([[0.0, m_par[0] / neigbours], [m_par[0] / neigbours, -m_par[1] + m_par[0] / (neigbours / 2.0)]]) ,] * 3
 	#m_par: 0 - mu, 1 - eps, 2 - multipartical interaction
-	elif model == "long-range":
+	elif model == "1D_long-range":
 		mu = m_par[0]
 		mean_field = m_par[2]
 		mu += mean_field
@@ -104,6 +105,41 @@ def build_matrix (calc, temp, m_par):
 				line.append((cur_mu - cur_en))
 			matrix.append(line)
 		matrixes = [np.array(matrix) ,]
+	elif model == "2D_long-range":
+		mu = m_par[0]
+		mean_field = m_par[2]
+		mu += mean_field
+		chem = [0, mu]
+		interactions_with_neighbours = m_par[1]
+
+		number_of_interactions = len(interactions_with_neighbours)
+		merged_nodes = 2 #here we should calculate number of merged nodes
+		calc.nodes = merged_nodes ** 2
+		states = len(chem)
+
+		new_nodes_combinations = product(range(states), repeat = merged_nodes ** 2)
+		combinations = []
+		combinations_mu = []
+		combinations_en = []
+		for comb in new_nodes_combinations:
+			comb_np = np.array(comb).reshape((merged_nodes, merged_nodes))
+			cur_mu = 0
+			cur_en = 0
+			for i in range(merged_nodes):
+				for j in range(merged_nodes):
+					cur_mu += chem[comb_np[i][j]]
+					"""for int_numbers in range(len(interactions_with_neighbours)):
+						inter_node = i + (j + 1)
+						if inter_node >= merged_nodes:
+							break
+						cur_en += interactions_with_neighbours[j] * comb[i] * comb[i + (j + 1)]"""
+
+			print(comb_np, cur_mu)
+			combinations.append(comb_np)
+			combinations_mu.append(cur_mu / neigbours)
+			combinations_en.append(cur_en / neigbours)
+		print("End of current version of the program")
+		exit()
 	elif model == "langmuir_m":
 		mult = np.zeros((2, 2, 2))
 		mult[1, 1, 1] = -m_par[2]
