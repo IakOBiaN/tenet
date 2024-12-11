@@ -65,12 +65,9 @@ def build_matrix (calc, temp, m_par):
 		chem = [0, mu]
 		interactions_with_neighbours = m_par[1]
 
-		merged_nodes = len(interactions_with_neighbours)#int(m_par[-1])
+		merged_nodes = len(interactions_with_neighbours)
 		calc.nodes = merged_nodes
-		#if len(interactions_with_neighbours) > merged_nodes:
-		#	print("ERROR! You should increase size of merged nodes!")
-		#	exit()
-		states = 2 #it is for langmuir model
+		states = 2 #it is for two state models
 		new_nodes_combinations = product(range(states), repeat = merged_nodes)
 		combinations = []
 		combinations_mu = []
@@ -99,8 +96,6 @@ def build_matrix (calc, temp, m_par):
 				cur_en = combinations_en[n1] + combinations_en[n2]
 				for i in range(1, len(interactions_with_neighbours) + 1):
 					for j in range(i):
-						#if (i - 1 - j) > (merged_nodes - 1) or (-1 - j) < -merged_nodes:
-						#	continue
 						cur_en += interactions_with_neighbours[i - 1] * comb2[i - 1 - j] * comb1[-1 - j]
 				line.append((cur_mu - cur_en))
 			matrix.append(line)
@@ -121,6 +116,42 @@ def build_matrix (calc, temp, m_par):
 		combinations = []
 		combinations_mu = []
 		combinations_en = []
+		#here we should create pattern for interactions
+		pattern = np.zeros((11, 11), dtype = int)
+		pattern_center = 5
+		if calc.lattice == "square":
+			pattern[pattern_center][pattern_center] = 0
+			pattern[pattern_center - 1][pattern_center] = 1
+			pattern[pattern_center + 1][pattern_center] = 1
+			pattern[pattern_center][pattern_center - 1] = 1
+			pattern[pattern_center][pattern_center + 1] = 1
+			pattern[pattern_center - 1][pattern_center - 1] = 2
+			pattern[pattern_center + 1][pattern_center + 1] = 2
+			pattern[pattern_center - 1][pattern_center + 1] = 2
+			pattern[pattern_center + 1][pattern_center - 1] = 2
+		elif calc.lattice == "triangular":
+			pattern[pattern_center][pattern_center] = 0
+			pattern[pattern_center - 1][pattern_center] = 1
+			pattern[pattern_center + 1][pattern_center] = 1
+			pattern[pattern_center][pattern_center - 1] = 1
+			pattern[pattern_center][pattern_center + 1] = 1
+			pattern[pattern_center - 1][pattern_center + 1] = 1
+			pattern[pattern_center + 1][pattern_center - 1] = 1
+
+			pattern[pattern_center - 2][pattern_center + 1] = 2
+			pattern[pattern_center - 1][pattern_center + 2] = 2
+			pattern[pattern_center + 1][pattern_center + 1] = 2
+			pattern[pattern_center + 2][pattern_center - 1] = 2
+			pattern[pattern_center + 1][pattern_center - 2] = 2
+			pattern[pattern_center - 1][pattern_center - 1] = 2
+
+			pattern[pattern_center][pattern_center + 2] = 3
+			pattern[pattern_center + 2][pattern_center] = 3
+			pattern[pattern_center + 2][pattern_center - 2] = 3
+			pattern[pattern_center][pattern_center - 2] = 3
+			pattern[pattern_center - 2][pattern_center] = 3
+			pattern[pattern_center - 2][pattern_center + 2] = 3
+
 		for comb in new_nodes_combinations:
 			comb_np = np.array(comb).reshape((merged_nodes, merged_nodes))
 			cur_mu = 0
@@ -128,18 +159,64 @@ def build_matrix (calc, temp, m_par):
 			for i in range(merged_nodes):
 				for j in range(merged_nodes):
 					cur_mu += chem[comb_np[i][j]]
-					"""for int_numbers in range(len(interactions_with_neighbours)):
-						inter_node = i + (j + 1)
-						if inter_node >= merged_nodes:
-							break
-						cur_en += interactions_with_neighbours[j] * comb[i] * comb[i + (j + 1)]"""
+					for ii in range(merged_nodes):
+						for jj in range(merged_nodes):
+							xx = ii - i + pattern_center
+							yy = j - jj + pattern_center
+							neighbour = pattern[xx][yy]
+							if neighbour == 0:
+								continue
+							else:
+								energy = comb_np[i][j] * comb_np[ii][jj] * interactions_with_neighbours[neighbour - 1]
+								cur_en += energy
 
-			print(comb_np, cur_mu)
 			combinations.append(comb_np)
 			combinations_mu.append(cur_mu / neigbours)
 			combinations_en.append(cur_en / neigbours)
-		print("End of current version of the program")
-		exit()
+
+		#interactions between new nodes
+		matrix_1 = []
+		matrix_2 = []
+		matrix_3 = []
+		for n1, comb1 in enumerate(combinations):
+			line_1 = []
+			line_2 = []
+			line_3 = []
+			for n2, comb2 in enumerate(combinations):
+				cur_mu = combinations_mu[n1] + combinations_mu[n2]
+				cur_en_1 = combinations_en[n1] + combinations_en[n2]
+				cur_en_2 = combinations_en[n1] + combinations_en[n2]
+				cur_en_3 = combinations_en[n1] + combinations_en[n2]
+				for i in range(merged_nodes):
+					for j in range(merged_nodes):
+						for ii in range(merged_nodes):
+							for jj in range(merged_nodes):
+								#right-up
+								xx = ii - i + pattern_center
+								yy = j - jj + merged_nodes + pattern_center
+								neighbour = pattern[xx][yy]
+								if neighbour > 0 and neighbour < len(interactions_with_neighbours):
+									cur_en_1 += comb1[i][j] * comb2[ii][jj] * interactions_with_neighbours[neighbour - 1]
+								#right
+								xx = (ii + merged_nodes) - i + pattern_center
+								yy = j - jj + pattern_center
+								neighbour = pattern[xx][yy]
+								if neighbour > 0 and neighbour < len(interactions_with_neighbours):
+									cur_en_2 += comb1[i][j] * comb2[ii][jj] * interactions_with_neighbours[neighbour - 1]
+								#right-bottom
+								xx = (ii + merged_nodes) - i + pattern_center
+								yy = j - (jj + merged_nodes) + pattern_center
+								neighbour = pattern[xx][yy]
+								if neighbour > 0  and neighbour < len(interactions_with_neighbours):
+									cur_en_3 += comb1[i][j] * comb2[ii][jj] * interactions_with_neighbours[neighbour - 1]
+
+				line_1.append((cur_mu - cur_en_1))
+				line_2.append((cur_mu - cur_en_2))
+				line_3.append((cur_mu - cur_en_3))
+			matrix_1.append(line_1)
+			matrix_2.append(line_2)
+			matrix_3.append(line_3)
+		matrixes = [np.array(matrix_1) ,np.array(matrix_2) ,np.array(matrix_3)]
 	elif model == "langmuir_m":
 		mult = np.zeros((2, 2, 2))
 		mult[1, 1, 1] = -m_par[2]
