@@ -79,7 +79,7 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 			assert False, "Error! There is no such method."
 
 		if calc.method != "htn":
-			if abs(old_scale - scale / calc.scale) < calc.methodTolerance and i > minimum_iterations:
+			if (abs(old_scale - scale / calc.scale) < calc.methodTolerance and i > minimum_iterations) or (tensors[0].size < 2):
 				break
 			else:
 				old_scale = scale
