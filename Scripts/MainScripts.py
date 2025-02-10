@@ -60,6 +60,8 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 	for i in range(calc.iterations):
 		if calc.method == "trg":
 			(tensors, scale, norm) = tn.trg_step(tensors, scale, norm, calc)
+		elif calc.method == "btrg":
+			(tensors, scale, norm) = tn.btrg_step(tensors, scale, norm, calc)
 		elif calc.method == "hotrg":
 			(tensors, scale, norm) = tn.hotrg_step(tensors, scale, norm, calc)
 		elif calc.method == "htn":
@@ -78,7 +80,7 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 			assert False, "Error! There is no such method."
 
 		if calc.method != "htn":
-			if abs(old_scale - scale / calc.scale) < calc.methodTolerance and i > minimum_iterations:
+			if (abs(old_scale - scale / calc.scale) < calc.methodTolerance and i > minimum_iterations) or (tensors[0].size < 2):
 				break
 			else:
 				old_scale = scale
