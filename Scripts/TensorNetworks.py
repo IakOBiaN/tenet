@@ -469,6 +469,12 @@ def btrg_step(tensors, scale, norm, calc):
 			tensors[0] /= norm
 			scale += np.log(norm)
 		tensors, scale = btrg_square(tensors, scale, calc)
+		temp_tensor = np.einsum("ajcd, ij->aicd",tensors[0], tensors[1])
+		temp_tensor = np.einsum("abkd, kl->abld",temp_tensor, tensors[2])
+		norm = temp_tensor.max()
+		if norm != 0:
+			tensors[0] /= norm
+			scale += np.log(norm)
 		tensors, scale = btrg_square(tensors, scale, calc)
 		norm = np.einsum("ajcd, ij->aicd",tensors[0], tensors[1])
 		norm = np.einsum("abkd, kl->abld",norm, tensors[2])
