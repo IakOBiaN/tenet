@@ -108,28 +108,20 @@ def build_matrix (calc, temp, m_par):
 		interactions_with_neighbours = m_par[1]
 
 		number_of_interactions = len(interactions_with_neighbours)
-		merged_nodes = 2 #here we should calculate number of merged nodes
-		calc.nodes = merged_nodes ** 2
+		triangular_value = 3
+		merged_nodes = round(1 / 2 * triangular_value * (triangular_value + 1)) #here we should calculate number of merged nodes
+		calc.nodes = 1
 		states = len(chem)
 
-		new_nodes_combinations = product(range(states), repeat = merged_nodes ** 2)
+		new_nodes_combinations = product(range(states), repeat = merged_nodes)
 		combinations = []
-		combinations_mu = []
-		combinations_en = []
 		#here we should create pattern for interactions
 		pattern = np.zeros((11, 11), dtype = int)
 		pattern_center = 5
-		if calc.lattice == "square":
-			pattern[pattern_center][pattern_center] = 0
-			pattern[pattern_center - 1][pattern_center] = 1
-			pattern[pattern_center + 1][pattern_center] = 1
-			pattern[pattern_center][pattern_center - 1] = 1
-			pattern[pattern_center][pattern_center + 1] = 1
-			pattern[pattern_center - 1][pattern_center - 1] = 2
-			pattern[pattern_center + 1][pattern_center + 1] = 2
-			pattern[pattern_center - 1][pattern_center + 1] = 2
-			pattern[pattern_center + 1][pattern_center - 1] = 2
-		elif calc.lattice == "triangular":
+		if calc.lattice == "square2":
+			print("Error! Now square lattice is not working...")
+			exit()
+		elif calc.lattice == "triangular" or calc.lattice == "square":
 			pattern[pattern_center][pattern_center] = 0
 			pattern[pattern_center - 1][pattern_center] = 1
 			pattern[pattern_center + 1][pattern_center] = 1
@@ -152,67 +144,134 @@ def build_matrix (calc, temp, m_par):
 			pattern[pattern_center - 2][pattern_center] = 3
 			pattern[pattern_center - 2][pattern_center + 2] = 3
 
+		#here we will calculate all interactions in one node (but it will be all interactions in the system because of overlaps)
 		for comb in new_nodes_combinations:
-			comb_np = np.array(comb).reshape((merged_nodes, merged_nodes))
-			cur_mu = 0
-			cur_en = 0
-			for i in range(merged_nodes):
-				for j in range(merged_nodes):
-					cur_mu += chem[comb_np[i][j]]
-					for ii in range(merged_nodes):
-						for jj in range(merged_nodes):
-							xx = ii - i + pattern_center
-							yy = j - jj + pattern_center
-							neighbour = pattern[xx][yy]
-							if neighbour == 0:
-								continue
-							else:
-								energy = comb_np[i][j] * comb_np[ii][jj] * interactions_with_neighbours[neighbour - 1]
-								cur_en += energy
-
+			comb_np = np.full((triangular_value, triangular_value), None)
+			counter = 0
+			for i in range(triangular_value):
+				for j in range(i + 1):
+					comb_np[i][j] = comb[counter]
+					counter += 1
+			#comb_np = np.array(comb).reshape((merged_nodes, merged_nodes))
 			combinations.append(comb_np)
-			combinations_mu.append(cur_mu / neigbours)
-			combinations_en.append(cur_en / neigbours)
 
-		#interactions between new nodes
+		#here we should check nodes compatibility and calculate probability matrixes
 		matrix_1 = []
 		matrix_2 = []
 		matrix_3 = []
+		diff_nodes = 9 * 2
+		common_nodes = 10
 		for n1, comb1 in enumerate(combinations):
 			line_1 = []
 			line_2 = []
 			line_3 = []
 			for n2, comb2 in enumerate(combinations):
-				cur_mu = combinations_mu[n1] + combinations_mu[n2]
-				cur_en_1 = combinations_en[n1] + combinations_en[n2]
-				cur_en_2 = combinations_en[n1] + combinations_en[n2]
-				cur_en_3 = combinations_en[n1] + combinations_en[n2]
-				for i in range(merged_nodes):
-					for j in range(merged_nodes):
-						for ii in range(merged_nodes):
-							for jj in range(merged_nodes):
-								#right-up
-								xx = ii - i + pattern_center
-								yy = j - jj + merged_nodes + pattern_center
-								neighbour = pattern[xx][yy]
-								if neighbour > 0 and neighbour < len(interactions_with_neighbours):
-									cur_en_1 += comb1[i][j] * comb2[ii][jj] * interactions_with_neighbours[neighbour - 1]
-								#right
-								xx = (ii + merged_nodes) - i + pattern_center
-								yy = j - jj + pattern_center
-								neighbour = pattern[xx][yy]
-								if neighbour > 0 and neighbour < len(interactions_with_neighbours):
-									cur_en_2 += comb1[i][j] * comb2[ii][jj] * interactions_with_neighbours[neighbour - 1]
-								#right-bottom
-								xx = (ii + merged_nodes) - i + pattern_center
-								yy = j - (jj + merged_nodes) + pattern_center
-								neighbour = pattern[xx][yy]
-								if neighbour > 0  and neighbour < len(interactions_with_neighbours):
-									cur_en_3 += comb1[i][j] * comb2[ii][jj] * interactions_with_neighbours[neighbour - 1]
+				cur_mu_1 = 0#combinations_mu[n1] + combinations_mu[n2]
+				cur_mu_2 = 0#combinations_mu[n1] + combinations_mu[n2]
+				cur_mu_3 = 0#combinations_mu[n1] + combinations_mu[n2]
+				cur_en_1 = 0#combinations_en[n1] + combinations_en[n2]
+				cur_en_2 = 0#combinations_en[n1] + combinations_en[n2]
+				cur_en_3 = 0#combinations_en[n1] + combinations_en[n2]
+				cur_mu_1 += (chem[comb1[2][0]] + chem[comb1[2][1]] + chem[comb1[2][2]]) / diff_nodes
+				cur_mu_1 += (chem[comb2[0][0]] + chem[comb2[1][1]] + chem[comb2[2][2]]) / diff_nodes
+				cur_mu_1 += (chem[comb1[0][0]] + chem[comb1[1][1]] + chem[comb1[1][0]]) / diff_nodes
 
-				line_1.append((cur_mu - cur_en_1))
-				line_2.append((cur_mu - cur_en_2))
-				line_3.append((cur_mu - cur_en_3))
+				"""cur_mu_1 += (chem[comb1[1][0]] + chem[comb1[1][1]]) / diff_nodes
+				cur_mu_1 += (chem[comb2[0][0]] + chem[comb2[1][1]]) / diff_nodes
+				cur_mu_1 += (chem[comb1[0][0]]) / diff_nodes"""
+
+				cur_mu_2 += (chem[comb1[0][0]] + chem[comb1[1][0]] + chem[comb1[2][0]]) / diff_nodes
+				cur_mu_2 += (chem[comb2[0][0]] + chem[comb2[1][1]] + chem[comb2[2][2]]) / diff_nodes
+				cur_mu_2 += (chem[comb1[1][1]] + chem[comb1[2][2]] + chem[comb1[2][1]]) / diff_nodes
+
+				"""cur_mu_2 += (chem[comb1[0][0]] + chem[comb1[1][0]]) / diff_nodes
+				cur_mu_2 += (chem[comb2[0][0]] + chem[comb2[1][1]]) / diff_nodes
+				cur_mu_2 += (chem[comb1[1][1]]) / diff_nodes"""
+
+				cur_mu_3 += (chem[comb1[0][0]] + chem[comb1[1][0]] + chem[comb1[2][0]]) / diff_nodes
+				cur_mu_3 += (chem[comb2[2][0]] + chem[comb2[2][1]] + chem[comb2[2][2]]) / diff_nodes
+				cur_mu_3 += (chem[comb1[1][1]] + chem[comb1[2][2]] + chem[comb1[2][1]]) / diff_nodes
+				
+				"""cur_mu_3 += (chem[comb1[0][0]] + chem[comb1[1][0]]) / diff_nodes
+				cur_mu_3 += (chem[comb2[1][0]] + chem[comb2[1][1]]) / diff_nodes
+				cur_mu_3 += (chem[comb1[1][1]]) / diff_nodes"""
+
+				"""cur_en_1 += comb1[0][0] * comb1[1][0] * interactions_with_neighbours[0] / common_nodes
+				cur_en_1 += comb1[0][0] * comb1[1][1] * interactions_with_neighbours[0] / common_nodes
+				cur_en_1 += comb1[1][0] * comb1[1][1] * interactions_with_neighbours[0] / common_nodes
+
+				cur_en_1 += comb2[0][0] * comb2[1][0] * interactions_with_neighbours[0] / common_nodes
+				cur_en_1 += comb2[0][0] * comb2[1][1] * interactions_with_neighbours[0] / common_nodes
+				cur_en_1 += comb2[1][0] * comb2[1][1] * interactions_with_neighbours[0] / common_nodes"""
+
+				cur_en_1 += comb1[0][0] * comb1[1][0] * interactions_with_neighbours[0] / common_nodes
+				cur_en_1 += comb1[0][0] * comb1[1][1] * interactions_with_neighbours[0] / common_nodes
+				cur_en_1 += comb1[1][0] * comb1[1][1] * interactions_with_neighbours[0] / common_nodes
+				cur_en_1 += comb1[1][1] * comb1[2][1] * interactions_with_neighbours[0] / common_nodes
+				cur_en_1 += comb1[1][1] * comb1[2][2] * interactions_with_neighbours[0] / common_nodes
+				cur_en_1 += comb1[2][1] * comb1[2][2] * interactions_with_neighbours[0] / common_nodes
+
+				cur_en_1 += comb2[1][0] * comb2[2][0] * interactions_with_neighbours[0] / common_nodes
+				cur_en_1 += comb2[1][0] * comb2[2][1] * interactions_with_neighbours[0] / common_nodes
+				cur_en_1 += comb2[2][0] * comb2[2][1] * interactions_with_neighbours[0] / common_nodes
+				cur_en_1 += comb2[1][1] * comb2[2][1] * interactions_with_neighbours[0] / common_nodes
+				cur_en_1 += comb2[1][1] * comb2[2][2] * interactions_with_neighbours[0] / common_nodes
+				cur_en_1 += comb2[2][1] * comb2[2][2] * interactions_with_neighbours[0] / common_nodes
+
+				cur_en_1 += comb2[0][0] * comb2[1][0] * interactions_with_neighbours[0] / common_nodes
+				cur_en_1 += comb2[0][0] * comb2[1][1] * interactions_with_neighbours[0] / common_nodes
+				cur_en_1 += comb2[1][0] * comb2[1][1] * interactions_with_neighbours[0] / common_nodes
+
+				"""cur_en_2 += comb1[0][0] * comb1[1][0] * interactions_with_neighbours[0] / common_nodes
+				cur_en_2 += comb1[0][0] * comb1[1][1] * interactions_with_neighbours[0] / common_nodes
+				cur_en_2 += comb1[1][0] * comb1[1][1] * interactions_with_neighbours[0] / common_nodes
+
+				cur_en_2 += comb2[0][0] * comb2[1][0] * interactions_with_neighbours[0] / common_nodes
+				cur_en_2 += comb2[0][0] * comb2[1][1] * interactions_with_neighbours[0] / common_nodes
+				cur_en_2 += comb2[1][0] * comb2[1][1] * interactions_with_neighbours[0] / common_nodes"""
+
+				cur_en_2 += comb1[0][0] * comb1[1][0] * interactions_with_neighbours[0] / common_nodes
+				cur_en_2 += comb1[0][0] * comb1[1][1] * interactions_with_neighbours[0] / common_nodes
+				cur_en_2 += comb1[1][0] * comb1[1][1] * interactions_with_neighbours[0] / common_nodes
+				cur_en_2 += comb1[1][0] * comb1[2][0] * interactions_with_neighbours[0] / common_nodes
+				cur_en_2 += comb1[1][0] * comb1[2][1] * interactions_with_neighbours[0] / common_nodes
+				cur_en_2 += comb1[2][0] * comb1[2][1] * interactions_with_neighbours[0] / common_nodes
+
+				cur_en_2 += comb2[0][0] * comb2[1][0] * interactions_with_neighbours[0] / common_nodes
+				cur_en_2 += comb2[0][0] * comb2[1][1] * interactions_with_neighbours[0] / common_nodes
+				cur_en_2 += comb2[1][0] * comb2[1][1] * interactions_with_neighbours[0] / common_nodes
+				cur_en_2 += comb2[1][1] * comb2[2][2] * interactions_with_neighbours[0] / common_nodes
+				cur_en_2 += comb2[1][1] * comb2[2][1] * interactions_with_neighbours[0] / common_nodes
+				cur_en_2 += comb2[2][1] * comb2[2][2] * interactions_with_neighbours[0] / common_nodes
+				
+				cur_en_2 += comb1[1][1] * comb1[2][2] * interactions_with_neighbours[0] / common_nodes
+				cur_en_2 += comb1[1][1] * comb1[2][1] * interactions_with_neighbours[0] / common_nodes
+				cur_en_2 += comb1[2][1] * comb1[2][2] * interactions_with_neighbours[0] / common_nodes
+				
+				"""cur_en_3 += comb1[0][0] * comb1[1][0] * interactions_with_neighbours[0] / common_nodes
+				cur_en_3 += comb1[0][0] * comb1[1][1] * interactions_with_neighbours[0] / common_nodes
+				cur_en_3 += comb1[1][0] * comb1[1][1] * interactions_with_neighbours[0] / common_nodes
+
+				cur_en_3 += comb2[0][0] * comb2[1][0] * interactions_with_neighbours[0] / common_nodes
+				cur_en_3 += comb2[0][0] * comb2[1][1] * interactions_with_neighbours[0] / common_nodes
+				cur_en_3 += comb2[1][0] * comb2[1][1] * interactions_with_neighbours[0] / common_nodes"""
+				
+
+				if comb1[0][0] == comb2[1][0] and comb1[1][1] == comb2[2][1] and comb1[1][0] == comb2[2][0]:
+				#if comb1[0][0] == comb2[1][0]:
+					line_1.append((cur_mu_1 - cur_en_1))
+				else:
+					line_1.append(inf)
+				if comb1[1][1] == comb2[1][0] and comb1[2][1] == comb2[2][0] and comb1[2][2] == comb2[2][1]:
+				#if comb1[1][1] == comb2[1][0]:
+					line_2.append((cur_mu_2 - cur_en_2))
+				else:
+					line_2.append(inf)
+				if comb1[1][1] == comb2[0][0] and comb1[2][1] == comb2[1][0] and comb1[2][2] == comb2[1][1]:
+				#if comb1[1][1] == comb2[0][0]:
+					line_3.append((cur_mu_3 - cur_en_3))
+				else:
+					line_3.append(inf)
 			matrix_1.append(line_1)
 			matrix_2.append(line_2)
 			matrix_3.append(line_3)
