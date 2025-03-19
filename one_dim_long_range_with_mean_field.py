@@ -20,15 +20,13 @@ def nonmonotonic(eps_f, q_f, delta_f, int_distance):
 		interactions.append(-eps_f * (2 * sin(delta_f) / pi) ** 2 * sin(2 * q_f * r + 2 * delta_f) / (q_f * r) ** 2)
 	return interactions
 
-#aaa = nonmonotonic(12.5, 1.06, pi / 2, 10)
-
 start_time = timeit.default_timer()
 
 calc = ms.CalcConfig()
 
 calc.method = "tm"
 calc.metModification = "default"
-calc.model = "long-range"
+calc.model = "1D_long-range"
 calc.lattice = "square"
 calc.gen_tensor = "default"
 calc.metParam = 1
