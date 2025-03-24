@@ -36,9 +36,6 @@ class CalcConfig:
 		#joining nodes
 		self.join_tensors = join_tensors
 
-	def __str__(self):
-		return method + "_p_" + str(metParam) + "_" + model + "_" + lattice
-
 def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 
 	if calc.lattice == "triangular":
@@ -93,6 +90,8 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 			nodes *= 2 ** (calc.metModification[0] - 1)
 	if calc.method != "htn":
 		nodes *= calc.scale ** (i + 1)
+	if norm <= 0:
+		norm = 1
 	return (scale + log(norm)) / (nodes / (calc.constant * T))
 
 def coverage_old(method, model, lattice, temp = 1., m_par = [0.0]*10):

@@ -58,7 +58,10 @@ def build_tensor(calc, matrixes):
 			S2 = np.sqrt(S2)
 			U2 = np.einsum("ai,i->ai", U2, S2)
 			V2 = np.einsum("ib,i->ib", V2, S2)
-			tensor = np.einsum("ijkl, kc, ai, bj, ld -> abcd", identity(4, leg_size), U1, V1, V2, U2)
+			tensor = np.einsum("ijkl, kc -> ijcl", identity(4, leg_size), U1)
+			tensor = np.einsum("ijkl, ai -> ajkl", tensor, V1)
+			tensor = np.einsum("ijkl, bj -> ibkl", tensor, V2)
+			tensor = np.einsum("ijkl, ld -> ijkd", tensor, U2)
 			tensor = list((tensor, ))
 		elif (gen_tensor == "default"):
 			id4 = identity(4, leg_size)
