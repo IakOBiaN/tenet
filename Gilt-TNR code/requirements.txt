@@ -1,4 +1,0 @@
-scipy >= 0.18.1
-abeliantensors
-ncon
-git+https://github.com/mhauru/tntools
