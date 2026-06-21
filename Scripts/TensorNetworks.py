@@ -1,6 +1,5 @@
 from math import exp, log,sqrt
 import numpy as np
-from scipy.misc import derivative
 import scipy.sparse.linalg
 from scipy.linalg import sqrtm
 import gc

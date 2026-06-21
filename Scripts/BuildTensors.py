@@ -1,7 +1,6 @@
 from math import exp, log,sqrt, pi, cos, radians
 import numpy as np
 from itertools import product
-from scipy.misc import derivative
 import scipy.sparse.linalg
 from scipy.linalg import sqrtm
 

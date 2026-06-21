@@ -1,6 +1,5 @@
 from math import exp, log, sqrt
 import numpy as np
-from scipy.misc import derivative
 import scipy.sparse.linalg
 from scipy.linalg import sqrtm
 import Scripts.TensorNetworks as tn
@@ -44,7 +43,7 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 		calc.coord = 2
 
 	matrixes, first_norm = bt.build_matrix(calc, T, m_par)
-	if calc.method != "htn" and (calc.metParam > 1 and calc.method != "tm"):
+	if calc.method != "htn" and not (calc.method == "tm" and calc.metParam == 1):
 		tensors = tn.build_tensor(calc, matrixes)
 
 	scale = first_norm
@@ -94,16 +93,13 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 		norm = 1
 	return (scale + log(norm)) / (nodes / (calc.constant * T))
 
-def coverage_old(method, model, lattice, temp = 1., m_par = [0.0]*10):
-	result = derivative(lambda x: simulate(method, model, lattice, temp, [x]+m_par[1:]), m_par[0], n=1, dx=1e-3)
-	return result
-
-def magnetization(method,model,size, temp = 1., field = 0, int = [0]):
-	result = derivative(lambda x: simulate(model,size,temp,field,[x]), int[0], n=1, dx=1e-5)
-	return result
-
-def heat_capasity(calc, T = 1., m_par = [0.0]*10):
-	result = T * derivative(lambda x: simulate(calc, x, m_par), T, n=2, dx=1e-4)
+def heat_capasity(calc, T = 1., m_par = [0.0] * 10, dT = 1e-4):
+	#central second-order finite difference of the grand potential with respect to T
+	#reproduces scipy.misc.derivative(..., n = 2, dx = 1e-4), removed in SciPy 1.12
+	omega_minus = simulate(calc, T - dT, m_par)
+	omega_center = simulate(calc, T, m_par)
+	omega_plus = simulate(calc, T + dT, m_par)
+	result = T * (omega_minus - 2.0 * omega_center + omega_plus) / dT ** 2
 	return result
 
 def susceptibility(calc, T = 1., m_par = [0.0]*10, dmu = 1e-4, derivatives = [1, ] + [0] * 2):
@@ -122,10 +118,6 @@ def susceptibility(calc, T = 1., m_par = [0.0]*10, dmu = 1e-4, derivatives = [1,
 	result = calc.constant * T * (grandPotential_dmu[0] - 2.0 * grandPotential_dmu[1] + grandPotential_dmu[2]) / (dmu ** 2.0)
 	return result
 
-def enthropy_old(method,model,size, temp = 1., field = 0, int = [0]):
-	result = derivative(lambda x: simulate(model,size,x,field,int), temp, n=1, dx=1e-5)
-	return result
-
 def coverage(method, model, lattice, temp = 1., m_par = [0.0]*10, temp_size = 300):
 	BTP = []
 	mu_step = 1e-3
@@ -134,10 +126,6 @@ def coverage(method, model, lattice, temp = 1., m_par = [0.0]*10, temp_size = 30
 		BTP.append(lnZ)
 
 	result = -(BTP[0]-BTP[1])/(mu_step*2.0)
-	return result
-
-def coverage_h(func, model, T = 1.0, m_par = [0.0]*10, size = 1):
-	result = derivative(lambda x: func(model, T, [x] + m_par[1:], size), m_par[0], n=1, dx=0.001)
 	return result
 
 def entropy(method, model, lattice, temp = 1., m_par = [0.0]*10):
