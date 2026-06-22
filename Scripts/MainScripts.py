@@ -39,11 +39,16 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 
 	if calc.lattice == "triangular":
 		calc.coord = 6
-	if calc.metParam == 1 and calc.method == "tm":
+	#1D long-range models build their transfer matrix directly in build_matrix
+	#(a single ready matrix on a chain with coordination number 2), so they bypass
+	#build_tensor and feed the raw matrix straight into tm_step; every other model
+	#builds a tensor first
+	tm_uses_raw_matrix = (calc.method == "tm" and calc.model == "1D_long-range")
+	if tm_uses_raw_matrix:
 		calc.coord = 2
 
 	matrixes, first_norm = bt.build_matrix(calc, T, m_par)
-	if calc.method != "htn" and not (calc.method == "tm" and calc.metParam == 1):
+	if calc.method != "htn" and not tm_uses_raw_matrix:
 		tensors = tn.build_tensor(calc, matrixes)
 
 	scale = first_norm
@@ -68,7 +73,7 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 				break
 		elif calc.method == "tm":
 			calc.scale = 2
-			if calc.metParam == 1:
+			if tm_uses_raw_matrix:
 				(tensors, scale, norm) = tn.tm_step(matrixes, scale, norm, calc)
 			else:
 				(tensors, scale, norm) = tn.tm_step(tensors, scale, norm, calc)
