@@ -1,7 +1,6 @@
-from math import exp, log,sqrt
+from math import sqrt
 import numpy as np
 import scipy.sparse.linalg
-from scipy.linalg import sqrtm
 import gc
 
 def identity(dimensions, elements):

@@ -1,7 +1,5 @@
-from math import exp, log, sqrt
+from math import log
 import numpy as np
-import scipy.sparse.linalg
-from scipy.linalg import sqrtm
 import Scripts.TensorNetworks as tn
 import Scripts.BuildTensors as bt
 
