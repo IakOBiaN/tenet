@@ -98,77 +98,95 @@ def simulate(calc, T = 1.0, m_par = [0.0] * 10):
 		norm = 1
 	return (scale + log(norm)) / (nodes / (calc.constant * T))
 
+def thermodynamics(calc, T = 1.0, m_par = None, *, coverage = False, susceptibility = False,
+		entropy = False, heat_capacity = False, mu_index = 0, dmu = 1e-3, dT = 1e-3):
+	"""Compute the requested thermodynamic observables.
+
+	Each observable is a finite-difference derivative of the grand potential
+	Omega = simulate(calc, T, m_par).  Only the points needed for the requested
+	observables are evaluated, and the central point Omega(mu0, T0) is shared
+	between the two second derivatives:
+
+	    coverage        first,  d/dmu     -> mu-, mu+
+	    susceptibility  second, d2/dmu2   -> mu-, center, mu+
+	    entropy         first,  d/dT      -> T-, T+
+	    heat_capacity   second, d2/dT2    -> T-, center, T+
+
+	mu_index selects which chemical potential in m_par is differentiated; it may
+	be a single index or a list of indices that are shifted together (the total
+	coverage / susceptibility with respect to several chemical potentials, which
+	the multi-component adsorption models need).
+
+	Returns a dict mapping each requested observable to its value; grand_potential
+	(= Omega(mu0, T0)) is included whenever a second derivative is requested.
+	"""
+	if m_par is None:
+		m_par = [0.0] * 10
+
+	if isinstance(mu_index, int):
+		mu_indices = [mu_index]
+	else:
+		mu_indices = list(mu_index)
+
+	need_mu = coverage or susceptibility
+	need_T = entropy or heat_capacity
+	need_center = susceptibility or heat_capacity
+
+	result = {}
+
+	center = None
+	if need_center:
+		center = simulate(calc, T, m_par)
+		result["grand_potential"] = center
+
+	if need_mu:
+		mu_minus = m_par[:]
+		mu_plus = m_par[:]
+		for j in mu_indices:
+			mu_minus[j] -= dmu
+			mu_plus[j] += dmu
+		omega_mu_minus = simulate(calc, T, mu_minus)
+		omega_mu_plus = simulate(calc, T, mu_plus)
+		if coverage:
+			result["coverage"] = -(omega_mu_minus - omega_mu_plus) / (2.0 * dmu)
+		if susceptibility:
+			result["susceptibility"] = calc.constant * T * (omega_mu_minus - 2.0 * center + omega_mu_plus) / (dmu ** 2)
+
+	if need_T:
+		omega_T_minus = simulate(calc, T - dT, m_par)
+		omega_T_plus = simulate(calc, T + dT, m_par)
+		if entropy:
+			result["entropy"] = -(omega_T_minus - omega_T_plus) / (2.0 * dT)
+		if heat_capacity:
+			result["heat_capacity"] = T * (omega_T_minus - 2.0 * center + omega_T_plus) / (dT ** 2)
+
+	return result
+
+def _mu_mask_to_indices(derivatives):
+	#convert a 0/1 mask like [1, 1] into the list of indices [0, 1]
+	return [i for i, flag in enumerate(derivatives) if flag == 1]
+
 def heat_capasity(calc, T = 1., m_par = [0.0] * 10, dT = 1e-4):
-	#central second-order finite difference of the grand potential with respect to T
-	#reproduces scipy.misc.derivative(..., n = 2, dx = 1e-4), removed in SciPy 1.12
-	omega_minus = simulate(calc, T - dT, m_par)
-	omega_center = simulate(calc, T, m_par)
-	omega_plus = simulate(calc, T + dT, m_par)
-	result = T * (omega_minus - 2.0 * omega_center + omega_plus) / dT ** 2
-	return result
+	#thin wrapper over thermodynamics(); dT = 1e-4 reproduces the legacy
+	#scipy.misc.derivative(..., n = 2, dx = 1e-4) used before SciPy 1.12
+	return thermodynamics(calc, T, m_par, heat_capacity = True, dT = dT)["heat_capacity"]
 
-def susceptibility(calc, T = 1., m_par = [0.0]*10, dmu = 1e-4, derivatives = [1, ] + [0] * 2):
-	grandPotential_dmu = []
-	der_par = m_par[:]
-	for i, par in enumerate(derivatives):
-		if par == 1:
-			der_par[i] -= dmu
-	for _ in range(3):
-		lnZ = simulate(calc, T, der_par)
-		grandPotential_dmu.append(lnZ)
-		for i, par in enumerate(derivatives):
-			if par == 1:
-				der_par[i] += dmu
-	del der_par
-	result = calc.constant * T * (grandPotential_dmu[0] - 2.0 * grandPotential_dmu[1] + grandPotential_dmu[2]) / (dmu ** 2.0)
-	return result
-
-def coverage(method, model, lattice, temp = 1., m_par = [0.0]*10, temp_size = 300):
-	BTP = []
-	mu_step = 1e-3
-	for mu_TRG in [m_par[0] - mu_step, m_par[0] + mu_step]:
-		lnZ = simulate(method, model, lattice, temp, [mu_TRG] + m_par[1:])
-		BTP.append(lnZ)
-
-	result = -(BTP[0]-BTP[1])/(mu_step*2.0)
-	return result
-
-def entropy(method, model, lattice, temp = 1., m_par = [0.0]*10):
-	BTP = []
-	temp_step = 1e-3
-	for temp_TRG in [temp - temp_step, temp + temp_step]:
-		lnZ = simulate(method, model, lattice, temp_TRG, m_par)
-		BTP.append(lnZ)
-
-	result = -(BTP[0]-BTP[1])/(temp_step*2.0)
-	return result
+def susceptibility(calc, T = 1., m_par = [0.0] * 10, dmu = 1e-4, derivatives = [1, ] + [0] * 2):
+	#thin wrapper over thermodynamics()
+	return thermodynamics(calc, T, m_par, susceptibility = True,
+		mu_index = _mu_mask_to_indices(derivatives), dmu = dmu)["susceptibility"]
 
 def full(calc, T = 1., m_par = [0.0] * 10, dmu = 1e-3, dT = 1e-3, derivatives = [1, ] + [0] * 2, T_derivative = True, mu_derivative = True):
-	grandPotential_dmu = []
-	grandPotential_dT = []
-	if mu_derivative:
-		der_par = m_par[:]
-		for i, par in enumerate(derivatives):
-			if par == 1:
-				der_par[i] -= dmu
-		for _ in range(2):
-			lnZ = simulate(calc, T, der_par)
-			grandPotential_dmu.append(lnZ)
-			for i, par in enumerate(derivatives):
-				if par == 1:
-					der_par[i] += 2.0 * dmu
-		del der_par
-	else:
-		grandPotential_dmu = [0, 0]
-	if T_derivative:
-		for diff_T in [T - dT, T, T + dT]:
-			lnZ = simulate(calc, diff_T, m_par)
-			grandPotential_dT.append(lnZ)
-	else:
-		grandPotential_dT = [0, 0, 0]
-
-	coverage = - (grandPotential_dmu[0] - grandPotential_dmu[1]) / (dmu * 2.0)
-	entropy = - (grandPotential_dT[0] - grandPotential_dT[2]) / (dT * 2.0)
-	susceptibility = calc.constant * T * (grandPotential_dmu[0] - 2.0 * grandPotential_dT[1] + grandPotential_dmu[1]) / (dT ** 2.0)
-	heat_capacity = T * (grandPotential_dT[0] - 2.0 * grandPotential_dT[1] + grandPotential_dT[2]) / (dT ** 2.0)
-	return coverage, entropy, susceptibility, heat_capacity, grandPotential_dT[1]
+	#backward-compatible wrapper returning the legacy tuple
+	#(coverage, entropy, susceptibility, heat_capacity, grand_potential).
+	#derivatives is a 0/1 mask selecting which chemical potentials are
+	#differentiated together.  susceptibility is only requested when T_derivative
+	#is also on, so the central point is reused and the simulate() call count
+	#(and coverage) match the previous implementation exactly.
+	obs = thermodynamics(calc, T, m_par,
+		coverage = mu_derivative, susceptibility = mu_derivative and T_derivative,
+		entropy = T_derivative, heat_capacity = T_derivative,
+		mu_index = _mu_mask_to_indices(derivatives), dmu = dmu, dT = dT)
+	return (obs.get("coverage", 0.0), obs.get("entropy", 0.0),
+		obs.get("susceptibility", 0.0), obs.get("heat_capacity", 0.0),
+		obs.get("grand_potential", 0.0))
