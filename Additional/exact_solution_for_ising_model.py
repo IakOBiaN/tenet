@@ -1,6 +1,5 @@
 from math import log, sinh, cosh, cos, pi, sqrt, exp
 from scipy import integrate
-from scipy.misc import derivative
 import numpy as np
 
 def exact(T = 1.0, J = 1.0, lattice = "square"):
@@ -22,8 +21,13 @@ def exact(T = 1.0, J = 1.0, lattice = "square"):
 
 	return (res*T, result[1])
 
-def heat_capasity(T = 1.0, J = 1.0, lattice = "square"):
-	result = T * derivative(lambda x: exact(x, J, lattice)[0], T, n=2, dx=1e-5)
+def heat_capasity(T = 1.0, J = 1.0, lattice = "square", dT = 1e-5):
+	#central second-order finite difference of the free energy w.r.t. T
+	#(replaces scipy.misc.derivative, removed in SciPy 1.12)
+	f_minus = exact(T - dT, J, lattice)[0]
+	f_center = exact(T, J, lattice)[0]
+	f_plus = exact(T + dT, J, lattice)[0]
+	result = T * (f_minus - 2.0 * f_center + f_plus) / dT ** 2
 	return (result, )
 
 T1 = 2.0/log(1+sqrt(2))

@@ -1,5 +1,6 @@
 import numpy as np
-import scipy as sp
+import scipy.linalg
+import scipy.sparse.linalg
 import matplotlib.pyplot as pt
 
 constant = 0.008314
@@ -18,9 +19,9 @@ def tensor_svd(tensor, legs_left, legs_right, chi_number):
 	matrix = np.moveaxis(tensor, list(legs_left) + list(legs_right), list(range(len(tensor.shape)))).reshape(right, right)
 
 	if chi_number <= min(matrix.shape)-1:
-		U, S, V = sp.sparse.linalg.svds(matrix, k = chi_number)
+		U, S, V = scipy.sparse.linalg.svds(matrix, k = chi_number)
 	else:
-		U, S, V = sp.linalg.svd(matrix, full_matrices = False, check_finite = False)
+		U, S, V = scipy.linalg.svd(matrix, full_matrices = False, check_finite = False)
 
 	cut = len([1 for s in S if s > 1e-12])
 	if cut < 1:
