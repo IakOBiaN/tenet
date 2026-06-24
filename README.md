@@ -1,12 +1,12 @@
-# ten_net
+# TeNeT - Tensor Network Thermodynamics
 
-Tensor-network renormalization code for the statistical mechanics of lattice
-models. It computes the grand potential `ln Z` per site of 1D/2D lattice models
+TeNeT is a tensor-network renormalization code for the statistical mechanics of
+lattice models. It computes the grand potential `ln Z` per site of 1D/2D lattice models
 via several renormalization-group (RG) schemes and takes finite-difference
 derivatives of it to obtain thermodynamic observables (coverage/density,
 entropy, susceptibility, heat capacity).
 
-The main application is **adsorption of molecules on surfaces** — Langmuir and
+The main application is **adsorption of molecules on surfaces** - Langmuir and
 binary lattice gases, hard-core models, and several molecule-specific models
 (pentacene, 1,4-CHD on Si, a TPB + Cu system), alongside standard benchmarks
 such as the 2D Ising model.
