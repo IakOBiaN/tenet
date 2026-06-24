@@ -17,7 +17,7 @@ T = 1.0
 coverage_res = []
 for mu in ms.np.arange(-6.00, 6.01, 0.1):
 	m_par = [mu, 0.0, 0, 0, 0, 0]
-	result = ms.full(calc, T, m_par)
+	obs = ms.thermodynamics(calc, T, m_par, coverage = True, susceptibility = True, entropy = True, heat_capacity = True)
 	calc_time = timeit.default_timer() - start_time
-	coverage_res.append(result[0])
-	print(mu, result[0], result[4])
+	coverage_res.append(obs["coverage"])
+	print(mu, obs["coverage"], obs["grand_potential"])

@@ -40,6 +40,6 @@ calc.constant = 1
 #interactions = [1.0, 0.57735, 0.5, 0.37796, 0.33333, 0.28868, 0.27735, 0.25, 0.22942]
 for mu in ms.np.arange(-1, 14.41, 0.2):
 	m_par = [mu, [1.0, 0.57735, 0.5], 0, 0, 0, 0]
-	result = ms.full(calc, T, m_par, T_derivative = False)
+	obs = ms.thermodynamics(calc, T, m_par, coverage = True)
 	calc_time = timeit.default_timer() - start_time
-	print(mu, result[0])
+	print(mu, obs["coverage"])

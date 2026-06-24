@@ -159,32 +159,3 @@ def thermodynamics(calc, T = 1.0, m_par = None, *, coverage = False, susceptibil
 			result["heat_capacity"] = T * (omega_T_minus - 2.0 * center + omega_T_plus) / (dT ** 2)
 
 	return result
-
-def _mu_mask_to_indices(derivatives):
-	#convert a 0/1 mask like [1, 1] into the list of indices [0, 1]
-	return [i for i, flag in enumerate(derivatives) if flag == 1]
-
-def heat_capasity(calc, T = 1., m_par = [0.0] * 10, dT = 1e-4):
-	#thin wrapper over thermodynamics(); dT = 1e-4 reproduces the legacy
-	#scipy.misc.derivative(..., n = 2, dx = 1e-4) used before SciPy 1.12
-	return thermodynamics(calc, T, m_par, heat_capacity = True, dT = dT)["heat_capacity"]
-
-def susceptibility(calc, T = 1., m_par = [0.0] * 10, dmu = 1e-4, derivatives = [1, ] + [0] * 2):
-	#thin wrapper over thermodynamics()
-	return thermodynamics(calc, T, m_par, susceptibility = True,
-		mu_index = _mu_mask_to_indices(derivatives), dmu = dmu)["susceptibility"]
-
-def full(calc, T = 1., m_par = [0.0] * 10, dmu = 1e-3, dT = 1e-3, derivatives = [1, ] + [0] * 2, T_derivative = True, mu_derivative = True):
-	#backward-compatible wrapper returning the legacy tuple
-	#(coverage, entropy, susceptibility, heat_capacity, grand_potential).
-	#derivatives is a 0/1 mask selecting which chemical potentials are
-	#differentiated together.  susceptibility is only requested when T_derivative
-	#is also on, so the central point is reused and the simulate() call count
-	#(and coverage) match the previous implementation exactly.
-	obs = thermodynamics(calc, T, m_par,
-		coverage = mu_derivative, susceptibility = mu_derivative and T_derivative,
-		entropy = T_derivative, heat_capacity = T_derivative,
-		mu_index = _mu_mask_to_indices(derivatives), dmu = dmu, dT = dT)
-	return (obs.get("coverage", 0.0), obs.get("entropy", 0.0),
-		obs.get("susceptibility", 0.0), obs.get("heat_capacity", 0.0),
-		obs.get("grand_potential", 0.0))

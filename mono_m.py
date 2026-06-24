@@ -27,10 +27,10 @@ for lat_size in invest:
 
 	for mu in ms.np.arange(-10.00, 60.01, 0.1):
 		m_par = [mu, 6.0, 2.0, 0, 0, 0]
-		result = ms.full(calc, T, m_par)
+		obs = ms.thermodynamics(calc, T, m_par, coverage = True, susceptibility = True, entropy = True, heat_capacity = True)
 		calc_time = timeit.default_timer() - start_time
-		print(mu, result[0], result[1], result[2], result[3], result[4], calc_time, lat_size)
-		f.write(('{}\t' * 7).format(mu, result[0], result[1], result[2], result[3], result[4], calc_time) + '\n')
+		print(mu, obs["coverage"], obs["entropy"], obs["susceptibility"], obs["heat_capacity"], obs["grand_potential"], calc_time, lat_size)
+		f.write(('{}\t' * 7).format(mu, obs["coverage"], obs["entropy"], obs["susceptibility"], obs["heat_capacity"], obs["grand_potential"], calc_time) + '\n')
 		f2.write(str(mu) + ' ' + str(calc_time) + '\n')
 	f2.write("Res. calculation_time: " + str(calc_time) + '\n')
 	f.close()

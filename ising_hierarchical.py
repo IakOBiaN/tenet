@@ -17,7 +17,7 @@ T = 1.0
 coverage_res = []
 for J in ms.np.arange(0.15, 0.85, 0.01):
 	m_par = [0, J, 0, 0, 0, 0]
-	result = ms.heat_capasity(calc, T, m_par)
+	result = ms.thermodynamics(calc, T, m_par, heat_capacity = True, dT = 1e-4)["heat_capacity"]
 	calc_time = timeit.default_timer() - start_time
 	coverage_res.append(result)
 	print(J, result, calc_time)

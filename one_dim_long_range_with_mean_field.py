@@ -40,14 +40,14 @@ coverage_convergence = 0.01
 #interactions = nonmonotonic(eps_f = 12.5, q_f = 1.06, delta_f = pi / 2, int_distance = 10)
 interactions = [1.0, 0.57735, 0.5]#, 0.37796, 0.33333, 0.28868, 0.27735, 0.25, 0.22942]
 for mu in ms.np.arange(-1, 10.01, 0.1):
-	result = [0, ] * 4
+	obs = {"coverage": 0.0}
 	old_coverage = 0
 	new_coverage = 1
 	while abs(old_coverage - new_coverage) > coverage_convergence:
 		old_coverage = new_coverage
 		m_par = [mu, interactions, mean_field * old_coverage, 0, 0, 0]
-		result = ms.full(calc, T, m_par, T_derivative = False)
-		new_coverage = result[0]
-		#print("AAA", mu, result[0])
+		obs = ms.thermodynamics(calc, T, m_par, coverage = True)
+		new_coverage = obs["coverage"]
+		#print("AAA", mu, obs["coverage"])
 	calc_time = timeit.default_timer() - start_time
-	print(mu, result[0])
+	print(mu, obs["coverage"])

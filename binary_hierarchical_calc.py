@@ -23,7 +23,7 @@ for muB in ms.np.arange(-5.00, 5.01, 0.1):
 	old_B = 0
 	for muA in ms.np.arange(10.00, 20.01, 0.01):
 		m_par = [muA, muB, 4.0, 6.0, 0, 0]
-		result = ms.susceptibility(calc, T, m_par)
+		result = ms.thermodynamics(calc, T, m_par, susceptibility = True, dmu = 1e-4)["susceptibility"]
 		if result > old_value:
 			old_value = result
 			old_A = muA

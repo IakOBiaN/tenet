@@ -21,9 +21,9 @@ f = open("temp.dat", "w")
 
 for mu in ms.np.arange(-8.0, 45.41, 1.0):
 	m_par = [mu, [sigma, eps], 0, 0, 0, 0]
-	result = ms.full(calc, T, m_par, dmu = 0.05, T_derivative = False)
+	obs = ms.thermodynamics(calc, T, m_par, coverage = True, dmu = 0.05)
 	calc_time = timeit.default_timer() - start_time
-	print(mu, result[0])
-	print(mu, result[0], file = f, flush = True)
+	print(mu, obs["coverage"])
+	print(mu, obs["coverage"], file = f, flush = True)
 
 f.close()

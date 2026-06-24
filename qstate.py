@@ -26,7 +26,7 @@ file = open(filename, "w")
 print("chemical_potential", "entropy", "susceptibility", "heat_capacity", "free_energy", file = file)
 for mu in ms.np.arange(-1.00, 7.01, 0.2):
 	m_par = [mu, c, n, epsilon, delta, 0.0]
-	result = ms.full(calc, T, m_par)
-	print(mu, result[0], result[1] , result[2] , result[3], result[4])
-	#print(mu, result[0], result[1] , result[2] , result[3], result[4], file = file)
+	obs = ms.thermodynamics(calc, T, m_par, coverage = True, susceptibility = True, entropy = True, heat_capacity = True)
+	print(mu, obs["coverage"], obs["entropy"], obs["susceptibility"], obs["heat_capacity"], obs["grand_potential"])
+	#print(mu, obs["coverage"], obs["entropy"], obs["susceptibility"], obs["heat_capacity"], obs["grand_potential"], file = file)
 file.close()
