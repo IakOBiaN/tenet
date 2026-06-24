@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/logo.svg" alt="TeNeT" width="420">
+</p>
+
 # TeNeT - Tensor Network Thermodynamics
 
 TeNeT is a tensor-network renormalization code for the statistical mechanics of
