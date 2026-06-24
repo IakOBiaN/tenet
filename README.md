@@ -15,6 +15,20 @@ binary lattice gases, hard-core models, and several molecule-specific models
 (pentacene, 1,4-CHD on Si, a TPB + Cu system), alongside standard benchmarks
 such as the 2D Ising model.
 
+## Publications
+
+Calculations for the following papers were performed with this code:
+
+- Akimenko, S. S. (2023). Tensor network construction for lattice gas models: Hard-core and triangular lattice models. *Physical Review E*, 107(5), 054116.
+- Gorbunov, V. A., Uliankina, A. I., Akimenko, S. S., & Myshlyavtsev, A. V. (2023). Tensor renormalization group study of orientational ordering in simple models of adsorption monolayers. *Physical Review E*, 108(1), 014133.
+- Sergienko, A. V., Akimenko, S. S., Karpov, A. A., & Myshlyavtsev, A. V. (2024). Influence of the simplest type of multiparticle interactions on the example of a lattice model of an adsorption layer. *Computer research and modeling*, 16(2), 445-458.
+- Akimenko, S. S., Gorbunov, V. A., Myshlyavtsev, A. V., Myshlyavtseva, M. D., & Podgornyi, S. O. (2024). Shape-interaction dualism: unraveling complex phase behavior in triangular particle monolayers. *Journal of Physics: Condensed Matter*, 36(23), 235402.
+- Gorbunov, V. A., Uliankina, A. I., Akimenko, S. S., & Myshlyavtsev, A. V. (2024). Equilibrium structure of 1, 4-cyclohexadiene monolayer on Si (001)-(2× 1). *Physical Review B*, 110(4), 045416.
+- Uliankina, A. I., Gorbunov, V. A., Akimenko, S. S., & Myshlyavtsev, A. V. (2024). Initial growth of the pentacene monolayer on a Si (001)-2× 1 substrate: A lattice model view. *The Journal of Physical Chemistry C*, 128(41), 17658-17667.
+- Akimenko, S. S., & Myshlyavtsev, A. V. (2024). Tensor networks for hierarchical lattices. *Europhysics Letters*, 148(6), 61001.
+- Karpova, A. V., Akimenko, S. S., Uliankina, A. I., & Myshlyavtsev, A. V. (2025). Extending Tensor Network Methods Beyond Pairwise Interactions in Adsorption Systems. *The Journal of Physical Chemistry A*, 129(14), 3345-3352.
+- Karpova, A. V., Uliankina, A. I., Gorbunov, V. A., Akimenko, S. S., & Myshlyavtsev, A. V. (2026). Long-Range Interactions in 1D Adsorption Models: Tensor Network Approach. *Journal of Statistical Physics*, 193(2), 9.
+
 ## Repository layout
 
 ```
