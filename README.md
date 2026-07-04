@@ -1,8 +1,13 @@
 <p align="center">
-  <img src="docs/logo.svg" alt="TeNeT" width="420">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/logo-dark.svg">
+    <img src="docs/logo.svg" alt="TeNeT" width="420">
+  </picture>
 </p>
 
 # TeNeT - Tensor Network Thermodynamics
+
+[![tests](https://github.com/IakOBiaN/tenet/actions/workflows/tests.yml/badge.svg)](https://github.com/IakOBiaN/tenet/actions/workflows/tests.yml)
 
 TeNeT is a tensor-network renormalization code for the statistical mechanics of
 lattice models. It computes the grand potential `ln Z` per site of 1D/2D lattice models
