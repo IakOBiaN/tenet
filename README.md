@@ -37,7 +37,7 @@ Calculations for the following papers were performed with this code:
 ## Repository layout
 
 ```
-Scripts/
+tenet/
   MainScripts.py     orchestration: CalcConfig, simulate(), thermodynamics()
   BuildTensors.py    build_matrix(): per-model Boltzmann weight matrices
   TensorNetworks.py  build_tensor() + the RG steps (trg/btrg/hotrg/tm/htn)
@@ -75,7 +75,7 @@ python ising.py       # 2D Ising, HOTRG
 Or drive the engine directly:
 
 ```python
-import Scripts.MainScripts as ms
+import tenet.MainScripts as ms
 
 calc = ms.CalcConfig()
 calc.method   = "trg"        # trg | btrg | hotrg | tm | htn
@@ -173,7 +173,7 @@ python -m tests.generate_golden
 
 ## Adding a model
 
-1. Add a branch to `build_matrix` in `Scripts/BuildTensors.py` returning the
+1. Add a branch to `build_matrix` in `tenet/BuildTensors.py` returning the
    model's Boltzmann weight matrices, and register the name in `models_dict`.
 2. Add a fast `build_matrix` golden case in `tests/build_cases.py` and
    regenerate the golden (`python -m tests.generate_golden`).

@@ -3,7 +3,7 @@
 One ``simulate()`` per case on the cheap langmuir model (plus one 1D long-range),
 covering every RG method and lattice geometry at tiny chi.  Compares ln Z against
 the committed golden (tests/golden_fast_engine.json).  This pins the RG algorithms
-in Scripts/TensorNetworks.py and runs in ~1s, so it is part of the fast tier.
+in tenet/TensorNetworks.py and runs in ~1s, so it is part of the fast tier.
 
 Regenerate the golden with::
 
@@ -18,7 +18,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-import Scripts.MainScripts as ms
+import tenet.MainScripts as ms
 from tests.build_cases import FAST_CASES, make_fast_calc
 
 GOLDEN = json.loads((Path(__file__).resolve().parent / "golden_fast_engine.json").read_text())

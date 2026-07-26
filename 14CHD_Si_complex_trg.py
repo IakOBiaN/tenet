@@ -1,4 +1,4 @@
-import Scripts.MainScripts as ms
+import tenet.MainScripts as ms
 import timeit
 
 start_time = timeit.default_timer()

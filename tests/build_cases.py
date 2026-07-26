@@ -2,7 +2,7 @@
 
 ``build_matrix`` is pure, deterministic construction of the per-model Boltzmann
 weight matrices (no SVD, no RG iteration), so a stored fingerprint of its output
-pins the physics encoding in ``Scripts/BuildTensors.py`` and catches accidental
+pins the physics encoding in ``tenet/BuildTensors.py`` and catches accidental
 changes in milliseconds.
 
 We store a compact fingerprint per returned matrix rather than the full arrays:
@@ -24,7 +24,7 @@ Excluded on purpose:
 """
 import numpy as np
 
-import Scripts.MainScripts as ms
+import tenet.MainScripts as ms
 
 
 def fingerprint(matrixes):
@@ -110,7 +110,7 @@ def make_fast_calc(case):
 # Fast end-to-end engine smoke tests: one simulate() per case on the cheap
 # langmuir ("mono") model (and one 1D long-range), exercising every RG method and
 # lattice geometry at tiny chi with few iterations.  This is the fast tier that
-# pins Scripts/TensorNetworks.py; the etalon scripts (slow tier) are the physics
+# pins tenet/TensorNetworks.py; the etalon scripts (slow tier) are the physics
 # validation.  simulate() returns ln Z per node, a basis-independent scalar.
 FAST_CASES = {
     "trg_square":        dict(method="trg",   lattice="square",     gen_tensor="default",  metParam=8, T=120.0, m_par=[4.0, 4.0]),

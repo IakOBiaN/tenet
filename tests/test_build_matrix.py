@@ -3,7 +3,7 @@
 For every model we recompute build_matrix and compare a compact fingerprint of
 its output against the committed golden (tests/golden_build_matrix.json).  This
 is the fast tier: it runs on every change and pins the physics encoding in
-Scripts/BuildTensors.py.  Regenerate the golden with::
+tenet/BuildTensors.py.  Regenerate the golden with::
 
     python -m tests.generate_golden
 
@@ -16,7 +16,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-import Scripts.BuildTensors as bt
+import tenet.BuildTensors as bt
 from tests.build_cases import BUILD_CASES, fingerprint, make_calc
 
 GOLDEN = json.loads((Path(__file__).resolve().parent / "golden_build_matrix.json").read_text())

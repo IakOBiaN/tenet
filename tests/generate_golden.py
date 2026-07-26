@@ -11,8 +11,8 @@ import json
 import time
 from pathlib import Path
 
-import Scripts.BuildTensors as bt
-import Scripts.MainScripts as ms
+import tenet.BuildTensors as bt
+import tenet.MainScripts as ms
 from tests.build_cases import (
     BUILD_CASES,
     FAST_CASES,

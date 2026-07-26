@@ -1,7 +1,7 @@
 from math import log
 import numpy as np
-import Scripts.TensorNetworks as tn
-import Scripts.BuildTensors as bt
+import tenet.TensorNetworks as tn
+import tenet.BuildTensors as bt
 
 class CalcConfig:
 

@@ -1,4 +1,4 @@
-import Scripts.MainScripts as ms
+import tenet.MainScripts as ms
 import timeit
 
 model_name = 'TRG_IRF'

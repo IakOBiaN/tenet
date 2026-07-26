@@ -1,4 +1,4 @@
-import Scripts.MainScripts as ms
+import tenet.MainScripts as ms
 from scipy.optimize import minimize
 
 #ising model
