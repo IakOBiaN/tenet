@@ -9,8 +9,12 @@ Regenerate the golden with::
 
     python -m tests.generate_golden
 
-Tolerance is loose-ish (1e-6) because the truncated SVD (scipy ARPACK ``svds``)
-is only reproducible to a few ULP; a real engine regression shifts ln Z far more.
+Run to run the engine is bit-exact: ``tensor_svd`` seeds ARPACK with a fixed
+``v0``, so rerunning on the same machine reproduces the golden exactly.  The
+1e-6 tolerance is kept for *cross-platform* drift - a different BLAS/LAPACK
+perturbs the last bits, and nearly degenerate singular values amplify that to
+~1e-7 in ln Z (``trg_triangular`` is the sensitive case).  A real engine
+regression shifts ln Z far more than that.
 """
 import json
 from pathlib import Path

@@ -9,6 +9,16 @@ def identity(dimensions, elements):
 		id[((i, ) * dimensions)] = 1
 	return id
 
+def start_vector(size):
+	"""Deterministic start vector for the ARPACK iteration inside tensor_svd.
+
+	Depends only on the size, so the same problem always gets the same start and
+	ln Z reproduces bit for bit; drawn from a seeded generator rather than being
+	uniform, so it is not orthogonal to the leading singular vector of a
+	symmetric tensor.
+	"""
+	return np.random.default_rng(0).standard_normal(size)
+
 def tensor_svd(tensor, legs_left, legs_right, chi_number = None):
 	old_shape_left = [tensor.shape[i] for i in legs_left]
 	old_shape_right = [tensor.shape[i] for i in legs_right]
@@ -20,7 +30,13 @@ def tensor_svd(tensor, legs_left, legs_right, chi_number = None):
 		chi_number = min(matrix.shape)
 
 	if chi_number <= min(matrix.shape)-1:
-		U, S, V = scipy.sparse.linalg.svds(matrix, k = chi_number)
+		#svds seeds ARPACK with a random start vector unless v0 is given, which makes
+		#every result irreproducible run to run - harmless where singular values are
+		#well separated, but worth 1e-7 in ln Z where they are nearly degenerate.
+		#A fixed seed keeps the start generic while making the whole pipeline
+		#reproducible.  Do NOT use ones() here: RG-step tensors carry signs, and a
+		#symmetric model can map a uniform vector exactly to zero (ARPACK error -9).
+		U, S, V = scipy.sparse.linalg.svds(matrix, k = chi_number, v0 = start_vector(min(matrix.shape)))
 	else:
 		U, S, V = scipy.linalg.svd(matrix, full_matrices = False, check_finite = False)
 
