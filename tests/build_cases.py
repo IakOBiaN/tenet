@@ -15,12 +15,9 @@ Each case fixes everything build_matrix actually reads: ``model``, ``coord``
 ``m_par``.  Params mirror the repository's entry scripts so the fingerprint
 corresponds to a physically meaningful construction.
 
-Excluded on purpose:
-  * HT1/HT2/HT3   - listed in build_matrix's models_dict but have NO construction
-                    branch (dead entries); they build nothing.
-  * six_leg_test  - 16**6 tensor; covered end-to-end by multy_test (slow tier).
-  * Pentacene_model_2 - 3375x3375 matrices, slow to even build; covered by
-                    Pentacene_model_2_tm (slow tier).
+Every model in build_matrix has a case here.  ``six_leg_test`` is the only one
+that is genuinely expensive to construct (a 16**6 tensor, ~12s and 134 MB), so
+generate_golden marks it ``slow`` and it runs only with ``--runslow``.
 """
 import numpy as np
 
@@ -59,6 +56,35 @@ def make_calc(case):
     return calc
 
 
+# Pentacene_model_2 takes 48 parameters: three chemical potentials followed by six
+# blocks of pair energies.  Built the way Pentacene_model_2_tm.py builds them, so
+# the case can be checked against the entry script by eye rather than by counting
+# indices into a 48-element literal.
+_PM2_E44 = [60.7, 48.8, 38.4]
+_PM2_E22 = [199.5, 217.4, 197.8, 101.7, 90.3, 150.5, 15.0, 97.9, 82.1]
+_PM2_E33 = [206.3, 295.6, 236.0, 95.7, 84.6, 98.1, 87.3, 109.3, 82.0]
+_PM2_E24 = [106.3, 87.9, 59.9, 62.7, 15.0, 68.9]
+_PM2_E34 = [164.9, 112.8, 75.1, 62.8, 69.4, 60.6]
+_PM2_E23 = [180.2, 182.4, 205.3, 201.3, 91.7, 96.5, 89.5, 94.9, 89.2, 81.8, 91.3, 77.3]
+
+
+def pentacene_2_m_par(mu):
+    """m_par for Pentacene_model_2 at chemical potential ``mu``."""
+    mu_2 = -(-526.5 - (-656.79))
+    mu_3 = -(-601.73 - (-656.79))
+    mu_4 = 0
+    return (
+        [mu_2 + mu, mu_3 + mu, mu_4 + mu]
+        + _PM2_E44 + _PM2_E22 + _PM2_E33 + _PM2_E24 + _PM2_E34 + _PM2_E23
+    )
+
+
+def six_leg_m_par():
+    """m_par for six_leg_test (the TPB + Cu model), mirroring multy_test.py."""
+    eps = 4.8
+    return [6.0, -19.0, -20, -40.0, -35.2 - eps, -45.6 - 3.0 * eps, eps]
+
+
 # id -> case.  T and m_par mirror the entry scripts (a representative mu is fixed).
 BUILD_CASES = {
     "langmuir":                 dict(model="langmuir", coord=4, constant=0.008314, T=120.0, m_par=[4.0, 4.0]),
@@ -83,6 +109,10 @@ BUILD_CASES = {
                                      m_par=[50.0, 60.7, 48.8, 38.4]),
     "Pentacene_model_1_complex": dict(model="Pentacene_model_1_complex", coord=4, constant=0.008314, T=300.0,
                                      m_par=[-1.3, -40.0, 60.7, 48.8, 38.4, -1.2, 2.0, 1.0, -17.4, 3.0, 1.0, -15.1, 0.0, 0.0]),
+    "Pentacene_model_2":        dict(model="Pentacene_model_2", coord=4, constant=0.008314, T=300.0,
+                                     m_par=pentacene_2_m_par(500.0)),
+    "six_leg_test":             dict(model="six_leg_test", coord=6, constant=0.008314, T=640.0,
+                                     m_par=six_leg_m_par()),
     "Pentacene_model_3":        dict(model="Pentacene_model_3", coord=4, constant=0.008314, T=300.0,
                                      m_par=[88.7, 50.0, 31.9, 19.8, 5.0, 40.1, 101.4, 6.0, 60.7, -2.4, -17.4, -15.1, 60.7, 0.0, 0.0]),
     "1D_long-range":            dict(model="1D_long-range", coord=2, constant=1.0, T=0.1, m_par=[5.0, [1.0, 0.57735, 0.5], 0.0]),
