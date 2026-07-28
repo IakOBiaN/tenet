@@ -1,3 +1,4 @@
+import copy
 from math import log
 import numpy as np
 import tenet.TensorNetworks as tn
@@ -5,7 +6,9 @@ import tenet.BuildTensors as bt
 
 class CalcConfig:
 
-	def __init__(self, methodTolerance = 1e-8, constant = 0.008314, method = "trg", metModification = "default", scale = 4, iterations = 300, model = "ising", lattice = "square", gen_tensor = "default", nodes = 1 , coord = 4, metParam = 10, join_tensors = [1, 1]):
+	def __init__(self, methodTolerance = 1e-8, constant = 0.008314, method = "trg", metModification = "default", scale = 4, iterations = 300, model = "ising", lattice = "square", gen_tensor = "default", nodes = 1 , coord = 4, metParam = 10, join_tensors = None):
+		if join_tensors is None:
+			join_tensors = [1, 1]
 		#tolerance of method
 		self.methodTolerance = methodTolerance
 		#constant. Default is R = 0.008314
@@ -33,7 +36,17 @@ class CalcConfig:
 		#joining nodes
 		self.join_tensors = join_tensors
 
-def simulate(calc, T = 1.0, m_par = [0.0] * 10):
+def simulate(calc, T = 1.0, m_par = None):
+
+	#Work on a copy.  This function and build_matrix write derived state back onto
+	#calc (coord, nodes, lattice); without the copy it leaks into the caller's
+	#config, so a triangular run leaves coord = 6 behind and silently changes the
+	#next square run on the same object.  A shallow copy is enough - the
+	#list-valued fields (join_tensors, metModification) are only ever read.
+	calc = copy.copy(calc)
+
+	if m_par is None:
+		m_par = [0.0] * 10
 
 	if calc.lattice == "triangular":
 		calc.coord = 6
