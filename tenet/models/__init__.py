@@ -55,4 +55,4 @@ def get_model(name):
 
 #Imported for their registration side effect, and kept at the bottom so that
 #register() above already exists when they run.
-from tenet.models import lattice_gases, spin  # noqa: E402,F401
+from tenet.models import exclusion, lattice_gases, spin  # noqa: E402,F401
