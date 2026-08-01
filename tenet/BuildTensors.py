@@ -1,8 +1,8 @@
-from math import pi, cos, radians
+from math import pi, cos
 import numpy as np
 from itertools import product
 
-inf = -1e8
+from tenet.models import get_model, inf
 
 def identity(dimensions, elements):
 	id = np.zeros((elements, ) * dimensions)
@@ -50,9 +50,9 @@ def build_matrix (calc, temp, m_par):
 
 	#[any],[right, bottom],[right-up, right, right-bottom], [right-up, right, right-bottom, bottom]
 	matrixes = []
-	if model == "langmuir":
-		matrixes = [np.array([[0.0, m_par[0] / neigbours], [m_par[0] / neigbours, -m_par[1] + m_par[0] / (neigbours / 2.0)]]) ,] * 3
-	#m_par: 0 - mu, 1 - eps, 2 - multipartical interaction
+	build = get_model(model)
+	if build is not None:
+		matrixes = build(calc, temp, m_par)
 	elif model == "1D_long-range":
 		mu = m_par[0]
 		mean_field = m_par[2]
@@ -464,10 +464,6 @@ def build_matrix (calc, temp, m_par):
 			matrix_2.append(line_2)
 			matrix_3.append(line_3)
 		matrixes = [np.array(matrix_1) ,np.array(matrix_2) ,np.array(matrix_3)]
-	elif model == "langmuir_m":
-		mult = np.zeros((2, 2, 2))
-		mult[1, 1, 1] = -m_par[2]
-		matrixes = [np.array([[0.0, m_par[0] / neigbours], [m_par[0] / neigbours, -m_par[1] + m_par[0] / (neigbours / 2.0)]]) ,] * 3 + [mult]
 	elif model == "six_leg_test":
 		mu_TPB = m_par[0]
 		mu_Cu = m_par[1]
@@ -589,15 +585,6 @@ def build_matrix (calc, temp, m_par):
 		matrixes.append(tensor)
 		#print(count)
 		#exit()
-	elif model == "binary":
-		#m_par: 0 - muA, 1 - muB, 2 - epsAA, 3 - epsBB, 4 - epsAB
-		matrixes = [np.array([[0.0, m_par[0] / neigbours, m_par[1] / neigbours], [m_par[0] / neigbours, -m_par[2] + 2.0 * m_par[0] / neigbours, (m_par[0] + m_par[1]) / neigbours], [m_par[1] / neigbours, (m_par[0] + m_par[1]) / neigbours, -m_par[3] + 2.0 * m_par[1] / neigbours]]) ,] * 3
-	elif model == "ising":
-		matrixes = [np.array([[(m_par[1] - m_par[0] / (neigbours / 2.0)), (-m_par[1])],[(-m_par[1]), (m_par[1] + m_par[0] / (neigbours / 2.0))]]), ] * 3
-	elif model == "hard-hexagon":
-		matrixes = [np.array([[0.0, m_par[0] / (neigbours)],[m_par[0] / (neigbours), inf + m_par[0]]]), ] * 3
-	elif model == "TLAT":
-		matrixes = [np.array([[-m_par[1] - m_par[2] - m_par[3], -m_par[1] + m_par[2] + m_par[3], m_par[1] - m_par[2] + m_par[3], m_par[1] + m_par[2] - m_par[3]], [-m_par[1] + m_par[2] + m_par[3], -m_par[1] - m_par[2] - m_par[3], m_par[1] + m_par[2] - m_par[3], m_par[1] - m_par[2] + m_par[3]], [m_par[1] - m_par[2] + m_par[3], m_par[1] + m_par[2] - m_par[3], -m_par[1] - m_par[2] - m_par[3], -m_par[1] + m_par[2] + m_par[3]], [m_par[1] + m_par[2] - m_par[3], m_par[1] - m_par[2] + m_par[3], -m_par[1] + m_par[2] + m_par[3], -m_par[1] - m_par[2] - m_par[3]]]), ] * 3
 	elif model == "Pentacene_model_1_simple":
 		mu = m_par[0] / neigbours
 		e_close = -m_par[1]
@@ -1069,33 +1056,6 @@ def build_matrix (calc, temp, m_par):
 						[mu_d_sigma, mu_t_sigma / 2.0 + mu_d_sigma + e_d_t_vert_out, mu_t_sigma / 2.0 + mu_d_sigma + e_d_t_vert_in, mu_d_sigma * 2.0 + e_d_d_vert_same, mu_d_sigma * 2.0 + e_d_d_vert_dif], \
 						[mu_d_sigma, mu_t_sigma / 2.0 + mu_d_sigma + e_d_t_vert_in, mu_t_sigma / 2.0 + mu_d_sigma + e_d_t_vert_out, mu_d_sigma * 2.0 + e_d_d_vert_dif, mu_d_sigma * 2.0 + e_d_d_vert_same]])]
 	#matrixes only for hex lattice
-	elif model == "dimers":
-		neigbours = 3.0
-		calc.nodes = 2.0
-		matrixes = [np.array([[0, inf, (m_par[0] + m_par[1]) / (neigbours * 2.0), (m_par[0] + m_par[1]) / (neigbours * 2.0), m_par[0] / neigbours], \
-						[(m_par[0] + m_par[1]) / (neigbours * 2.0), inf, inf, inf, inf], \
-						[inf, (m_par[0] + m_par[1]) / neigbours, inf, inf, inf], \
-						[(m_par[0] + m_par[1]) / (neigbours * 2.0), inf, inf, inf, inf], \
-						[m_par[0] / neigbours, inf, inf, inf, inf]]), \
-					np.array([[0, (m_par[0] + m_par[1]) / (neigbours * 2.0), (m_par[0] + m_par[1]) / (neigbours * 2.0), inf, m_par[0] / neigbours], \
-						[(m_par[0] + m_par[1]) / (neigbours * 2.0), inf, inf, inf, inf], \
-						[(m_par[0] + m_par[1]) / (neigbours * 2.0), inf, inf, inf, inf], \
-						[inf, inf, inf, (m_par[0] + m_par[1]) / neigbours, inf], \
-						[m_par[0] / neigbours, inf, inf, inf, inf]])]
-	elif model == "dimers_test":
-		mu = m_par[0] / neigbours
-		matrixes = [np.array([[0, mu / 2.0, inf, mu / 2.0, mu / 2.0, mu], \
-						[inf, inf, mu, inf, inf, inf], \
-						[mu / 2.0, mu, inf, mu, mu, 3.0 / 2.0 * mu], \
-						[mu / 2.0, mu, inf, mu, mu, 3.0 / 2.0 * mu], \
-						[mu / 2.0, mu, inf, mu, mu, 3.0 / 2.0 * mu], \
-						[mu, 3.0 / 2.0 * mu, inf, 3.0 / 2.0 * mu, 3.0 / 2.0 * mu, 2.0 * mu]]), \
-					np.array([[0, mu / 2.0, mu / 2.0, mu / 2.0, inf, mu], \
-						[mu / 2.0, mu, mu, mu, inf, 3.0 / 2.0 * mu], \
-						[mu / 2.0, mu, mu, mu, inf, 3.0 / 2.0 * mu], \
-						[inf, inf, inf, inf, mu, inf], \
-						[mu / 2.0, mu, mu, mu, inf, 3.0 / 2.0 * mu], \
-						[mu, 3.0 / 2.0 * mu, 3.0 / 2.0 * mu, 3.0 / 2.0 * mu, inf, 2.0 * mu]])]
 	elif model == "1NN" or model == "2NN" or model == "3NN" or model == "4NN" or model == "5NN":
 		var_1NN_0 = 0
 		var_1NN_mu = m_par[0] / neigbours
@@ -1162,61 +1122,6 @@ def build_matrix (calc, temp, m_par):
 						[0, var_1NN_mu, var_3NN, var_3NN, var_2NN_0, inf, inf, var_2NN_0], \
 						[0, var_2NN_mu, var_3NN, var_4NN, var_3NN, var_1NN_0, inf, var_1NN_0], \
 						[0, var_1NN_mu, var_2NN_0, var_3NN, var_3NN, var_2NN_0, inf, inf]])]
-	elif model == "qstate":
-		mu = m_par[0] / 6
-		c = m_par[1]
-		n = m_par[2]
-		epsilon = m_par[3]
-		delta = m_par[4]
-		matrixes = []
-		#right-up
-		anglesi = [(i - radians(60)) for i in np.arange(0, 2.0 * pi, 2.0 * pi / n)]
-		anglesj = [(i + pi - radians(60)) for i in np.arange(0, 2.0 * pi, 2.0 * pi / n)]
-		matrix = [[0, ] + [mu, ] * n]
-		for alpha_i in anglesi:
-			line = [mu, ]
-			for alpha_j in anglesj:
-				uij = 0
-				for k in range(c):
-					for l in range (c):
-						if (cos(alpha_i - 2 * pi * k / c) > 0) and (cos(alpha_j - 2 * pi * l / c) > 0):
-							uij += epsilon * cos(alpha_i - 2 * pi * k / c) ** 2 * cos(alpha_j - 2 * pi * l / c) ** 2
-				uij += delta
-				line.append(-uij + 2.0 * mu)
-			matrix.append(line)
-		matrixes.append(np.array(matrix))
-		#right
-		anglesi = [i for i in np.arange(0, 2.0 * pi, 2.0 * pi / n)]
-		anglesj = [(i - pi) for i in np.arange(0, 2.0 * pi, 2.0 * pi / n)]
-		matrix = [[0, ] + [mu, ] * n]
-		for alpha_i in anglesi:
-			line = [mu, ]
-			for alpha_j in anglesj:
-				uij = 0
-				for k in range(c):
-					for l in range (c):
-						if (cos(alpha_i - 2 * pi * k / c) > 0) and (cos(alpha_j - 2 * pi * l / c) > 0):
-							uij += epsilon * cos(alpha_i - 2 * pi * k / c) ** 2 * cos(alpha_j - 2 * pi * l / c) ** 2
-				uij += delta
-				line.append(-uij + 2.0 * mu)
-			matrix.append(line)
-		matrixes.append(np.array(matrix))
-		#right-bottom
-		anglesi = [(i + radians(60)) for i in np.arange(0, 2.0 * pi, 2.0 * pi / n)]
-		anglesj = [(i + pi + radians(60)) for i in np.arange(0, 2.0 * pi, 2.0 * pi / n)]
-		matrix = [[0, ] + [mu, ] * n]
-		for alpha_i in anglesi:
-			line = [mu, ]
-			for alpha_j in anglesj:
-				uij = 0
-				for k in range(c):
-					for l in range (c):
-						if (cos(alpha_i - 2 * pi * k / c) > 0) and (cos(alpha_j - 2 * pi * l / c) > 0):
-							uij += epsilon * cos(alpha_i - 2 * pi * k / c) ** 2 * cos(alpha_j - 2 * pi * l / c) ** 2
-				uij += delta
-				line.append(-uij + 2.0 * mu)
-			matrix.append(line)
-		matrixes.append(np.array(matrix))
 
 	for i in range(len(matrixes)):
 		matrixes[i] = matrixes[i] / (calc.constant * temp)
