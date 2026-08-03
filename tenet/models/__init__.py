@@ -59,6 +59,8 @@ from tenet.models import (  # noqa: E402,F401
 	adsorption,
 	exclusion,
 	lattice_gases,
+	long_range,
+	long_range_v,
 	pentacene_2,
 	six_leg,
 	spin,
