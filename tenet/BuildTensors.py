@@ -1,57 +1,24 @@
 import numpy as np
-from itertools import product
 
-from tenet.models import get_model, inf
-
-def identity(dimensions, elements):
-	id = np.zeros((elements, ) * dimensions)
-	for i in range(elements):
-		id[((i, ) * dimensions)] = 1
-	return id
+from tenet.models import get_model
 
 def build_matrix (calc, temp, m_par):
+	"""Boltzmann weight matrices for calc.model, ready for the tensor network.
 
-	model = calc.model
-	neigbours = calc.coord
+	Looks the model up in the registry (see tenet/models/) and applies the
+	epilogue every model shares: divide the energies by R*T and exponentiate.
+
+	Returns (matrixes, first_norm).  first_norm is always 0 - the loop resets it
+	on every pass and nothing ever assigns anything else - but it is still
+	returned because simulate() seeds its running scale with it.
+	"""
+	build = get_model(calc.model)
+	assert (build is not None), "Error! This model is not in the database"
 
 	if len(m_par) < 10:
 		m_par = m_par + [0.0] * (10 - len(m_par))
 
-	models_dict = {
-		"langmuir" : True,
-		"langmuir_m" : True,
-		"binary" : True,
-		"ising" : True,
-		"hard-hexagon" : True,
-		"TLAT" : True,
-		"dimers" : True,
-		"1NN" : True,
-		"2NN" : True,
-		"3NN" : True,
-		"4NN" : True,
-		"5NN" : True,
-		"qstate" : True,
-		"CHD_simple" : True,
-		"Pentacene_model_1_simple" : True,
-		"Pentacene_model_1_complex" : True,
-		"Pentacene_model_2" : True,
-		"Pentacene_model_3" : True,
-		"CHD_complex" : True,
-		"six_leg_test" : True,
-		"dimers_test" : True,
-		"1D_long-range" : True,
-		"2D_long-range" : True,
-		"2D_long-range_V" : True
-	}
-
-	exist = models_dict.get(calc.model)
-	assert (exist is not None), "Error! This model is not in the database"
-
-	#[any],[right, bottom],[right-up, right, right-bottom], [right-up, right, right-bottom, bottom]
-	matrixes = []
-	build = get_model(model)
-	if build is not None:
-		matrixes = build(calc, temp, m_par)
+	matrixes = build(calc, temp, m_par)
 
 	for i in range(len(matrixes)):
 		matrixes[i] = matrixes[i] / (calc.constant * temp)

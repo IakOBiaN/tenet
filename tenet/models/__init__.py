@@ -18,6 +18,13 @@ goes into ``CalcConfig.model``::
 ``temp`` is part of the contract even though most models ignore it - temperature
 normally enters through the epilogue, not the construction.
 
+How many matrices to return, and what each one means, is a convention shared
+with ``build_tensor``: one entry when every bond is equivalent, otherwise
+[right, bottom], or [right-up, right, right-bottom], or [right-up, right,
+right-bottom, bottom], depending on the lattice.  A model may append extra
+weights beyond that - ``langmuir_m`` returns a fourth, rank-3 tensor that the
+``_m`` construction variants read as ``matrixes[-1]``.
+
 A model may write derived configuration back onto ``calc``: ``calc.nodes`` when
 it merges several lattice sites into one tensor, or ``calc.lattice`` when the
 network geometry it produces differs from the one the caller asked for.
