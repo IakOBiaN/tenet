@@ -82,6 +82,30 @@ def test_positional_and_named_access_agree():
     assert (params.mu_A, params.mu_B, params.eps_AA, params.eps_BB) == (1.0, 2.0, 3.0, 4.0)
 
 
+def test_mu_index_is_interchangeable_between_positions_and_names():
+    """A position and a name have to select the same parameter for either m_par form.
+
+    mu_index defaults to 0, so a dict m_par combined with that default used to add
+    a literal 0 key and then be rejected as an undeclared parameter.
+    """
+    calc = ms.CalcConfig()
+    calc.model = "langmuir"
+    calc.metParam = 8
+    calc.iterations = 12
+    kw = dict(coverage=True)
+
+    reference = ms.thermodynamics(calc, 120.0, [4.0, 4.0], **kw)["coverage"]
+    variants = {
+        "dict, default mu_index": ({"mu": 4.0, "eps": 4.0}, {}),
+        "dict, named mu_index": ({"mu": 4.0, "eps": 4.0}, {"mu_index": "mu"}),
+        "dict, positional mu_index": ({"mu": 4.0, "eps": 4.0}, {"mu_index": 0}),
+        "list, named mu_index": ([4.0, 4.0], {"mu_index": "mu"}),
+    }
+    for name, (m_par, extra) in variants.items():
+        got = ms.thermodynamics(calc, 120.0, m_par, **kw, **extra)["coverage"]
+        assert got == reference, name
+
+
 def test_thermodynamics_accepts_named_parameters():
     calc = ms.CalcConfig()
     calc.model = "langmuir"

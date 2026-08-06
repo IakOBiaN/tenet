@@ -3,6 +3,7 @@ from math import log
 import numpy as np
 import tenet.TensorNetworks as tn
 import tenet.BuildTensors as bt
+from tenet.models import get_params
 
 class CalcConfig:
 
@@ -109,15 +110,24 @@ def simulate(calc, T = 1.0, m_par = None):
 		norm = 1
 	return (scale + log(norm)) / (nodes / (calc.constant * T))
 
-def _shifted(m_par, keys, delta):
-	"""Copy m_par with delta added to each of keys (positions, or names for a dict)."""
+def _shifted(m_par, keys, delta, names):
+	"""Copy m_par with delta added to each of keys.
+
+	A key may be a position or a parameter name whichever form m_par takes: the
+	model's declared order translates between them, so mu_index = 0 and
+	mu_index = "mu" mean the same thing for a dict as for a list.
+	"""
 	if isinstance(m_par, dict):
 		shifted = dict(m_par)
 		for key in keys:
+			if isinstance(key, int):
+				key = names[key]
 			shifted[key] = shifted.get(key, 0.0) + delta
 	else:
 		shifted = list(m_par)
 		for key in keys:
+			if isinstance(key, str):
+				key = names.index(key)
 			shifted[key] += delta
 	return shifted
 
@@ -165,8 +175,9 @@ def thermodynamics(calc, T = 1.0, m_par = None, *, coverage = False, susceptibil
 		result["grand_potential"] = center
 
 	if need_mu:
-		omega_mu_minus = simulate(calc, T, _shifted(m_par, mu_indices, -dmu))
-		omega_mu_plus = simulate(calc, T, _shifted(m_par, mu_indices, dmu))
+		names = get_params(calc.model) or ()
+		omega_mu_minus = simulate(calc, T, _shifted(m_par, mu_indices, -dmu, names))
+		omega_mu_plus = simulate(calc, T, _shifted(m_par, mu_indices, dmu, names))
 		if coverage:
 			result["coverage"] = -(omega_mu_minus - omega_mu_plus) / (2.0 * dmu)
 		if susceptibility:
