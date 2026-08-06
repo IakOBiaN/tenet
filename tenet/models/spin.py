@@ -6,7 +6,7 @@ import numpy as np
 from tenet.models import register
 
 
-@register("ising")
+@register("ising", params = ["h", "J"])
 def ising(calc, temp, m_par):
 	"""Two-dimensional Ising model.
 
@@ -17,7 +17,7 @@ def ising(calc, temp, m_par):
 	return matrixes
 
 
-@register("TLAT")
+@register("TLAT", params = ["mu", "e_1", "e_2", "e_3"])
 def tlat(calc, temp, m_par):
 	"""TLAT: four-state model with three interaction constants.
 
@@ -28,7 +28,7 @@ def tlat(calc, temp, m_par):
 	return matrixes
 
 
-@register("qstate")
+@register("qstate", params = ["mu", "c", "n", "epsilon", "delta"])
 def qstate(calc, temp, m_par):
 	"""Orientational model with n discrete orientations per site.
 

@@ -4,7 +4,7 @@ import numpy as np
 from tenet.models import inf, register
 
 
-@register("langmuir")
+@register("langmuir", params = ["mu", "eps"])
 def langmuir(calc, temp, m_par):
 	"""Langmuir lattice gas: one particle per site, nearest-neighbour interaction.
 
@@ -15,7 +15,7 @@ def langmuir(calc, temp, m_par):
 	return matrixes
 
 
-@register("langmuir_m")
+@register("langmuir_m", params = ["mu", "eps", "eps_multi"])
 def langmuir_m(calc, temp, m_par):
 	"""Langmuir gas with an added three-particle interaction.
 
@@ -31,7 +31,7 @@ def langmuir_m(calc, temp, m_par):
 	return matrixes
 
 
-@register("binary")
+@register("binary", params = ["mu_A", "mu_B", "eps_AA", "eps_BB"])
 def binary(calc, temp, m_par):
 	"""Two-component (A/B) lattice gas.
 
@@ -46,7 +46,7 @@ def binary(calc, temp, m_par):
 	return matrixes
 
 
-@register("hard-hexagon")
+@register("hard-hexagon", params = ["mu"])
 def hard_hexagon(calc, temp, m_par):
 	"""Hard hexagon model: neighbouring sites cannot both be occupied.
 
@@ -57,7 +57,7 @@ def hard_hexagon(calc, temp, m_par):
 	return matrixes
 
 
-@register("dimers")
+@register("dimers", params = ["mu", "e_dimer"])
 def dimers(calc, temp, m_par):
 	"""Dimers on a honeycomb lattice, five states per site.
 
@@ -82,7 +82,7 @@ def dimers(calc, temp, m_par):
 	return matrixes
 
 
-@register("dimers_test")
+@register("dimers_test", params = ["mu"])
 def dimers_test(calc, temp, m_par):
 	"""Six-state dimer variant kept as a cross-check of the dimers construction.
 

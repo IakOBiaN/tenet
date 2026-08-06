@@ -6,7 +6,7 @@ import numpy as np
 from tenet.models import inf, register
 
 
-@register("six_leg_test")
+@register("six_leg_test", params = ["mu_TPB", "mu_Cu", "w2", "w3", "w3_1", "w4", "eps"])
 def six_leg_test(calc, temp, m_par):
 	"""TPB + Cu co-adsorption, built directly as a rank-6 tensor.
 

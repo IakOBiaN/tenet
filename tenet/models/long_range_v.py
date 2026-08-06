@@ -6,7 +6,7 @@ import numpy as np
 from tenet.models import inf, register
 
 
-@register("2D_long-range_V")
+@register("2D_long-range_V", params = ["mu", "sigma_eps"])
 def two_dim_long_range_v(calc, temp, m_par):
 	"""As 2D_long-range, but the interaction follows from the particle shape.
 

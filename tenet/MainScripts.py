@@ -109,6 +109,18 @@ def simulate(calc, T = 1.0, m_par = None):
 		norm = 1
 	return (scale + log(norm)) / (nodes / (calc.constant * T))
 
+def _shifted(m_par, keys, delta):
+	"""Copy m_par with delta added to each of keys (positions, or names for a dict)."""
+	if isinstance(m_par, dict):
+		shifted = dict(m_par)
+		for key in keys:
+			shifted[key] = shifted.get(key, 0.0) + delta
+	else:
+		shifted = list(m_par)
+		for key in keys:
+			shifted[key] += delta
+	return shifted
+
 def thermodynamics(calc, T = 1.0, m_par = None, *, coverage = False, susceptibility = False,
 		entropy = False, heat_capacity = False, mu_index = 0, dmu = 1e-3, dT = 1e-3):
 	"""Compute the requested thermodynamic observables.
@@ -126,7 +138,9 @@ def thermodynamics(calc, T = 1.0, m_par = None, *, coverage = False, susceptibil
 	mu_index selects which chemical potential in m_par is differentiated; it may
 	be a single index or a list of indices that are shifted together (the total
 	coverage / susceptibility with respect to several chemical potentials, which
-	the multi-component adsorption models need).
+	the multi-component adsorption models need).  When m_par is a dict keyed by
+	the model's declared parameter names, mu_index takes those names instead:
+	mu_index = ["mu_2", "mu_3", "mu_4"] rather than [0, 1, 2].
 
 	Returns a dict mapping each requested observable to its value; grand_potential
 	(= Omega(mu0, T0)) is included whenever a second derivative is requested.
@@ -134,7 +148,7 @@ def thermodynamics(calc, T = 1.0, m_par = None, *, coverage = False, susceptibil
 	if m_par is None:
 		m_par = [0.0] * 10
 
-	if isinstance(mu_index, int):
+	if isinstance(mu_index, (int, str)):
 		mu_indices = [mu_index]
 	else:
 		mu_indices = list(mu_index)
@@ -151,13 +165,8 @@ def thermodynamics(calc, T = 1.0, m_par = None, *, coverage = False, susceptibil
 		result["grand_potential"] = center
 
 	if need_mu:
-		mu_minus = m_par[:]
-		mu_plus = m_par[:]
-		for j in mu_indices:
-			mu_minus[j] -= dmu
-			mu_plus[j] += dmu
-		omega_mu_minus = simulate(calc, T, mu_minus)
-		omega_mu_plus = simulate(calc, T, mu_plus)
+		omega_mu_minus = simulate(calc, T, _shifted(m_par, mu_indices, -dmu))
+		omega_mu_plus = simulate(calc, T, _shifted(m_par, mu_indices, dmu))
 		if coverage:
 			result["coverage"] = -(omega_mu_minus - omega_mu_plus) / (2.0 * dmu)
 		if susceptibility:

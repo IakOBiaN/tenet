@@ -6,7 +6,7 @@ import numpy as np
 from tenet.models import inf, register
 
 
-@register("1D_long-range")
+@register("1D_long-range", params = ["mu", "interactions", "mean_field"])
 def one_dim_long_range(calc, temp, m_par):
 	"""Chain with interactions out to the r-th neighbour.
 
@@ -64,7 +64,7 @@ def one_dim_long_range(calc, temp, m_par):
 	return matrixes
 
 
-@register("2D_long-range")
+@register("2D_long-range", params = ["mu", "interactions", "mean_field"])
 def two_dim_long_range(calc, temp, m_par):
 	"""Triangular lattice with interactions out to the third neighbour.
 

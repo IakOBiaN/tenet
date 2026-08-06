@@ -4,11 +4,11 @@ import numpy as np
 from tenet.models import inf, register
 
 
-@register("1NN")
-@register("2NN")
-@register("3NN")
-@register("4NN")
-@register("5NN")
+@register("1NN", params = ["mu"])
+@register("2NN", params = ["mu"])
+@register("3NN", params = ["mu"])
+@register("4NN", params = ["mu"])
+@register("5NN", params = ["mu"])
 def exclusion_series(calc, temp, m_par):
 	"""Lattice gas that forbids every neighbour shell closer than the k-th.
 

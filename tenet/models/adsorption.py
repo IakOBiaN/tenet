@@ -6,7 +6,11 @@ import numpy as np
 from tenet.models import inf, register
 
 
-@register("CHD_simple")
+@register("CHD_simple", params = [
+	"mu_t_sigma", "mu_d_sigma",
+	"e_d_d_in", "e_d_t_in", "e_t_t_in",
+	"e_d_d_out", "e_d_t_out", "e_t_t_out",
+])
 def chd_simple(calc, temp, m_par):
 	"""1,4-cyclohexadiene on Si(001)-(2x1), simple variant.
 
@@ -35,7 +39,13 @@ def chd_simple(calc, temp, m_par):
 	return matrixes
 
 
-@register("CHD_complex")
+@register("CHD_complex", params = [
+	"mu_t_sigma", "mu_d_sigma",
+	"e_d_d_hor_same", "e_d_d_hor_dif_in", "e_d_d_hor_dif_out",
+	"e_d_t_hor_in", "e_d_t_hor_out", "e_t_t_hor",
+	"e_d_d_vert_same", "e_d_d_vert_dif",
+	"e_d_t_vert_in", "e_d_t_vert_out", "e_t_t_vert",
+])
 def chd_complex(calc, temp, m_par):
 	"""1,4-cyclohexadiene on Si(001)-(2x1), extended state space.
 
@@ -72,7 +82,7 @@ def chd_complex(calc, temp, m_par):
 	return matrixes
 
 
-@register("Pentacene_model_1_simple")
+@register("Pentacene_model_1_simple", params = ["mu", "e_close", "e_one", "e_two"])
 def pentacene_model_1_simple(calc, temp, m_par):
 	"""Pentacene on Si(001)-2x1, model 1, simple variant: 5 states, 3 merged sites.
 
@@ -163,7 +173,10 @@ def pentacene_model_1_simple(calc, temp, m_par):
 	return matrixes
 
 
-@register("Pentacene_model_1_complex")
+@register("Pentacene_model_1_complex", params = [
+	"mu_pentacene_per", "mu_pentacene_par",
+	"e_1", "e_2", "e_3", "e_4", "e_5", "e_6", "e_7", "e_8", "e_9", "e_10", "e_11", "e_12",
+])
 def pentacene_model_1_complex(calc, temp, m_par):
 	"""Pentacene on Si(001)-2x1, model 1, extended: 9 states, 3 merged sites.
 
@@ -286,7 +299,12 @@ def pentacene_model_1_complex(calc, temp, m_par):
 	return matrixes
 
 
-@register("Pentacene_model_3")
+@register("Pentacene_model_3", params = [
+	"mu_pentacene_per", "mu_pentacene_par",
+	"e_v1", "e_v2", "e_v3", "e_v4", "e_v5", "e_v6", "e_v7",
+	"e_h1", "e_h2", "e_h3", "e_h4",
+	"e_v8", "e_v9",
+])
 def pentacene_model_3(calc, temp, m_par):
 	"""Pentacene on Si(001)-2x1, model 3.
 

@@ -6,7 +6,15 @@ import numpy as np
 from tenet.models import inf, register
 
 
-@register("Pentacene_model_2")
+@register("Pentacene_model_2", params = [
+	"mu_2", "mu_3", "mu_4",
+	"e_44_1", "e_44_2", "e_44_3",
+	"e_22_1", "e_22_2", "e_22_3", "e_22_4", "e_22_5", "e_22_6", "e_22_7", "e_22_8", "e_22_9",
+	"e_33_1", "e_33_2", "e_33_3", "e_33_4", "e_33_5", "e_33_6", "e_33_7", "e_33_8", "e_33_9",
+	"e_24_1", "e_24_2", "e_24_3", "e_24_4", "e_24_5", "e_24_6",
+	"e_34_1", "e_34_2", "e_34_3", "e_34_4", "e_34_5", "e_34_6",
+	"e_23_1", "e_23_2", "e_23_3", "e_23_4", "e_23_5", "e_23_6", "e_23_7", "e_23_8", "e_23_9", "e_23_10", "e_23_11", "e_23_12",
+])
 def pentacene_model_2(calc, temp, m_par):
 	"""Pentacene model 2: 15 states over 3 merged sites, 48 parameters.
 
