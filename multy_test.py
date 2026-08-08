@@ -1,7 +1,6 @@
 import tenet.MainScripts as ms
-import timeit
+from tenet.sweep import run_sweep
 
-start_time = timeit.default_timer()
 
 calc = ms.CalcConfig()
 
@@ -30,21 +29,18 @@ w4 = -37.7 - 3.0 * eps
 mu_TPB = 6.0"""
 
 #fff = open("an_calc_prov.dat", "w")
-coverage_res = []
-for T in ms.np.arange(300, 1000.01, 100):
-	m_par = [mu_TPB, mu_Cu, w2, w3, w3_1, w4, eps]
-	obs = ms.thermodynamics(calc, T, m_par, coverage = True, mu_index = [0, 1], dmu = 1e-1)
-	calc_time = timeit.default_timer() - start_time
-	coverage_res.append(obs["coverage"])
-	print(T, obs["coverage"])
-	#print(mu_TPB, result[0], file = fff, flush = True)
-#fff.close()
+
 etalon_coverage = [0.666830385986863, 0.6677578428100706, 0.6700237836368839, 0.6736219881364036, 0.6780650915418285, 0.68272407905412, 0.6874497260243384, 0.6907369973878019]
 
-etalon_coverage = ms.np.array(etalon_coverage)
-coverage_res = ms.np.array(coverage_res)
-difference = sum(ms.np.abs(coverage_res - etalon_coverage))
-
-assert difference < 0.5, "ERROR! Test multy_test.py is broken now!"
-print("Test multy_test.py is", end = "")
-print("\033[92m {}\033[00m" .format("OK"), "!", sep = "")
+run_sweep(
+	calc,
+	ms.np.arange(300, 1000.01, 100),
+	T = lambda T: T,
+	m_par = lambda T: {"mu_TPB": mu_TPB, "mu_Cu": mu_Cu, "w2": w2, "w3": w3,
+			"w3_1": w3_1, "w4": w4, "eps": eps},
+	observables = ("coverage", ),
+	mu_index = ["mu_TPB", "mu_Cu"],
+	dmu = 1e-1,
+	show_time = False,
+	etalon = etalon_coverage,
+)

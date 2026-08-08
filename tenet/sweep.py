@@ -48,31 +48,33 @@ def run_sweep(calc, values, *, T, m_par, observables = ("coverage", ),
 	"""
 	if label is None:
 		label = Path(inspect.stack()[1].filename).name
-	compare = compare or observables[0]
-	if compare not in observables:
+	#an empty observables list means the sweep wants the grand potential itself,
+	#so simulate() is called directly and no derivatives are taken
+	columns = tuple(observables) or ("lnZ", )
+	compare = compare or columns[0]
+	if compare not in columns:
 		raise ValueError("compare=" + repr(compare) + " is not among the requested observables")
 
 	requested = {name: True for name in observables if name != "grand_potential"}
-	collected = {name: [] for name in observables}
+	collected = {name: [] for name in columns}
 
 	if header is True:
-		print("Parameter", *observables, *(["Time"] if show_time else []))
+		print("Parameter", *columns, *(["Time"] if show_time else []))
 	elif header:
 		print(*header)
 
 	start = timeit.default_timer()
 	for value in values:
-		obs = ms.thermodynamics(
-			calc,
-			T(value) if callable(T) else T,
-			m_par(value) if callable(m_par) else m_par,
-			**requested,
-			**thermo_kwargs,
-		)
-		for name in observables:
+		point_T = T(value) if callable(T) else T
+		point_par = m_par(value) if callable(m_par) else m_par
+		if observables:
+			obs = ms.thermodynamics(calc, point_T, point_par, **requested, **thermo_kwargs)
+		else:
+			obs = {"lnZ": ms.simulate(calc, point_T, point_par)}
+		for name in columns:
 			collected[name].append(obs.get(name, 0.0))
 		if not quiet:
-			row = [value] + [obs.get(name, 0.0) for name in observables]
+			row = [value] + [obs.get(name, 0.0) for name in columns]
 			if show_time:
 				row.append(timeit.default_timer() - start)
 			print(*row)
