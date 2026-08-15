@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tenet"
+version = "1.0.0"
+description = "Tensor network renormalization for the thermodynamics of lattice models"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [{ name = "Sergey Akimenko", email = "iakobian@gmail.com" }]
+keywords = [
+    "tensor networks",
+    "renormalization group",
+    "lattice models",
+    "statistical mechanics",
+    "adsorption",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+dependencies = ["numpy", "scipy"]
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[project.urls]
+Repository = "https://github.com/IakOBiaN/tenet"
+
+[tool.setuptools]
+packages = ["tenet", "tenet.models"]

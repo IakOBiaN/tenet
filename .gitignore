@@ -32,3 +32,8 @@
 *.pyc
 __pycache__/
 .pytest_cache/
+
+# Packaging
+build/
+dist/
+*.egg-info/

@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+title: "TeNeT: Tensor Network Thermodynamics"
+message: "If you use this software, please cite the article under preferred-citation."
+type: software
+version: 1.0.0
+license: MIT
+repository-code: "https://github.com/IakOBiaN/tenet"
+abstract: >-
+  Tensor network renormalization for the statistical mechanics of lattice models.
+  Computes the grand potential per site through several renormalization-group
+  schemes (TRG, BTRG, HOTRG, transfer matrix, hierarchical lattices) and derives
+  thermodynamic observables from it. The main application is adsorption of
+  molecules on surfaces.
+keywords:
+  - tensor networks
+  - renormalization group
+  - lattice models
+  - statistical mechanics
+  - adsorption
+authors:
+  - family-names: Akimenko
+    given-names: Sergey
+    email: iakobian@gmail.com
+preferred-citation:
+  type: article
+  title: "Tensor network construction for lattice gas models: Hard-core and triangular lattice models"
+  authors:
+    - family-names: Akimenko
+      given-names: Sergey
+  journal: "Physical Review E"
+  volume: 107
+  issue: 5
+  start: "054116"
+  year: 2023
+  doi: 10.1103/PhysRevE.107.054116

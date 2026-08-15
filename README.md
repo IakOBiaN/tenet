@@ -59,7 +59,7 @@ it, so they double as regression tests.
 - `matplotlib` (only for `Additional/TRG_code_for_registration.py`)
 
 ```bash
-pip install -r requirements.txt   # numpy, scipy, pytest
+pip install -e ".[test]"           # the package plus pytest
 pip install matplotlib            # only for Additional/TRG_code_for_registration.py
 ```
 
